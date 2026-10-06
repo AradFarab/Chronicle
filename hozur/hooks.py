@@ -170,6 +170,9 @@ AUDITED_DOCTYPES = [
 	"Department",
 	"Designation",
 	"Employee",
+	"Attendance Device",
+	"Device User Map",
+	"Punch Import Template",
 ]
 
 doc_events = {
@@ -185,8 +188,16 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
+	"cron": {
+		# each device is read at its own interval (Attendance Device.polling_interval_minutes)
+		"* * * * *": ["hozur.devices.service.poll_devices"],
+	},
 	"daily": ["hozur.calendar_sync.warn_predicted_next_year"],
 }
+
+# Device adapters contributed by other apps: dotted module paths whose import registers a
+# hozur.devices.base.DeviceAdapter subclass with @register.
+hozur_device_adapters = []
 
 # Testing
 # -------

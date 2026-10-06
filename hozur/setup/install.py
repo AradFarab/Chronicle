@@ -6,15 +6,26 @@ from hozur.setup.data import ROLES, ROOT_DEPARTMENT
 
 def after_install():
 	set_system_defaults()
+	ensure_settings()
 	ensure_roles()
 	ensure_root_department()
 	install_calendar()
 
 
 def after_migrate():
+	ensure_settings()
 	ensure_roles()
 	ensure_root_department()
 	install_calendar()
+
+
+def ensure_settings():
+	"""Save single doctypes once so their field defaults exist in the database."""
+	for doctype in ("Hozur Settings",):
+		if not frappe.db.exists("Singles", {"doctype": doctype}):
+			doc = frappe.get_single(doctype)
+			doc.flags.ignore_permissions = doc.flags.skip_audit = True
+			doc.save()
 
 
 def set_system_defaults():

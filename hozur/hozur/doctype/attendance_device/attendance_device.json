@@ -1,0 +1,290 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:device_name",
+ "creation": "2026-10-06 17:56:58.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "device_name",
+  "adapter_type",
+  "branch",
+  "column_break_enabled",
+  "enabled",
+  "direction_mode",
+  "section_connection",
+  "host",
+  "port",
+  "comm_key",
+  "column_break_connection",
+  "polling_interval_minutes",
+  "timeout_seconds",
+  "use_udp",
+  "section_status",
+  "last_sync",
+  "last_sync_status",
+  "punches_last_sync",
+  "last_punch_timestamp",
+  "column_break_status",
+  "last_error",
+  "section_info",
+  "model",
+  "serial_number",
+  "firmware",
+  "last_health_check",
+  "column_break_info",
+  "user_count",
+  "record_count",
+  "record_capacity",
+  "clock_drift_seconds"
+ ],
+ "fields": [
+  {
+   "fieldname": "device_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Device Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "ZKTeco",
+   "fieldname": "adapter_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Device Type",
+   "options": "ZKTeco\nFile Import",
+   "reqd": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "column_break_enabled",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "default": "From Device",
+   "description": "Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Ignore: punches are then paired by order.",
+   "fieldname": "direction_mode",
+   "fieldtype": "Select",
+   "label": "Punch Direction",
+   "options": "From Device\nAlways In\nAlways Out\nIgnore (Pair by Order)",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.adapter_type!='File Import'",
+   "fieldname": "section_connection",
+   "fieldtype": "Section Break",
+   "label": "Connection"
+  },
+  {
+   "description": "e.g. 192.168.1.201",
+   "fieldname": "host",
+   "fieldtype": "Data",
+   "label": "IP Address",
+   "mandatory_depends_on": "eval:doc.adapter_type!='File Import'"
+  },
+  {
+   "default": "4370",
+   "fieldname": "port",
+   "fieldtype": "Int",
+   "label": "Port",
+   "mandatory_depends_on": "eval:doc.adapter_type!='File Import'"
+  },
+  {
+   "description": "Device communication password (Menu > Comm. > Comm Key). Leave empty if not set.",
+   "fieldname": "comm_key",
+   "fieldtype": "Password",
+   "label": "Comm Key"
+  },
+  {
+   "fieldname": "column_break_connection",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "5",
+   "fieldname": "polling_interval_minutes",
+   "fieldtype": "Int",
+   "label": "Read Every (Minutes)",
+   "mandatory_depends_on": "eval:doc.adapter_type!='File Import'"
+  },
+  {
+   "default": "10",
+   "fieldname": "timeout_seconds",
+   "fieldtype": "Int",
+   "label": "Timeout (Seconds)"
+  },
+  {
+   "description": "Only for older firmware",
+   "fieldname": "use_udp",
+   "fieldtype": "Check",
+   "label": "Use UDP"
+  },
+  {
+   "depends_on": "eval:doc.adapter_type!='File Import'",
+   "fieldname": "section_status",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "fieldname": "last_sync",
+   "fieldtype": "Data",
+   "label": "Last Read",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_sync_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Last Read Status",
+   "no_copy": 1,
+   "options": "\nOK\nError",
+   "read_only": 1
+  },
+  {
+   "fieldname": "punches_last_sync",
+   "fieldtype": "Int",
+   "label": "New Punches in Last Read",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "description": "Raw device time of the newest punch read; the next read continues from here",
+   "fieldname": "last_punch_timestamp",
+   "fieldtype": "Datetime",
+   "label": "Latest Punch (Device Clock)",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_status",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_error",
+   "fieldtype": "Small Text",
+   "label": "Last Error",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:doc.adapter_type!='File Import'",
+   "fieldname": "section_info",
+   "fieldtype": "Section Break",
+   "label": "Device Information"
+  },
+  {
+   "fieldname": "model",
+   "fieldtype": "Data",
+   "label": "Model",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "serial_number",
+   "fieldtype": "Data",
+   "label": "Serial Number",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "firmware",
+   "fieldtype": "Data",
+   "label": "Firmware",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_health_check",
+   "fieldtype": "Data",
+   "label": "Last Connection Test",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_info",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "user_count",
+   "fieldtype": "Int",
+   "label": "Users on Device",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "record_count",
+   "fieldtype": "Int",
+   "label": "Log Records on Device",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "record_capacity",
+   "fieldtype": "Int",
+   "label": "Log Capacity",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "description": "Device clock minus server clock",
+   "fieldname": "clock_drift_seconds",
+   "fieldtype": "Int",
+   "label": "Clock Difference (Seconds)",
+   "no_copy": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-06 17:56:58.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Attendance Device",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
