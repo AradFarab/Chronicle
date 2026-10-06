@@ -111,6 +111,7 @@ def set_system_defaults():
 	settings = frappe.get_single("System Settings")
 	settings.time_zone = "Asia/Tehran"
 	settings.country = settings.country or "Iran"
+	settings.language = "fa"  # Persian-first: the desk and the PWA speak Persian, right to left
 	settings.flags.ignore_mandatory = True
 	settings.save()
 
