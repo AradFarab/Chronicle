@@ -96,7 +96,8 @@ app_license = "gpl-3.0"
 # ------------
 
 # before_install = "hozur.install.before_install"
-# after_install = "hozur.install.after_install"
+after_install = "hozur.setup.install.after_install"
+after_migrate = "hozur.setup.install.after_migrate"
 
 # Uninstallation
 # ------------
@@ -142,46 +143,50 @@ app_license = "gpl-3.0"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+# Role + department subtree (hozur.permissions). Doctypes with an `employee` field are
+# added to EMPLOYEE_SCOPED_DOCTYPES as they are built.
+EMPLOYEE_SCOPED_DOCTYPES = []
+
+permission_query_conditions = {
+	"Employee": "hozur.permissions.employee_query",
+	**{dt: "hozur.permissions.employee_condition" for dt in EMPLOYEE_SCOPED_DOCTYPES},
+}
+
+has_permission = {
+	"Employee": "hozur.permissions.has_employee_doc_permission",
+	**{dt: "hozur.permissions.has_employee_permission" for dt in EMPLOYEE_SCOPED_DOCTYPES},
+}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+# Configured records write an append-only Audit Entry on every change (hozur.audit).
+AUDITED_DOCTYPES = [
+	"Iran Holiday",
+	"Hozur Settings",
+	"Organization",
+	"Branch",
+	"Department",
+	"Designation",
+	"Employee",
+]
+
+doc_events = {
+	dt: {
+		"validate": "hozur.audit.require_reason",
+		"on_update": "hozur.audit.on_update",
+		"on_trash": "hozur.audit.on_trash",
+	}
+	for dt in AUDITED_DOCTYPES
+}
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"hozur.tasks.all"
-# 	],
-# 	"daily": [
-# 		"hozur.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"hozur.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"hozur.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"hozur.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"daily": ["hozur.calendar_sync.warn_predicted_next_year"],
+}
 
 # Testing
 # -------
@@ -217,7 +222,8 @@ app_license = "gpl-3.0"
 # Ignore links to specified DocTypes when deleting documents
 # -----------------------------------------------------------
 
-# ignore_links_on_delete = ["Communication", "ToDo"]
+# The audit trail outlives the documents it describes and must never block a delete.
+ignore_links_on_delete = ["Audit Entry"]
 
 # Request Events
 # ----------------
