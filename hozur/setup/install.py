@@ -1,7 +1,8 @@
 import frappe
 
 from hozur.calendar_sync import install_calendar
-from hozur.setup.data import DEFAULT_PROCESSES, ROLES, ROOT_DEPARTMENT, STANDARD_PROCESSES
+from hozur.rule_sets import seed_baseline
+from hozur.setup.data import DEFAULT_PROCESSES, LEAVE_TYPES, ROLES, ROOT_DEPARTMENT, STANDARD_PROCESSES
 
 
 def after_install():
@@ -11,6 +12,8 @@ def after_install():
 	ensure_root_department()
 	install_calendar()
 	ensure_approval_processes()
+	seed_baseline()
+	ensure_leave_types()
 
 
 def after_migrate():
@@ -19,6 +22,29 @@ def after_migrate():
 	ensure_root_department()
 	install_calendar()
 	ensure_approval_processes()
+	seed_baseline()
+	ensure_leave_types()
+
+
+def ensure_leave_types():
+	for name, category, paid, deducts, hourly, rule_limit, once in LEAVE_TYPES:
+		if frappe.db.exists("Leave Type", name):
+			continue
+		doc = frappe.get_doc(
+			{
+				"doctype": "Leave Type",
+				"leave_type_name": name,
+				"category": category,
+				"is_paid": paid,
+				"deducts_from_balance": deducts,
+				"allow_hourly": hourly,
+				"rule_limit": rule_limit,
+				"once_in_service": once,
+				"is_standard": 1,
+			}
+		)
+		doc.flags.skip_audit = True
+		doc.insert(ignore_permissions=True)
 
 
 def ensure_approval_processes():

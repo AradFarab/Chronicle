@@ -142,7 +142,11 @@ class ApprovableRequest(Document):
 
 	def before_submit(self):
 		self.validate_requester()
+		self.check_period_open()
 		self.build_approval_steps()
+
+	def before_cancel(self):
+		self.check_period_open()
 
 	def build_approval_steps(self):
 		process_name = get_process(self.employee, self.get_request_type(), bool(self.entered_by_operator))
@@ -189,11 +193,12 @@ class ApprovableRequest(Document):
 			self.on_approved()
 
 	def on_cancel(self):
+		previous = self.status
 		self.status = "Cancelled"
 		self.pending_approver = self.pending_approver_user = None
 		self.db_set({"status": "Cancelled", "pending_approver": None, "pending_approver_user": None})
 		audit.log(self.doctype, self.name, "Cancel")
-		self.on_cancelled()
+		self.on_cancelled(previous)
 
 	# approval actions --------------------------------------------------------
 
@@ -242,14 +247,22 @@ class ApprovableRequest(Document):
 			self.on_approved()
 
 	def check_period_open(self):
-		"""Overridden once Attendance Period exists (period lock)."""
+		"""Nothing inside a closed period changes (CLAUDE.md rule 9)."""
+		from hozur.periods import assert_range_open
+
+		start, end = self.affected_range()
+		assert_range_open(start, end)
 
 	# hooks for concrete requests ---------------------------------------------
+
+	def affected_range(self) -> tuple[str, str]:
+		"""First and last Jalali day the request touches."""
+		raise NotImplementedError
 
 	def on_approved(self):
 		pass
 
-	def on_cancelled(self):
+	def on_cancelled(self, previous_status: str):
 		pass
 
 

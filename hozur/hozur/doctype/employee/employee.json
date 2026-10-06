@@ -26,12 +26,16 @@
   "department",
   "designation",
   "reports_to",
+  "section_overtime",
+  "overtime_consent_on_file",
+  "overtime_consent_date",
   "section_privacy",
   "birth_date",
   "column_break_privacy",
   "biometric_consent_date",
   "biometric_consent_file",
-  "uses_card_instead_of_biometrics"
+  "uses_card_instead_of_biometrics",
+  "nursing_until"
  ],
  "fields": [
   {
@@ -170,6 +174,24 @@
    "options": "Employee"
   },
   {
+   "fieldname": "section_overtime",
+   "fieldtype": "Section Break",
+   "label": "Overtime"
+  },
+  {
+   "description": "Article 59: with a signed general consent, extra work counts as overtime (up to the daily cap) without a request per day",
+   "fieldname": "overtime_consent_on_file",
+   "fieldtype": "Check",
+   "label": "Written Overtime Consent on File"
+  },
+  {
+   "depends_on": "overtime_consent_on_file",
+   "description": "Jalali date, e.g. 1405/07/14",
+   "fieldname": "overtime_consent_date",
+   "fieldtype": "Data",
+   "label": "Consent Date"
+  },
+  {
    "fieldname": "section_privacy",
    "fieldtype": "Section Break",
    "label": "Restricted",
@@ -204,11 +226,18 @@
    "fieldtype": "Check",
    "label": "Uses Card Instead of Biometrics",
    "permlevel": 1
+  },
+  {
+   "description": "Jalali date, e.g. 1405/07/14. Article 78: half an hour after every 3 hours, counted as work.",
+   "fieldname": "nursing_until",
+   "fieldtype": "Data",
+   "label": "Nursing Breaks Until",
+   "permlevel": 1
   }
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-10-06 17:47:33.000000",
+ "modified": "2026-10-06 18:19:49.000000",
  "modified_by": "Administrator",
  "module": "Hozur",
  "name": "Employee",

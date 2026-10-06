@@ -158,3 +158,17 @@ def display_long(value: str) -> str:
 	"""'1405/07/14' -> 'دوشنبه ۱۴ مهر ۱۴۰۵'."""
 	year, month, day = parse_jdate(value)
 	return f"{WEEKDAY_NAMES[weekday(value)]} {to_persian_digits(day)} {MONTH_NAMES[month - 1]} {to_persian_digits(year)}"
+
+
+_TIME_RE = re.compile(r"^(\d{1,2}):(\d{2})(?::(\d{2}))?$")
+
+
+def normalize_time(value: str) -> str | None:
+	"""'8:05' / '۰۸:۰۵:۰۰' -> '08:05:00'; None when it is not a valid time of day."""
+	m = _TIME_RE.match(to_ascii_digits(str(value or "").strip()))
+	if not m:
+		return None
+	h, mi, s = int(m[1]), int(m[2]), int(m[3] or 0)
+	if h > 23 or mi > 59 or s > 59:
+		return None
+	return f"{h:02d}:{mi:02d}:{s:02d}"

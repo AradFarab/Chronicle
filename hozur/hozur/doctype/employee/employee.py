@@ -17,6 +17,20 @@ def is_valid_national_code(code: str) -> bool:
 	return check == total if total < 2 else check == 11 - total
 
 
+RECALCULATE_ON = (
+	"status",
+	"start_date",
+	"end_date",
+	"branch",
+	"department",
+	"designation",
+	"birth_date",
+	"nursing_until",
+	"overtime_consent_on_file",
+	"overtime_consent_date",
+)
+
+
 class Employee(Document):
 	def validate(self):
 		from hozur.jalali.dates import to_ascii_digits
@@ -53,6 +67,18 @@ class Employee(Document):
 	def on_update(self):
 		if self.user:
 			add_role(self.user, "Hozur Employee")
+		if not self.flags.in_insert and any(self.has_value_changed(f) for f in RECALCULATE_ON):
+			from hozur.attendance import schedule_recalculation
+			from hozur.jalali.dates import iter_days
+			from hozur.utils import today_jalali
+
+			today = today_jalali()
+			start = max(today[:7] + "/01", self.start_date)
+			if start <= today:
+				schedule_recalculation(
+					[(self.name, d) for d in iter_days(start, today)],
+					_("Employee {0} changed").format(self.name),
+				)
 
 
 def add_role(user: str, role: str):

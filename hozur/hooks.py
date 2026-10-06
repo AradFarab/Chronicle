@@ -145,11 +145,11 @@ after_migrate = "hozur.setup.install.after_migrate"
 
 # Role + department subtree (hozur.permissions). Doctypes with an `employee` field are
 # added to EMPLOYEE_SCOPED_DOCTYPES as they are built.
-EMPLOYEE_SCOPED_DOCTYPES = []
+EMPLOYEE_SCOPED_DOCTYPES = ["Daily Attendance", "Leave Ledger Entry", "Shift Override"]
 
 # Requests (hozur.approvals.ApprovableRequest): visible to the employee scope and to the
 # people in their approval chain; listed in the approval inbox.
-hozur_request_doctypes = ["Attendance Correction"]
+hozur_request_doctypes = ["Attendance Correction", "Leave Application", "Mission", "Overtime Request"]
 
 permission_query_conditions = {
 	"Employee": "hozur.permissions.employee_query",
@@ -181,6 +181,13 @@ AUDITED_DOCTYPES = [
 	"Punch Import Template",
 	"Approval Process",
 	"Approval Override",
+	"Labor Rule Set",
+	"Shift",
+	"Work Pattern",
+	"Work Pattern Assignment",
+	"Shift Override",
+	"Leave Type",
+	"Attendance Period",
 ]
 
 doc_events = {
@@ -200,7 +207,7 @@ scheduler_events = {
 		# each device is read at its own interval (Attendance Device.polling_interval_minutes)
 		"* * * * *": ["hozur.devices.service.poll_devices"],
 	},
-	"daily": ["hozur.calendar_sync.warn_predicted_next_year"],
+	"daily": ["hozur.calendar_sync.warn_predicted_next_year", "hozur.attendance.nightly"],
 }
 
 # Device adapters contributed by other apps: dotted module paths whose import registers a

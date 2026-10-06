@@ -1,0 +1,129 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:period",
+ "creation": "2026-10-06 18:19:49.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "period",
+  "jyear",
+  "jmonth",
+  "column_break_status",
+  "status",
+  "closed_by",
+  "closed_on",
+  "section_notes",
+  "note"
+ ],
+ "fields": [
+  {
+   "description": "Jalali month, e.g. 1405/07",
+   "fieldname": "period",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Period",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "jyear",
+   "fieldtype": "Int",
+   "in_standard_filter": 1,
+   "label": "Year",
+   "read_only": 1
+  },
+  {
+   "fieldname": "jmonth",
+   "fieldtype": "Int",
+   "label": "Month",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_status",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nClosed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "closed_by",
+   "fieldtype": "Link",
+   "label": "Closed By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "closed_on",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Closed On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "label": "Note"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-06 18:19:49.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Attendance Period",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Hozur Employee"
+  },
+  {
+   "read": 1,
+   "role": "Hozur Manager"
+  },
+  {
+   "read": 1,
+   "role": "Hozur CEO"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "period",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

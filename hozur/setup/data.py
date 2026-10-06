@@ -59,3 +59,15 @@ DEFAULT_PROCESSES = {
 	"mission_process": MANAGER_THEN_CEO,
 	"correction_process": DIRECT_MANAGER,
 }
+
+# Standard leave types (names are data and editable). category drives the legal behaviour.
+LEAVE_TYPES = (
+	# name, category, paid by employer, deducts from balance, hourly, rule limit, once in service
+	("استحقاقی", "Earned", 1, 1, 1, None, 0),
+	("استعلاجی", "Sick", 0, 0, 0, None, 0),
+	("بدون حقوق", "Unpaid", 0, 0, 1, None, 0),
+	("ازدواج یا فوت بستگان", "Marriage or Bereavement", 1, 0, 0, "marriage_bereavement_leave_days", 0),
+	("حج واجب", "Hajj", 1, 0, 0, "hajj_leave_days", 1),
+	("زایمان", "Maternity", 0, 0, 0, "maternity_leave_days", 0),
+	("پدری (تولد فرزند)", "Paternity", 1, 0, 0, "paternity_leave_days", 0),
+)

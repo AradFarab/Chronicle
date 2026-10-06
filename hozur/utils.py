@@ -52,3 +52,10 @@ def validate_date_order(doc, start_field: str, end_field: str):
 				_(doc.meta.get_label(end_field)), _(doc.meta.get_label(start_field))
 			)
 		)
+
+
+def clear_request_cache():
+	"""Forget values memoized with frappe.utils.caching.request_cache in this request."""
+	cache = getattr(frappe.local, "request_cache", None)
+	if cache is not None:
+		cache.clear()

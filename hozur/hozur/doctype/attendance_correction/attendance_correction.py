@@ -1,27 +1,14 @@
 # Copyright (c) 2026, Arad Farab and contributors
 # For license information, please see license.txt
 
-import re
-
 import frappe
 from frappe import _
 
-from hozur.approvals import ApprovableRequest
+from hozur.approvals import APPROVED, ApprovableRequest
+from hozur.attendance import schedule_recalculation
 from hozur.devices.service import employee_punches
-from hozur.jalali.dates import to_ascii_digits
+from hozur.jalali.dates import normalize_time
 from hozur.utils import clean_jdate, set_year_month, today_jalali
-
-TIME_RE = re.compile(r"^(\d{1,2}):(\d{2})(?::(\d{2}))?$")
-
-
-def normalize_time(value: str) -> str | None:
-	m = TIME_RE.match(to_ascii_digits((value or "").strip()))
-	if not m:
-		return None
-	h, mi, s = int(m[1]), int(m[2]), int(m[3] or 0)
-	if h > 23 or mi > 59 or s > 59:
-		return None
-	return f"{h:02d}:{mi:02d}:{s:02d}"
 
 
 class AttendanceCorrection(ApprovableRequest):
@@ -63,3 +50,17 @@ class AttendanceCorrection(ApprovableRequest):
 			if key in seen:
 				frappe.throw(_("Row {0} repeats an earlier row").format(item.idx))
 			seen.add(key)
+
+	def affected_range(self):
+		return self.jdate, self.jdate
+
+	def on_approved(self):
+		schedule_recalculation(
+			[(self.employee, self.jdate)], _("Attendance correction {0}").format(self.name)
+		)
+
+	def on_cancelled(self, previous_status):
+		if previous_status == APPROVED:
+			schedule_recalculation(
+				[(self.employee, self.jdate)], _("Attendance correction {0} cancelled").format(self.name)
+			)

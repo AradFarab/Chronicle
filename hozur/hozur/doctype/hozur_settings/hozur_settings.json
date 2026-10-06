@@ -8,6 +8,9 @@
   "section_punches",
   "dedup_window_seconds",
   "clock_drift_warning_seconds",
+  "section_attendance",
+  "absence_warning_days",
+  "allow_negative_leave_balance",
   "section_calendar",
   "calendar_update_url",
   "last_calendar_update",
@@ -38,6 +41,23 @@
    "fieldname": "clock_drift_warning_seconds",
    "fieldtype": "Int",
    "label": "Device Clock Drift Warning (Seconds)"
+  },
+  {
+   "fieldname": "section_attendance",
+   "fieldtype": "Section Break",
+   "label": "Attendance"
+  },
+  {
+   "default": "3",
+   "description": "Only produces a disciplinary warning for the operator. Nothing is ever done automatically (Article 27).",
+   "fieldname": "absence_warning_days",
+   "fieldtype": "Int",
+   "label": "Absence Warning After (Consecutive Days)"
+  },
+  {
+   "fieldname": "allow_negative_leave_balance",
+   "fieldtype": "Check",
+   "label": "Allow Negative Leave Balance"
   },
   {
    "fieldname": "section_calendar",
@@ -108,7 +128,7 @@
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-06 18:06:50.000000",
+ "modified": "2026-10-06 18:20:52.000000",
  "modified_by": "Administrator",
  "module": "Hozur",
  "name": "Hozur Settings",

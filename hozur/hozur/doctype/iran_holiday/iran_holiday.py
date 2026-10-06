@@ -7,6 +7,7 @@ from frappe.model.document import Document
 
 from hozur.calendar_sync import refresh_days
 from hozur.jalali import holidays as jhol
+from hozur.periods import assert_open
 from hozur.utils import clean_jdate, set_year_month
 
 OFFICIAL_SCOPES = ("Country", "Province")
@@ -54,10 +55,23 @@ class IranHoliday(Document):
 
 	def on_update(self):
 		before = self.get_doc_before_save()
-		refresh_days([self.jdate, before.jdate if before else None])
+		days = [self.jdate, before.jdate if before else None]
+		if not self.flags.from_seed:
+			assert_open(*days)
+		refresh_days(days)
+		if not self.flags.from_seed:
+			recalculate_days(days, _("Holiday {0} changed").format(self.title))
 
 	def on_trash(self):
-		self.flags.deleted_jdate = self.jdate
+		assert_open(self.jdate)
 
 	def after_delete(self):
-		refresh_days([self.flags.deleted_jdate])
+		refresh_days([self.jdate])
+		recalculate_days([self.jdate], _("Holiday {0} deleted").format(self.title))
+
+
+def recalculate_days(days, reason):
+	from hozur.attendance import recalculate_everyone
+
+	for jdate in {d for d in days if d}:
+		recalculate_everyone(jdate, jdate, reason)

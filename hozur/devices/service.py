@@ -16,7 +16,7 @@ import frappe
 from frappe import _
 
 from hozur.devices import base
-from hozur.jalali.dates import to_gregorian, to_jalali
+from hozur.jalali.dates import normalize_time, to_gregorian, to_jalali
 from hozur.utils import now_jalali
 
 SYNC_OVERLAP = timedelta(minutes=10)  # re-read a little before the last punch; dedup absorbs it
@@ -67,6 +67,11 @@ def ingest(device, items: list[dict], source: str, punch_import: str | None = No
 	window = frappe.db.get_single_value("Hozur Settings", "dedup_window_seconds")
 	window = 30 if window is None else int(window)
 	stats = {"created": 0, "existing": 0, "duplicates": 0}
+	for item in items:
+		time = normalize_time(item["time"])
+		if not time:
+			raise base.DeviceError(f"Invalid punch time {item['time']!r}")
+		item["time"] = time
 	items = sorted(items, key=lambda i: (i["device_user_id"], i["jdate"], i["time"]))
 	keys = {_dedup_key(device.name, i["device_user_id"], i["jdate"], i["time"]): i for i in items}
 	existing = set()
@@ -78,6 +83,7 @@ def ingest(device, items: list[dict], source: str, punch_import: str | None = No
 			)
 		)
 	last_by_user: dict[str, tuple[str, str] | None] = {}
+	new_days: set[tuple[str, str]] = set()
 	for key, item in keys.items():
 		user = item["device_user_id"]
 		if key in existing:
@@ -119,6 +125,11 @@ def ingest(device, items: list[dict], source: str, punch_import: str | None = No
 		stats["created"] += 1
 		stats["duplicates"] += int(is_duplicate)
 		last_by_user[user] = (item["jdate"], item["time"])
+		new_days.add((user, item["jdate"]))
+	if new_days:
+		from hozur.attendance import on_punches
+
+		on_punches(device.name, sorted(new_days))
 	return stats
 
 
