@@ -19,6 +19,7 @@ from hozur.devices.base import (
 	DeviceHealth,
 	DevicePunch,
 	DeviceUser,
+	_,
 	register,
 )
 
@@ -67,7 +68,7 @@ class ZKTecoAdapter(DeviceAdapter):
 		try:
 			password = int(self.config.comm_key or 0)
 		except ValueError:
-			raise DeviceError("The ZKTeco comm key must be a number") from None
+			raise DeviceError(_("The ZKTeco comm key must be a number")) from None
 		return ZK(
 			self.config.host,
 			port=int(self.config.port or 4370),
@@ -80,7 +81,7 @@ class ZKTecoAdapter(DeviceAdapter):
 	@contextmanager
 	def _connect(self, allow_write: bool = False):
 		if not self.config.host:
-			raise DeviceError("Device IP address is not set")
+			raise DeviceError(_("Device IP address is not set"))
 		port = int(self.config.port or 4370)
 		if not self.config.use_udp:
 			# One quick probe: pyzk retries several times before giving up on a dead address.
@@ -89,18 +90,18 @@ class ZKTecoAdapter(DeviceAdapter):
 					(self.config.host, port), timeout=int(self.config.timeout or 10)
 				).close()
 			except OSError as e:
-				raise DeviceError(f"Cannot connect to {self.config.host}:{port}: {e}") from e
+				raise DeviceError(_("Cannot connect to {0}:{1}: {2}"), self.config.host, port, e) from e
 		try:
 			conn = self._zk().connect()
 		except Exception as e:
-			raise DeviceError(f"Cannot connect to {self.config.host}:{port}: {e}") from e
+			raise DeviceError(_("Cannot connect to {0}:{1}: {2}"), self.config.host, port, e) from e
 		guarded = _GuardedConnection(conn, allow_write)
 		try:
 			yield guarded
 		except PermissionError:
 			raise
 		except Exception as e:
-			raise DeviceError(f"Device error: {e}") from e
+			raise DeviceError(_("Device error: {0}"), e) from e
 		finally:
 			try:
 				conn.disconnect()

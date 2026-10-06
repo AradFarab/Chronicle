@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur VERSION\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-06 22:44+0326\n"
-"PO-Revision-Date: 2026-10-06 22:44+0326\n"
+"POT-Creation-Date: 2026-10-06 22:47+0326\n"
+"PO-Revision-Date: 2026-10-06 22:47+0326\n"
 "Last-Translator: 219307864+AradFarab@users.noreply.github.com\n"
 "Language-Team: 219307864+AradFarab@users.noreply.github.com\n"
 "MIME-Version: 1.0\n"
@@ -783,6 +783,10 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
+#: hozur/devices/zkteco.py:93 hozur/devices/zkteco.py:97
+msgid "Cannot connect to {0}:{1}: {2}"
+msgstr ""
+
 #. Label of the card (Data) field in DocType 'Device User Map'
 #: hozur/hozur/doctype/device_user_map/device_user_map.json
 msgid "Card Number"
@@ -893,6 +897,10 @@ msgstr ""
 #. Label of the label (Data) field in DocType 'Report Template Column'
 #: hozur/hozur/doctype/report_template_column/report_template_column.json
 msgid "Column Title"
+msgstr ""
+
+#: hozur/devices/file_import.py:114
+msgid "Column {0} not found in the file"
 msgstr ""
 
 #. Label of the section_columns (Section Break) field in DocType 'Punch Import
@@ -1400,6 +1408,10 @@ msgstr ""
 msgid "Device Error"
 msgstr ""
 
+#: hozur/devices/zkteco.py:84
+msgid "Device IP address is not set"
+msgstr ""
+
 #. Label of the section_info (Section Break) field in DocType 'Attendance
 #. Device'
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
@@ -1464,6 +1476,10 @@ msgstr ""
 #: frontend/src/pages/DeviceForm.vue:51
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Device communication password (Menu > Comm. > Comm Key). Leave empty if not set."
+msgstr ""
+
+#: hozur/devices/zkteco.py:104
+msgid "Device error: {0}"
 msgstr ""
 
 #: frontend/src/pages/DeviceForm.vue:72
@@ -2432,6 +2448,10 @@ msgstr ""
 msgid "Invalid Date"
 msgstr ""
 
+#: hozur/devices/service.py:73
+msgid "Invalid punch time {0}"
+msgstr ""
+
 #. Name of a DocType
 #. Label of a Sidebar Item
 #: hozur/hozur/doctype/iran_holiday/iran_holiday.json
@@ -3043,6 +3063,10 @@ msgstr ""
 
 #: hozur/attendance.py:377
 msgid "Nightly calculation"
+msgstr ""
+
+#: hozur/devices/base.py:115
+msgid "No adapter registered for device type {0}"
 msgstr ""
 
 #: hozur/approvals.py:155
@@ -4266,6 +4290,10 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+#: hozur/devices/zkteco.py:71
+msgid "The ZKTeco comm key must be a number"
+msgstr ""
+
 #: frontend/src/pages/DeviceForm.vue:108
 msgid "The app only reads from the device; it never clears the device logs."
 msgstr ""
@@ -4313,6 +4341,10 @@ msgstr ""
 msgid "The shift is longer than the daily limit (Article 51)"
 msgstr ""
 
+#: hozur/devices/file_import.py:192
+msgid "The template needs a user id column and either a date-time column or date and time columns"
+msgstr ""
+
 #. Description of the 'Legal Baseline' (Check) field in DocType 'Labor Rule
 #. Set'
 #: hozur/hozur/doctype/labor_rule_set/labor_rule_set.json
@@ -4349,6 +4381,10 @@ msgstr ""
 
 #: hozur/hozur/doctype/labor_rule_set/labor_rule_set.py:41
 msgid "These values are worse for the worker than the law allows:"
+msgstr ""
+
+#: hozur/devices/file_import.py:51
+msgid "This device receives punches by file import; there is nothing to connect to"
 msgstr ""
 
 #: hozur/hozur/doctype/work_pattern/work_pattern.py:48

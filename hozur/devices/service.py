@@ -70,7 +70,7 @@ def ingest(device, items: list[dict], source: str, punch_import: str | None = No
 	for item in items:
 		time = normalize_time(item["time"])
 		if not time:
-			raise base.DeviceError(f"Invalid punch time {item['time']!r}")
+			raise base.DeviceError(base._("Invalid punch time {0}"), item["time"])
 		item["time"] = time
 	items = sorted(items, key=lambda i: (i["device_user_id"], i["jdate"], i["time"]))
 	keys = {_dedup_key(device.name, i["device_user_id"], i["jdate"], i["time"]): i for i in items}
@@ -189,7 +189,7 @@ def sync_device(device_name: str, since: datetime | None = None, use_watermark: 
 		stats = ingest(device, _punch_items(punches), source="Device")
 	except base.DeviceError as e:
 		device.db_set(
-			{"last_sync": _now_label(), "last_sync_status": "Error", "last_error": str(e)},
+			{"last_sync": _now_label(), "last_sync_status": "Error", "last_error": e.translated(_)},
 			update_modified=False,
 		)
 		frappe.db.commit()
@@ -259,7 +259,7 @@ def _run(fn):
 	try:
 		return fn()
 	except base.DeviceError as e:
-		frappe.throw(str(e), title=_("Device Error"))
+		frappe.throw(e.translated(_), title=_("Device Error"))
 
 
 @frappe.whitelist()

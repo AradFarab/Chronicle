@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from hozur.devices.base import IN, OUT, UNKNOWN, DeviceAdapter, DeviceError, register
+from hozur.devices.base import IN, OUT, UNKNOWN, DeviceAdapter, DeviceError, _, register
 from hozur.jalali.dates import InvalidJalaliDate, from_gregorian, normalize_jdate, to_ascii_digits
 
 ZKTECO_USB = "ZKTeco USB (attlog.dat)"
@@ -48,7 +48,7 @@ class FileImportAdapter(DeviceAdapter):
 	network = False
 
 	def _not_available(self):
-		raise DeviceError("This device receives punches by file import; there is nothing to connect to")
+		raise DeviceError(_("This device receives punches by file import; there is nothing to connect to"))
 
 	def fetch_since(self, since):
 		self._not_available()
@@ -111,7 +111,7 @@ def _column(header: list[str] | None, spec: str | None) -> int | None:
 		for i, name in enumerate(header):
 			if normalize_text(name.strip()) == wanted:
 				return i
-	raise DeviceError(f"Column {spec!r} not found in the file")
+	raise DeviceError(_("Column {0} not found in the file"), spec)
 
 
 def _time(value: str) -> str:
@@ -189,7 +189,7 @@ def parse_rows(rows: list[list[str]], template: dict) -> ParseResult:
 	col_dir = _column(header, template.get("direction_column"))
 	if col_user is None or (col_dt is None and (col_date is None or col_time is None)):
 		raise DeviceError(
-			"The template needs a user id column and either a date-time column or date and time columns"
+			_("The template needs a user id column and either a date-time column or date and time columns")
 		)
 	calendar = template.get("date_calendar") or "Jalali"
 	date_format = template.get("date_format") or ("YYYY/MM/DD" if calendar == "Jalali" else "YYYY-MM-DD")
@@ -205,7 +205,7 @@ def parse_rows(rows: list[list[str]], template: dict) -> ParseResult:
 			if not user:
 				raise ValueError("empty user id")
 			if col_dt is not None:
-				date_part, _, time_part = to_ascii_digits(cells[col_dt]).strip().partition(" ")
+				date_part, _sep, time_part = to_ascii_digits(cells[col_dt]).strip().partition(" ")
 			else:
 				date_part, time_part = cells[col_date], cells[col_time]
 			time = _time(time_part)

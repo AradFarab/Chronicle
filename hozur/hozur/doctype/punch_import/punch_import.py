@@ -24,8 +24,9 @@ class PunchImport(Document):
 			rows = read_table(_bytes(file_doc), template.file_format, template.delimiter, template.encoding)
 			result = parse_rows(rows, template)
 		except DeviceError as e:
-			self.db_set({"status": "Failed", "error_log": str(e), "error_count": 1})
-			frappe.throw(str(e))
+			message = e.translated(_)
+			self.db_set({"status": "Failed", "error_log": message, "error_count": 1})
+			frappe.throw(message)
 		items = [
 			{
 				"device_user_id": p.device_user_id,

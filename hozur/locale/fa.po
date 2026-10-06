@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur VERSION\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-06 22:44+0326\n"
+"POT-Creation-Date: 2026-10-06 22:47+0326\n"
 "PO-Revision-Date: 2026-10-06 22:10+0326\n"
 "Last-Translator: Hozur contributors\n"
 "Language: fa\n"
@@ -785,6 +785,10 @@ msgstr "لغو"
 msgid "Cancelled"
 msgstr "لغوشده"
 
+#: hozur/devices/zkteco.py:93 hozur/devices/zkteco.py:97
+msgid "Cannot connect to {0}:{1}: {2}"
+msgstr "اتصال به {0}:{1} برقرار نشد: {2}. نشانی IP، پورت، روشن بودن دستگاه و شبکه را بررسی کنید."
+
 #. Label of the card (Data) field in DocType 'Device User Map'
 #: hozur/hozur/doctype/device_user_map/device_user_map.json
 msgid "Card Number"
@@ -898,6 +902,10 @@ msgstr "رنگ"
 #: hozur/hozur/doctype/report_template_column/report_template_column.json
 msgid "Column Title"
 msgstr "عنوان ستون"
+
+#: hozur/devices/file_import.py:114
+msgid "Column {0} not found in the file"
+msgstr "ستون {0} در فایل پیدا نشد"
 
 #. Label of the section_columns (Section Break) field in DocType 'Punch Import
 #. Template'
@@ -1407,6 +1415,10 @@ msgstr "هشدار اختلاف ساعت دستگاه (ثانیه)"
 msgid "Device Error"
 msgstr "خطای دستگاه"
 
+#: hozur/devices/zkteco.py:84
+msgid "Device IP address is not set"
+msgstr "نشانی IP دستگاه وارد نشده است"
+
 #. Label of the section_info (Section Break) field in DocType 'Attendance
 #. Device'
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
@@ -1474,6 +1486,10 @@ msgstr "ساعت دستگاه روی {0} {1} تنظیم شد"
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Device communication password (Menu > Comm. > Comm Key). Leave empty if not set."
 msgstr "رمز ارتباطی دستگاه (منو > ارتباطات > Comm Key). اگر تنظیم نشده خالی بگذارید."
+
+#: hozur/devices/zkteco.py:104
+msgid "Device error: {0}"
+msgstr "خطای دستگاه: {0}"
 
 #: frontend/src/pages/DeviceForm.vue:72
 msgid "Device tools"
@@ -2447,6 +2463,10 @@ msgstr "سقف فاصله کار متناوب (دقیقه)"
 msgid "Invalid Date"
 msgstr "تاریخ نامعتبر"
 
+#: hozur/devices/service.py:73
+msgid "Invalid punch time {0}"
+msgstr "ساعت تردد نامعتبر است: {0}"
+
 #. Name of a DocType
 #. Label of a Sidebar Item
 #: hozur/hozur/doctype/iran_holiday/iran_holiday.json
@@ -3067,6 +3087,10 @@ msgstr "شروع کار شب (دقیقه از شروع روز)"
 #: hozur/attendance.py:377
 msgid "Nightly calculation"
 msgstr "محاسبه شبانه"
+
+#: hozur/devices/base.py:115
+msgid "No adapter registered for device type {0}"
+msgstr "برای نوع دستگاه {0} رابطی ثبت نشده است"
 
 #: hozur/approvals.py:155
 #, python-brace-format
@@ -4307,6 +4331,10 @@ msgstr "تست اتصال"
 msgid "Text"
 msgstr "متن"
 
+#: hozur/devices/zkteco.py:71
+msgid "The ZKTeco comm key must be a number"
+msgstr "رمز ارتباطی ZKTeco باید عدد باشد"
+
 #: frontend/src/pages/DeviceForm.vue:108
 msgid "The app only reads from the device; it never clears the device logs."
 msgstr "نرم‌افزار فقط از دستگاه می‌خواند و هرگز حافظه تردد دستگاه را پاک نمی‌کند."
@@ -4354,6 +4382,10 @@ msgstr "شیفت برای کار سخت و زیان‌آور بیش از ۶ سا
 msgid "The shift is longer than the daily limit (Article 51)"
 msgstr "شیفت از سقف کار روزانه بیشتر است (ماده ۵۱)"
 
+#: hozur/devices/file_import.py:192
+msgid "The template needs a user id column and either a date-time column or date and time columns"
+msgstr "قالب باید ستون شناسه کاربر و یا ستون تاریخ‌وساعت یا ستون‌های جداگانه تاریخ و ساعت داشته باشد"
+
 #. Description of the 'Legal Baseline' (Check) field in DocType 'Labor Rule
 #. Set'
 #: hozur/hozur/doctype/labor_rule_set/labor_rule_set.json
@@ -4392,6 +4424,10 @@ msgstr "این درخواست‌ها هنوز در انتظار تأییدند: 
 #: hozur/hozur/doctype/labor_rule_set/labor_rule_set.py:41
 msgid "These values are worse for the worker than the law allows:"
 msgstr "این مقادیر از حد قانون به ضرر کارگر است:"
+
+#: hozur/devices/file_import.py:51
+msgid "This device receives punches by file import; there is nothing to connect to"
+msgstr "ترددهای این دستگاه با ورود فایل می‌آید و اتصالی ندارد"
 
 #: hozur/hozur/doctype/work_pattern/work_pattern.py:48
 #, python-brace-format

@@ -57,8 +57,22 @@ class DeviceHealth:
 	device_time: datetime | None = None
 
 
+def _(text: str) -> str:
+	"""Marks a message for translation extraction; the caller translates it (no frappe here)."""
+	return text
+
+
 class DeviceError(Exception):
-	"""Raised by adapters for connection/protocol problems; the message is shown to the operator."""
+	"""Raised by adapters for connection/protocol problems; the message is shown to the operator.
+	It is an English template with {0}-style arguments, so the caller can translate it."""
+
+	def __init__(self, message: str, *params):
+		super().__init__(message.format(*params) if params else message)
+		self.template = message
+		self.params = params
+
+	def translated(self, translate) -> str:
+		return translate(self.template).format(*self.params)
 
 
 class DeviceAdapter(ABC):
@@ -98,4 +112,4 @@ def get_adapter_class(code: str) -> type[DeviceAdapter]:
 	try:
 		return REGISTRY[code]
 	except KeyError:
-		raise DeviceError(f"No adapter registered for device type {code!r}") from None
+		raise DeviceError(_("No adapter registered for device type {0}"), code) from None
