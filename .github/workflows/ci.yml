@@ -104,6 +104,12 @@ jobs:
         env:
           TYPE: server
 
+      - name: PWA typecheck and tests
+        working-directory: /home/runner/frappe-bench/apps/hozur/frontend
+        run: |
+          yarn typecheck
+          yarn test
+
       - name: Run engine, Jalali and exporter tests (pytest)
         working-directory: /home/runner/frappe-bench/apps/hozur
         run: |

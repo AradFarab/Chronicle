@@ -4,6 +4,7 @@ from hozur.calendar_sync import install_calendar
 from hozur.rule_sets import seed_baseline
 from hozur.setup.data import (
 	DEFAULT_PROCESSES,
+	IMPORT_TEMPLATES,
 	LEAVE_TYPES,
 	REPORT_TEMPLATES,
 	ROLES,
@@ -22,6 +23,7 @@ def after_install():
 	seed_baseline()
 	ensure_leave_types()
 	ensure_report_templates()
+	ensure_import_templates()
 
 
 def after_migrate():
@@ -33,6 +35,16 @@ def after_migrate():
 	seed_baseline()
 	ensure_leave_types()
 	ensure_report_templates()
+	ensure_import_templates()
+
+
+def ensure_import_templates():
+	for template in IMPORT_TEMPLATES:
+		if frappe.db.exists("Punch Import Template", template["template_name"]):
+			continue
+		doc = frappe.get_doc({"doctype": "Punch Import Template", **template})
+		doc.flags.skip_audit = True
+		doc.insert(ignore_permissions=True)
 
 
 def ensure_report_templates():

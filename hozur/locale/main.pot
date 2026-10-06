@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur VERSION\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-06 22:10+0326\n"
-"PO-Revision-Date: 2026-10-06 22:10+0326\n"
+"POT-Creation-Date: 2026-10-06 22:44+0326\n"
+"PO-Revision-Date: 2026-10-06 22:44+0326\n"
 "Last-Translator: 219307864+AradFarab@users.noreply.github.com\n"
 "Language-Team: 219307864+AradFarab@users.noreply.github.com\n"
 "MIME-Version: 1.0\n"
@@ -48,15 +48,16 @@ msgstr ""
 msgid "A hard-and-harmful designation needs the committee ruling number"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:6
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:5
 msgid "A punch has no pair: correct the day"
 msgstr ""
 
-#: hozur/reports/catalog.py:60
+#: frontend/src/pages/Month.vue:220 hozur/reports/catalog.py:60
 msgid "Absence (Days)"
 msgstr ""
 
-#: hozur/reports/catalog.py:59
+#: frontend/src/components/DayNumbers.vue:29 hozur/reports/catalog.py:59
 msgid "Absence (Hours)"
 msgstr ""
 
@@ -71,6 +72,7 @@ msgid "Absence Warning After (Consecutive Days)"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Daily Attendance'
+#: frontend/src/pages/Month.vue:209
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 msgid "Absent"
 msgstr ""
@@ -78,6 +80,14 @@ msgstr ""
 #. Label of the absent_day (Check) field in DocType 'Daily Attendance'
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 msgid "Absent Day"
+msgstr ""
+
+#: frontend/src/pages/Approvals.vue:29
+msgid "Accept"
+msgstr ""
+
+#: frontend/src/components/UserMenu.vue:7
+msgid "Account"
 msgstr ""
 
 #. Label of the acted_by (Link) field in DocType 'Request Approval'
@@ -110,8 +120,24 @@ msgstr ""
 msgid "Add Punch"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:5 frontend/src/pages/Devices.vue:6
+msgid "Add a device"
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:113
+msgid "Add a time"
+msgstr ""
+
 #: hozur/hozur/doctype/attendance_correction/attendance_correction.py:29
 msgid "Add at least one time"
+msgstr ""
+
+#: frontend/src/pages/Devices.vue:15
+msgid "Add the device with its IP address and port; you can test the connection right away."
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:72
+msgid "Add the times the device missed. They count only after approval; device punches are never changed."
 msgstr ""
 
 #. Label of the address (Small Text) field in DocType 'Branch'
@@ -129,6 +155,10 @@ msgstr ""
 #. Label of the after (Code) field in DocType 'Audit Entry'
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 msgid "After"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:230
+msgid "All branches"
 msgstr ""
 
 #. Option for the 'Entry Type' (Select) field in DocType 'Leave Ledger Entry'
@@ -262,11 +292,13 @@ msgstr ""
 
 #. Label of the section_approvals (Section Break) field in DocType 'Hozur
 #. Settings'
+#: frontend/src/components/AppShell.vue:100 frontend/src/pages/Today.vue:88
 #: hozur/hozur/doctype/hozur_settings/hozur_settings.json
 msgid "Approvals"
 msgstr ""
 
 #. Option for the 'Action' (Select) field in DocType 'Audit Entry'
+#: frontend/src/pages/Approvals.vue:29
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 #: hozur/public/js/approvals.js:21 hozur/public/js/approvals.js:24
 msgid "Approve"
@@ -277,6 +309,7 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'Mission'
 #. Option for the 'Status' (Select) field in DocType 'Overtime Request'
 #. Option for the 'Status' (Select) field in DocType 'Request Approval'
+#: frontend/src/pages/Approvals.vue:107
 #: hozur/hozur/doctype/attendance_correction/attendance_correction.json
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
@@ -534,6 +567,10 @@ msgstr ""
 msgid "At least one holiday on this day is a prediction that the operator has not confirmed yet"
 msgstr ""
 
+#: frontend/src/pages/Today.vue:28
+msgid "At work"
+msgstr ""
+
 #. Label of the section_attendance (Section Break) field in DocType 'Hozur
 #. Settings'
 #. Label of a Sidebar Item
@@ -580,6 +617,10 @@ msgstr ""
 msgid "Attendance correction {0} cancelled"
 msgstr ""
 
+#: frontend/src/pages/Devices.vue:4
+msgid "Attendance devices"
+msgstr ""
+
 #. Name of a DocType
 #. Label of a Sidebar Item
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
@@ -593,6 +634,14 @@ msgstr ""
 
 #: hozur/hozur/doctype/audit_entry/audit_entry.py:17
 msgid "Audit entries cannot be deleted"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:4
+msgid "Back"
+msgstr ""
+
+#: frontend/src/pages/NotFound.vue:5
+msgid "Back to today"
 msgstr ""
 
 #. Label of the before (Code) field in DocType 'Audit Entry'
@@ -626,6 +675,7 @@ msgstr ""
 #. Option for the 'Scope' (Select) field in DocType 'Iran Holiday'
 #. Label of the branch (Link) field in DocType 'Iran Holiday'
 #. Label of a Sidebar Item
+#: frontend/src/pages/DeviceForm.vue:20
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 #: hozur/hozur/doctype/branch/branch.json
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
@@ -717,6 +767,7 @@ msgid "Can contain sub-departments"
 msgstr ""
 
 #. Option for the 'Action' (Select) field in DocType 'Audit Entry'
+#: frontend/src/pages/NewRequest.vue:122
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 msgid "Cancel"
 msgstr ""
@@ -760,6 +811,15 @@ msgstr ""
 msgid "Changed Fields"
 msgstr ""
 
+#: frontend/src/components/JalaliDatePicker.vue:12
+msgid "Choose a date"
+msgstr ""
+
+#: frontend/src/pages/Month.vue:13 frontend/src/pages/NewRequest.vue:11
+#: frontend/src/pages/Requests.vue:14
+msgid "Choose an employee"
+msgstr ""
+
 #: hozur/reports/builder.py:50
 msgid "Choose at least one column"
 msgstr ""
@@ -782,7 +842,12 @@ msgstr ""
 msgid "City"
 msgstr ""
 
+#: frontend/src/components/JalaliDatePicker.vue:58
+msgid "Clear"
+msgstr ""
+
 #. Label of the clock_drift_seconds (Int) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:284
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:41
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Clock Difference (Seconds)"
@@ -841,6 +906,7 @@ msgid "Columns"
 msgstr ""
 
 #. Label of the comm_key (Password) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:48
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Comm Key"
 msgstr ""
@@ -924,8 +990,13 @@ msgstr ""
 msgid "Connected"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:295 frontend/src/pages/Devices.vue:134
+msgid "Connected: {0}"
+msgstr ""
+
 #. Label of the section_connection (Section Break) field in DocType 'Attendance
 #. Device'
+#: frontend/src/pages/DeviceForm.vue:37
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Connection"
 msgstr ""
@@ -1011,6 +1082,7 @@ msgstr ""
 #. Application'
 #. Option for the 'Daily or Hourly' (Select) field in DocType 'Mission'
 #. Option for the 'One Row Per' (Select) field in DocType 'Report Template'
+#: frontend/src/pages/NewRequest.vue:154
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
 #: hozur/hozur/doctype/report_template/report_template.json
@@ -1069,6 +1141,8 @@ msgstr ""
 #. Label of the jdate (Data) field in DocType 'Overtime Request'
 #. Label of the jdate (Data) field in DocType 'Raw Punch'
 #. Label of the jdate (Data) field in DocType 'Shift Override'
+#: frontend/src/pages/NewRequest.vue:25 frontend/src/pages/NewRequest.vue:45
+#: frontend/src/pages/NewRequest.vue:59 frontend/src/pages/NewRequest.vue:77
 #: hozur/hozur/doctype/attendance_correction/attendance_correction.json
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 #: hozur/hozur/doctype/calendar_day/calendar_day.json
@@ -1145,13 +1219,17 @@ msgstr ""
 msgid "Days Employed"
 msgstr ""
 
-#: hozur/reports/catalog.py:81
+#: frontend/src/pages/Month.vue:219 hozur/reports/catalog.py:81
 msgid "Days Present"
 msgstr ""
 
 #. Option for the 'Time Unit' (Select) field in DocType 'Report Template'
 #: hozur/hozur/doctype/report_template/report_template.json
 msgid "Decimal Hours"
+msgstr ""
+
+#: frontend/src/pages/Approvals.vue:32
+msgid "Decline"
 msgstr ""
 
 #. Label of the deducts_from_balance (Check) field in DocType 'Leave Type'
@@ -1277,6 +1355,7 @@ msgid "Designation Name"
 msgstr ""
 
 #. Label of the destination (Data) field in DocType 'Mission'
+#: frontend/src/pages/NewRequest.vue:37
 #: hozur/hozur/doctype/mission/mission.json
 msgid "Destination"
 msgstr ""
@@ -1296,6 +1375,7 @@ msgstr ""
 #. Label of the device (Link) field in DocType 'Punch Import'
 #. Label of the device (Link) field in DocType 'Raw Punch'
 #. Option for the 'Source' (Select) field in DocType 'Raw Punch'
+#: frontend/src/lib/format.ts:48
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:57
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:67
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:80
@@ -1327,8 +1407,13 @@ msgid "Device Information"
 msgstr ""
 
 #. Label of the device_name (Data) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:14
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Device Name"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:283
+msgid "Device Time"
 msgstr ""
 
 #. Label of the device_timestamp (Datetime) field in DocType 'Raw Punch'
@@ -1337,6 +1422,7 @@ msgid "Device Timestamp (Raw)"
 msgstr ""
 
 #. Label of the adapter_type (Select) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:19
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Device Type"
 msgstr ""
@@ -1369,18 +1455,27 @@ msgstr ""
 msgid "Device clock set to {0}"
 msgstr ""
 
-#: hozur/devices/service.py:350
+#: frontend/src/pages/DeviceForm.vue:314 hozur/devices/service.py:350
 msgid "Device clock set to {0} {1}"
 msgstr ""
 
 #. Description of the 'Comm Key' (Password) field in DocType 'Attendance
 #. Device'
+#: frontend/src/pages/DeviceForm.vue:51
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Device communication password (Menu > Comm. > Comm Key). Leave empty if not set."
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:72
+msgid "Device tools"
+msgstr ""
+
 #: hozur/hozur/doctype/device_user_map/device_user_map.py:31
 msgid "Device user {0} on {1} is already mapped for an overlapping period ({2})"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:152
+msgid "Device users"
 msgstr ""
 
 #: hozur/devices/service.py:183
@@ -1388,6 +1483,7 @@ msgid "Device {0} receives punches by file import"
 msgstr ""
 
 #. Label of a Sidebar Item
+#: frontend/src/components/AppShell.vue:109 frontend/src/pages/Today.vue:17
 #: hozur/hozur/sidebar/hozur/hozur.json
 msgid "Devices"
 msgstr ""
@@ -1416,6 +1512,10 @@ msgstr ""
 #. Label of the reported_direction (Select) field in DocType 'Raw Punch'
 #: hozur/hozur/doctype/raw_punch/raw_punch.json
 msgid "Direction Reported by Device"
+msgstr ""
+
+#: frontend/src/pages/Devices.vue:31
+msgid "Disabled"
 msgstr ""
 
 #. Label of the reference_name (Dynamic Link) field in DocType 'Audit Entry'
@@ -1464,12 +1564,16 @@ msgstr ""
 msgid "Duplicates (Within Window)"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:159
+msgid "Each device user must point to an employee; users whose ID equals an employee code are mapped automatically."
+msgstr ""
+
 #. Description of the 'End' (Time) field in DocType 'Shift'
 #: hozur/hozur/doctype/shift/shift.json
 msgid "Earlier than the start means the shift ends after midnight"
 msgstr ""
 
-#: hozur/reports/catalog.py:58
+#: frontend/src/components/DayNumbers.vue:28 hozur/reports/catalog.py:58
 msgid "Early Leave"
 msgstr ""
 
@@ -1514,6 +1618,7 @@ msgid "Email"
 msgstr ""
 
 #. Option for the 'Kind' (Select) field in DocType 'Overtime Request'
+#: frontend/src/pages/NewRequest.vue:165
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
 msgid "Emergency"
 msgstr ""
@@ -1534,6 +1639,7 @@ msgstr ""
 msgid "Emergency Overtime Cap (Minutes)"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:13
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:10
 msgid "Emergency overtime above 8 hours was not counted (Article 60)"
 msgstr ""
@@ -1553,6 +1659,8 @@ msgstr ""
 #. Assignment'
 #. Label of the employee (Link) field in DocType 'Work Pattern Assignment'
 #. Label of a Sidebar Item
+#: frontend/src/pages/Month.vue:12 frontend/src/pages/NewRequest.vue:10
+#: frontend/src/pages/Requests.vue:13
 #: hozur/hozur/doctype/approval_override/approval_override.json
 #: hozur/hozur/doctype/attendance_correction/attendance_correction.json
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
@@ -1619,6 +1727,7 @@ msgid "Empty: day off"
 msgstr ""
 
 #. Label of the enabled (Check) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:64
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Enabled"
 msgstr ""
@@ -1742,6 +1851,7 @@ msgid "Excel"
 msgstr ""
 
 #. Option for the 'Kind' (Select) field in DocType 'Overtime Request'
+#: frontend/src/pages/NewRequest.vue:164
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
 msgid "Exceptional"
 msgstr ""
@@ -1792,6 +1902,7 @@ msgstr ""
 msgid "Extra Work (Minutes)"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:17
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:14
 msgid "Extra work without an approved overtime request"
 msgstr ""
@@ -1823,12 +1934,14 @@ msgstr ""
 
 #. Option for the 'Device Type' (Select) field in DocType 'Attendance Device'
 #. Option for the 'Source' (Select) field in DocType 'Raw Punch'
+#: frontend/src/lib/format.ts:49
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 #: hozur/hozur/doctype/raw_punch/raw_punch.json
 msgid "File Import"
 msgstr ""
 
 #. Label of the firmware (Data) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:280
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:37
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Firmware"
@@ -1842,6 +1955,7 @@ msgid "First Day"
 msgstr ""
 
 #. Label of the first_in (Data) field in DocType 'Daily Attendance'
+#: frontend/src/components/DayNumbers.vue:21
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 #: hozur/reports/catalog.py:50
 msgid "First In"
@@ -1870,6 +1984,10 @@ msgstr ""
 #. Option for the 'Shift Type' (Select) field in DocType 'Shift'
 #: hozur/hozur/doctype/shift/shift.json
 msgid "Flexible"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:117
+msgid "For a USB export or an Excel/CSV file from another program. Punches already stored are skipped."
 msgstr ""
 
 #. Description of the 'Start' (Time) field in DocType 'Shift'
@@ -1909,6 +2027,7 @@ msgstr ""
 
 #. Label of the from_date (Data) field in DocType 'Leave Application'
 #. Label of the from_date (Data) field in DocType 'Mission'
+#: frontend/src/pages/NewRequest.vue:20 frontend/src/pages/NewRequest.vue:40
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
 msgid "From Date"
@@ -1928,6 +2047,8 @@ msgstr ""
 #. Label of the from_time (Time) field in DocType 'Leave Application'
 #. Label of the from_time (Time) field in DocType 'Mission'
 #. Label of the from_time (Time) field in DocType 'Overtime Request'
+#: frontend/src/pages/NewRequest.vue:27 frontend/src/pages/NewRequest.vue:47
+#: frontend/src/pages/NewRequest.vue:62
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
@@ -2048,6 +2169,7 @@ msgstr ""
 #. Option for the 'Daily or Hourly' (Select) field in DocType 'Leave
 #. Application'
 #. Option for the 'Daily or Hourly' (Select) field in DocType 'Mission'
+#: frontend/src/pages/NewRequest.vue:155
 #: hozur/hozur/doctype/employee/employee.json
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
@@ -2073,6 +2195,8 @@ msgid "Hours:Minutes"
 msgstr ""
 
 #. Title of a Sidebar
+#: frontend/src/components/AppShell.vue:8
+#: frontend/src/components/AppShell.vue:122
 #: hozur/hozur/sidebar/hozur/hozur.json
 msgid "Hozur"
 msgstr ""
@@ -2202,6 +2326,7 @@ msgid "Hozur Settings"
 msgstr ""
 
 #. Label of the host (Data) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:39
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "IP Address"
 msgstr ""
@@ -2210,6 +2335,10 @@ msgstr ""
 #: hozur/reports/catalog.py:39 hozur/reports/catalog.py:40
 #: hozur/reports/catalog.py:41 hozur/reports/catalog.py:42
 msgid "Identity"
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:96
+msgid "Ignore"
 msgstr ""
 
 #. Option for the 'Punch Direction' (Select) field in DocType 'Attendance
@@ -2224,6 +2353,7 @@ msgstr ""
 msgid "Ignore Punch"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:136
 #: hozur/hozur/doctype/punch_import/punch_import.js:7
 msgid "Import"
 msgstr ""
@@ -2233,12 +2363,17 @@ msgid "Import Again"
 msgstr ""
 
 #. Label of the template (Link) field in DocType 'Punch Import'
+#: frontend/src/pages/DeviceForm.vue:122
 #: hozur/hozur/doctype/punch_import/punch_import.json
 msgid "Import Template"
 msgstr ""
 
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:19
 msgid "Import a File"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:114
+msgid "Import a punch file"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Punch Import'
@@ -2260,12 +2395,14 @@ msgstr ""
 #. Option for the 'Direction' (Select) field in DocType 'Raw Punch'
 #. Option for the 'Direction Reported by Device' (Select) field in DocType 'Raw
 #. Punch'
+#: frontend/src/pages/NewRequest.vue:158
 #: hozur/hozur/doctype/attendance_correction_item/attendance_correction_item.json
 #: hozur/hozur/doctype/raw_punch/raw_punch.json
 msgid "In"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Daily Attendance'
+#: frontend/src/pages/Month.vue:208
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 msgid "Incomplete"
 msgstr ""
@@ -2441,12 +2578,14 @@ msgid "Last Name"
 msgstr ""
 
 #. Label of the last_out (Data) field in DocType 'Daily Attendance'
+#: frontend/src/components/DayNumbers.vue:22
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 #: hozur/reports/catalog.py:51
 msgid "Last Out"
 msgstr ""
 
 #. Label of the last_sync (Data) field in DocType 'Attendance Device'
+#: frontend/src/pages/Devices.vue:50
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Last Read"
 msgstr ""
@@ -2460,6 +2599,7 @@ msgstr ""
 msgid "Last read failed"
 msgstr ""
 
+#: frontend/src/components/DayNumbers.vue:27 frontend/src/pages/Month.vue:223
 #: hozur/reports/catalog.py:57
 msgid "Late"
 msgstr ""
@@ -2482,6 +2622,8 @@ msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Daily Attendance'
 #. Label of the section_leave (Section Break) field in DocType 'Labor Rule Set'
+#: frontend/src/pages/Month.vue:101 frontend/src/pages/Month.vue:210
+#: frontend/src/pages/NewRequest.vue:148
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 #: hozur/hozur/doctype/labor_rule_set/labor_rule_set.json
 msgid "Leave"
@@ -2493,7 +2635,7 @@ msgstr ""
 msgid "Leave (Days)"
 msgstr ""
 
-#: hozur/reports/catalog.py:74
+#: frontend/src/components/DayNumbers.vue:30 hozur/reports/catalog.py:74
 msgid "Leave (Hours)"
 msgstr ""
 
@@ -2509,7 +2651,7 @@ msgstr ""
 msgid "Leave Application"
 msgstr ""
 
-#: hozur/reports/catalog.py:78
+#: frontend/src/pages/Today.vue:77 hozur/reports/catalog.py:78
 msgid "Leave Balance (Days)"
 msgstr ""
 
@@ -2530,6 +2672,7 @@ msgstr ""
 #. Label of the leave_type (Link) field in DocType 'Leave Ledger Entry'
 #. Name of a DocType
 #. Label of a Sidebar Item
+#: frontend/src/pages/NewRequest.vue:16
 #: hozur/hozur/doctype/daily_attendance_leave/daily_attendance_leave.json
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/leave_ledger_entry/leave_ledger_entry.json
@@ -2621,6 +2764,12 @@ msgstr ""
 msgid "Limit from Labor Rule Set"
 msgstr ""
 
+#: frontend/src/pages/Approvals.vue:5 frontend/src/pages/Devices.vue:11
+#: frontend/src/pages/Month.vue:69 frontend/src/pages/Requests.vue:18
+#: frontend/src/pages/Today.vue:23
+msgid "Loading..."
+msgstr ""
+
 #. Option for the 'Action' (Select) field in DocType 'Audit Entry'
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 msgid "Lock"
@@ -2632,9 +2781,14 @@ msgid "Log Capacity"
 msgstr ""
 
 #. Label of the record_count (Int) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:282 frontend/src/pages/Devices.vue:58
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:39
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Log Records on Device"
+msgstr ""
+
+#: frontend/src/components/UserMenu.vue:65
+msgid "Log out"
 msgstr ""
 
 #. Description of the 'User Account' (Link) field in DocType 'Employee'
@@ -2666,6 +2820,15 @@ msgstr ""
 #. Label of the manager (Link) field in DocType 'Department'
 #: hozur/hozur/doctype/department/department.json
 msgid "Manager"
+msgstr ""
+
+#: frontend/src/lib/format.ts:50
+msgid "Manual"
+msgstr ""
+
+#: frontend/src/pages/Month.vue:90 frontend/src/pages/NewRequest.vue:151
+#: frontend/src/pages/Today.vue:69
+msgid "Manual entry"
 msgstr ""
 
 #. Option for the 'Category' (Select) field in DocType 'Leave Type'
@@ -2714,6 +2877,7 @@ msgstr ""
 #. Label of the minutes (Int) field in DocType 'Daily Attendance Leave'
 #. Label of the total_minutes (Int) field in DocType 'Leave Application'
 #. Label of the minutes (Int) field in DocType 'Overtime Request'
+#: hozur/api/pwa.py:226
 #: hozur/hozur/doctype/daily_attendance_leave/daily_attendance_leave.json
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
@@ -2731,6 +2895,7 @@ msgstr ""
 #. Label of the mission_process (Link) field in DocType 'Hozur Settings'
 #. Name of a DocType
 #. Label of a Sidebar Item
+#: frontend/src/pages/Month.vue:211 frontend/src/pages/NewRequest.vue:149
 #: hozur/hozur/doctype/approval_override/approval_override.json
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 #: hozur/hozur/doctype/hozur_settings/hozur_settings.json
@@ -2743,7 +2908,7 @@ msgstr ""
 msgid "Mission (Days)"
 msgstr ""
 
-#: hozur/reports/catalog.py:75
+#: frontend/src/components/DayNumbers.vue:31 hozur/reports/catalog.py:75
 msgid "Mission (Hours)"
 msgstr ""
 
@@ -2766,6 +2931,7 @@ msgid "Mobile"
 msgstr ""
 
 #. Label of the model (Data) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:278
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:35
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Model"
@@ -2784,6 +2950,7 @@ msgstr ""
 #. Label of the jmonth (Int) field in DocType 'Daily Attendance'
 #. Label of the jmonth (Int) field in DocType 'Iran Holiday'
 #. Label of the jmonth (Int) field in DocType 'Raw Punch'
+#: frontend/src/components/AppShell.vue:96
 #: hozur/hozur/doctype/attendance_correction/attendance_correction.json
 #: hozur/hozur/doctype/attendance_period/attendance_period.json
 #: hozur/hozur/doctype/calendar_day/calendar_day.json
@@ -2793,8 +2960,13 @@ msgstr ""
 msgid "Month"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:7
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:6
 msgid "More than 15 hours from first to last punch (Article 54)"
+msgstr ""
+
+#: frontend/src/pages/Requests.vue:4
+msgid "My requests"
 msgstr ""
 
 #. Label of the device_user_name (Data) field in DocType 'Device User Map'
@@ -2832,6 +3004,15 @@ msgstr ""
 
 #: hozur/attendance.py:366
 msgid "New punches from {0}"
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:3 frontend/src/pages/Requests.vue:6
+msgid "New request"
+msgstr ""
+
+#: frontend/src/components/JalaliDatePicker.vue:33
+#: frontend/src/pages/Month.vue:6
+msgid "Next month"
 msgstr ""
 
 #. Label of the section_night (Section Break) field in DocType 'Labor Rule Set'
@@ -2872,19 +3053,35 @@ msgstr ""
 msgid "No approver found for step {0} ({1}). Set the manager of the department or the CEO."
 msgstr ""
 
+#: frontend/src/pages/Devices.vue:13
+msgid "No device yet."
+msgstr ""
+
+#: frontend/src/lib/warnings.ts:16
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:13
 msgid "No night work for young workers (Article 84)"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:15
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:12
 msgid "No overtime for young workers (Article 84)"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:14
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:11
 msgid "No overtime in hard and harmful work (Article 61)"
 msgstr ""
 
+#: frontend/src/components/PunchList.vue:20
+msgid "No punches"
+msgstr ""
+
+#: frontend/src/pages/Requests.vue:20
+msgid "No requests yet"
+msgstr ""
+
 #. Option for the 'Kind' (Select) field in DocType 'Overtime Request'
+#: frontend/src/pages/NewRequest.vue:163
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
 msgid "Normal"
 msgstr ""
@@ -2898,6 +3095,7 @@ msgstr ""
 msgid "Not enough leave: {0} days available, {1} requested"
 msgstr ""
 
+#: hozur/api/pwa.py:38 hozur/api/pwa.py:50 hozur/api/pwa.py:340
 #: hozur/attendance.py:440 hozur/leave.py:137 hozur/reports/builder.py:70
 msgid "Not permitted"
 msgstr ""
@@ -2924,6 +3122,10 @@ msgstr ""
 #: hozur/hozur/doctype/iran_holiday/iran_holiday.json
 #: hozur/hozur/doctype/punch_import_template/punch_import_template.json
 msgid "Notes"
+msgstr ""
+
+#: frontend/src/pages/Approvals.vue:7
+msgid "Nothing is waiting for you"
 msgstr ""
 
 #. Label of the nursing_minutes (Int) field in DocType 'Daily Attendance'
@@ -3020,6 +3222,7 @@ msgid "Only after a ruling of the hard-and-harmful jobs committee. Caps work at 
 msgstr ""
 
 #. Description of the 'Use UDP' (Check) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:62
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Only for older firmware"
 msgstr ""
@@ -3069,6 +3272,7 @@ msgstr ""
 #. Option for the 'Direction' (Select) field in DocType 'Raw Punch'
 #. Option for the 'Direction Reported by Device' (Select) field in DocType 'Raw
 #. Punch'
+#: frontend/src/pages/NewRequest.vue:159
 #: hozur/hozur/doctype/attendance_correction_item/attendance_correction_item.json
 #: hozur/hozur/doctype/raw_punch/raw_punch.json
 msgid "Out"
@@ -3085,6 +3289,8 @@ msgstr ""
 #. Option for the 'Request Type' (Select) field in DocType 'Approval Override'
 #. Label of the section_overtime (Section Break) field in DocType 'Employee'
 #. Label of the overtime_process (Link) field in DocType 'Hozur Settings'
+#: frontend/src/components/DayNumbers.vue:32
+#: frontend/src/pages/NewRequest.vue:150
 #: hozur/hozur/doctype/approval_override/approval_override.json
 #: hozur/hozur/doctype/employee/employee.json
 #: hozur/hozur/doctype/hozur_settings/hozur_settings.json
@@ -3103,6 +3309,10 @@ msgstr ""
 msgid "Overtime Counts After (Minutes)"
 msgstr ""
 
+#: frontend/src/pages/NewRequest.vue:60
+msgid "Overtime Kind"
+msgstr ""
+
 #. Label of the overtime_premium_percent (Float) field in DocType 'Labor Rule
 #. Set'
 #: hozur/hozur/doctype/labor_rule_set/labor_rule_set.json
@@ -3116,6 +3326,7 @@ msgstr ""
 msgid "Overtime Request"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:12
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:9
 msgid "Overtime above the daily cap was not counted (Article 59)"
 msgstr ""
@@ -3124,6 +3335,10 @@ msgstr ""
 #. Set'
 #: hozur/hozur/doctype/labor_rule_set/labor_rule_set.json
 msgid "Overtime and Premiums"
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:57
+msgid "Overtime you assign needs the employee's acceptance (Article 59)."
 msgstr ""
 
 #: hozur/hozur/doctype/overtime_request/overtime_request.py:87
@@ -3137,6 +3352,10 @@ msgstr ""
 #. Option for the 'Export Format' (Select) field in DocType 'Report Template'
 #: hozur/hozur/doctype/report_template/report_template.json
 msgid "PDF"
+msgstr ""
+
+#: frontend/src/pages/NotFound.vue:3
+msgid "Page not found"
 msgstr ""
 
 #: hozur/reports/catalog.py:84
@@ -3247,6 +3466,7 @@ msgid "Please enter the reason for this change"
 msgstr ""
 
 #. Label of the port (Int) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:40
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Port"
 msgstr ""
@@ -3270,6 +3490,10 @@ msgstr ""
 msgid "Predicted Holiday"
 msgstr ""
 
+#: frontend/src/pages/Month.vue:59
+msgid "Predicted holiday"
+msgstr ""
+
 #: hozur/reports/api.py:100
 msgid "Prepared by {0} on {1} at {2}"
 msgstr ""
@@ -3285,8 +3509,13 @@ msgid "Presence"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Daily Attendance'
+#: frontend/src/pages/Month.vue:207
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
 msgid "Present"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:165
+msgid "Press “Read Users from Device”."
 msgstr ""
 
 #: hozur/hozur/doctype/report_template/report_template.js:21
@@ -3298,6 +3527,11 @@ msgstr ""
 #. Option for the 'Default Range' (Select) field in DocType 'Report Template'
 #: hozur/hozur/doctype/report_template/report_template.json
 msgid "Previous Month"
+msgstr ""
+
+#: frontend/src/components/JalaliDatePicker.vue:24
+#: frontend/src/pages/Month.vue:4
+msgid "Previous month"
 msgstr ""
 
 #. Label of the process_name (Data) field in DocType 'Approval Process'
@@ -3327,6 +3561,7 @@ msgid "Province Name"
 msgstr ""
 
 #. Label of the direction_mode (Select) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:25
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Punch Direction"
 msgstr ""
@@ -3364,6 +3599,10 @@ msgstr ""
 #. Label of the total_rows (Int) field in DocType 'Punch Import'
 #: hozur/hozur/doctype/punch_import/punch_import.json
 msgid "Punches in File"
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:79
+msgid "Punches of this day"
 msgstr ""
 
 #. Label of the reason (Small Text) field in DocType 'Mission'
@@ -3408,6 +3647,7 @@ msgstr ""
 
 #. Label of the polling_interval_minutes (Int) field in DocType 'Attendance
 #. Device'
+#: frontend/src/pages/DeviceForm.vue:58
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Read Every (Minutes)"
 msgstr ""
@@ -3416,8 +3656,24 @@ msgstr ""
 msgid "Read Punches Now"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:78
+msgid "Read Users from Device"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:95
+msgid "Read again"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:88
+msgid "Read again from"
+msgstr ""
+
 #: hozur/hozur/doctype/attendance_device/attendance_device.py:36
 msgid "Read interval must be at least one minute"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:81 frontend/src/pages/Devices.vue:79
+msgid "Read punches now"
 msgstr ""
 
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:60
@@ -3431,6 +3687,9 @@ msgstr ""
 #. Label of the reason (Small Text) field in DocType 'Leave Application'
 #. Label of the reason (Small Text) field in DocType 'Overtime Request'
 #. Label of the reason (Small Text) field in DocType 'Shift Override'
+#: frontend/src/pages/Approvals.vue:39 frontend/src/pages/NewRequest.vue:31
+#: frontend/src/pages/NewRequest.vue:51 frontend/src/pages/NewRequest.vue:65
+#: frontend/src/pages/NewRequest.vue:115
 #: hozur/hozur/doctype/attendance_correction/attendance_correction.json
 #: hozur/hozur/doctype/attendance_period/attendance_period.js:16
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
@@ -3480,7 +3739,13 @@ msgstr ""
 msgid "Reference Type"
 msgstr ""
 
+#: frontend/src/pages/Today.vue:40
+msgid "Refresh"
+msgstr ""
+
 #. Option for the 'Action' (Select) field in DocType 'Audit Entry'
+#: frontend/src/pages/Approvals.vue:32 frontend/src/pages/Approvals.vue:38
+#: frontend/src/pages/Approvals.vue:47
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 #: hozur/public/js/approvals.js:21 hozur/public/js/approvals.js:25
 msgid "Reject"
@@ -3491,12 +3756,17 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'Mission'
 #. Option for the 'Status' (Select) field in DocType 'Overtime Request'
 #. Option for the 'Status' (Select) field in DocType 'Request Approval'
+#: frontend/src/pages/Approvals.vue:107
 #: hozur/hozur/doctype/attendance_correction/attendance_correction.json
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
 #: hozur/hozur/doctype/request_approval/request_approval.json
 msgid "Rejected"
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:108
+msgid "Remove"
 msgstr ""
 
 #. Option for the 'Action' (Select) field in DocType 'Audit Entry'
@@ -3544,8 +3814,16 @@ msgstr ""
 msgid "Request Type"
 msgstr ""
 
+#: frontend/src/pages/Today.vue:82
+msgid "Request leave"
+msgstr ""
+
+#: frontend/src/pages/NewRequest.vue:288
+msgid "Request submitted: {0}"
+msgstr ""
+
 #. Label of a Sidebar Item
-#: hozur/hozur/sidebar/hozur/hozur.json
+#: frontend/src/components/AppShell.vue:97 hozur/hozur/sidebar/hozur/hozur.json
 msgid "Requests"
 msgstr ""
 
@@ -3554,7 +3832,7 @@ msgstr ""
 msgid "Requests Entered by an Operator"
 msgstr ""
 
-#: hozur/reports/catalog.py:54
+#: frontend/src/components/DayNumbers.vue:23 hozur/reports/catalog.py:54
 msgid "Required"
 msgstr ""
 
@@ -3666,6 +3944,14 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:66
+msgid "Save"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:252 frontend/src/pages/DeviceForm.vue:387
+msgid "Saved"
+msgstr ""
+
 #. Label of the section_schedule (Section Break) field in DocType 'Daily
 #. Attendance'
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.json
@@ -3705,11 +3991,13 @@ msgid "Semicolon"
 msgstr ""
 
 #. Label of the serial_number (Data) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:279
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:36
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Serial Number"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:84
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:82
 msgid "Set Device Clock"
 msgstr ""
@@ -3723,8 +4011,12 @@ msgid "Set the device clock to the server time?"
 msgstr ""
 
 #. Label of a Sidebar Item
-#: hozur/hozur/sidebar/hozur/hozur.json
+#: frontend/src/pages/DeviceForm.vue:10 hozur/hozur/sidebar/hozur/hozur.json
 msgid "Settings"
+msgstr ""
+
+#: frontend/src/components/UserMenu.vue:60
+msgid "Settings (Desk)"
 msgstr ""
 
 #. Label of the shared_with (Table MultiSelect) field in DocType 'Report
@@ -3882,6 +4174,7 @@ msgid "Steps"
 msgstr ""
 
 #. Option for the 'Action' (Select) field in DocType 'Audit Entry'
+#: frontend/src/pages/NewRequest.vue:121
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 msgid "Submit"
 msgstr ""
@@ -3963,6 +4256,7 @@ msgstr ""
 msgid "Template Name"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:75 frontend/src/pages/Devices.vue:76
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:26
 msgid "Test Connection"
 msgstr ""
@@ -3972,8 +4266,16 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:108
+msgid "The app only reads from the device; it never clears the device logs."
+msgstr ""
+
 #: hozur/hozur/doctype/shift/shift.py:39
 msgid "The break must be inside the shift"
+msgstr ""
+
+#: frontend/src/pages/Today.vue:48
+msgid "The day is not over; the numbers are final after your last punch."
 msgstr ""
 
 #: hozur/hozur/doctype/department/department.py:21
@@ -4001,10 +4303,12 @@ msgstr ""
 msgid "The legal baseline is the law itself and cannot be edited. Create a company rule set instead."
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:9
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:8
 msgid "The shift is longer than 6 hours for hard and harmful work (Article 52)"
 msgstr ""
 
+#: frontend/src/lib/warnings.ts:8
 #: hozur/hozur/doctype/daily_attendance/daily_attendance.js:7
 msgid "The shift is longer than the daily limit (Article 51)"
 msgstr ""
@@ -4017,6 +4321,18 @@ msgstr ""
 
 #: hozur/hozur/doctype/work_pattern/work_pattern.py:24
 msgid "The weekly rest day cannot have a shift"
+msgstr ""
+
+#: frontend/src/components/UserMenu.vue:41
+msgid "Theme: dark"
+msgstr ""
+
+#: frontend/src/components/UserMenu.vue:39
+msgid "Theme: follow the device"
+msgstr ""
+
+#: frontend/src/components/UserMenu.vue:40
+msgid "Theme: light"
 msgstr ""
 
 #: hozur/hozur/doctype/leave_application/leave_application.py:43
@@ -4061,6 +4377,7 @@ msgstr ""
 #. Label of the time (Data) field in DocType 'Attendance Correction Item'
 #. Label of the at_time (Data) field in DocType 'Audit Entry'
 #. Label of the time (Data) field in DocType 'Raw Punch'
+#: frontend/src/pages/NewRequest.vue:103
 #: hozur/hozur/doctype/attendance_correction_item/attendance_correction_item.json
 #: hozur/hozur/doctype/audit_entry/audit_entry.json
 #: hozur/hozur/doctype/raw_punch/raw_punch.json
@@ -4078,6 +4395,7 @@ msgid "Time Unit"
 msgstr ""
 
 #. Label of the timeout_seconds (Int) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:60
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Timeout (Seconds)"
 msgstr ""
@@ -4091,6 +4409,10 @@ msgstr ""
 msgid "Times"
 msgstr ""
 
+#: frontend/src/pages/NewRequest.vue:101
+msgid "Times to add"
+msgstr ""
+
 #. Label of the title (Data) field in DocType 'Iran Holiday'
 #: hozur/hozur/doctype/iran_holiday/iran_holiday.json
 msgid "Title"
@@ -4098,6 +4420,7 @@ msgstr ""
 
 #. Label of the to_date (Data) field in DocType 'Leave Application'
 #. Label of the to_date (Data) field in DocType 'Mission'
+#: frontend/src/pages/NewRequest.vue:21 frontend/src/pages/NewRequest.vue:41
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
 msgid "To Date"
@@ -4110,6 +4433,8 @@ msgstr ""
 #. Label of the to_time (Time) field in DocType 'Leave Application'
 #. Label of the to_time (Time) field in DocType 'Mission'
 #. Label of the to_time (Time) field in DocType 'Overtime Request'
+#: frontend/src/pages/NewRequest.vue:28 frontend/src/pages/NewRequest.vue:48
+#: frontend/src/pages/NewRequest.vue:63
 #: hozur/hozur/doctype/leave_application/leave_application.json
 #: hozur/hozur/doctype/mission/mission.json
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
@@ -4117,8 +4442,15 @@ msgid "To Time"
 msgstr ""
 
 #. Option for the 'Default Range' (Select) field in DocType 'Report Template'
+#: frontend/src/components/AppShell.vue:95
+#: frontend/src/components/JalaliDatePicker.vue:56
+#: frontend/src/pages/Today.vue:4
 #: hozur/hozur/doctype/report_template/report_template.json
 msgid "Today"
+msgstr ""
+
+#: frontend/src/pages/Today.vue:59
+msgid "Today's punches"
 msgstr ""
 
 #: hozur/reports/catalog.py:65
@@ -4156,7 +4488,7 @@ msgstr ""
 msgid "Unapproved Extra (Minutes)"
 msgstr ""
 
-#: hozur/reports/catalog.py:66
+#: frontend/src/components/DayNumbers.vue:33 hozur/reports/catalog.py:66
 msgid "Unapproved Extra Work"
 msgstr ""
 
@@ -4165,6 +4497,7 @@ msgstr ""
 #. Option for the 'Direction' (Select) field in DocType 'Raw Punch'
 #. Option for the 'Direction Reported by Device' (Select) field in DocType 'Raw
 #. Punch'
+#: frontend/src/pages/NewRequest.vue:160
 #: hozur/hozur/doctype/attendance_correction_item/attendance_correction_item.json
 #: hozur/hozur/doctype/raw_punch/raw_punch.json
 msgid "Unknown"
@@ -4194,6 +4527,14 @@ msgstr ""
 msgid "Unknown report source"
 msgstr ""
 
+#: hozur/api/pwa.py:284
+msgid "Unknown request type"
+msgstr ""
+
+#: frontend/src/pages/Devices.vue:62
+msgid "Unmapped users"
+msgstr ""
+
 #. Option for the 'Category' (Select) field in DocType 'Leave Type'
 #: hozur/hozur/doctype/leave_type/leave_type.json
 msgid "Unpaid"
@@ -4215,11 +4556,13 @@ msgstr ""
 
 #. Description of the 'Punch Direction' (Select) field in DocType 'Attendance
 #. Device'
+#: frontend/src/pages/DeviceForm.vue:30
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Ignore: punches are then paired by order."
 msgstr ""
 
 #. Label of the use_udp (Check) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:62
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Use UDP"
 msgstr ""
@@ -4258,7 +4601,12 @@ msgstr ""
 msgid "User {0} is already linked to employee {1}"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:165
+msgid "Users appear after the first import."
+msgstr ""
+
 #. Label of the user_count (Int) field in DocType 'Attendance Device'
+#: frontend/src/pages/DeviceForm.vue:281 frontend/src/pages/Devices.vue:54
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:38
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "Users on Device"
@@ -4339,6 +4687,14 @@ msgstr ""
 #: hozur/hozur/doctype/mission/mission.json
 #: hozur/hozur/doctype/overtime_request/overtime_request.json
 msgid "Waiting For (User)"
+msgstr ""
+
+#: frontend/src/pages/Approvals.vue:3 frontend/src/pages/Today.vue:86
+msgid "Waiting for my approval"
+msgstr ""
+
+#: frontend/src/pages/Requests.vue:32
+msgid "Waiting for {0}"
 msgstr ""
 
 #. Label of the section_warnings (Section Break) field in DocType 'Daily
@@ -4453,6 +4809,7 @@ msgstr ""
 msgid "Workday"
 msgstr ""
 
+#: frontend/src/components/DayNumbers.vue:24 frontend/src/pages/Month.vue:221
 #: hozur/reports/catalog.py:55
 msgid "Worked"
 msgstr ""
@@ -4531,6 +4888,14 @@ msgstr ""
 msgid "Young Worker Up To Age (Years)"
 msgstr ""
 
+#: frontend/src/pages/Approvals.vue:19
+msgid "Your manager assigned this overtime; it needs your acceptance (Article 59)."
+msgstr ""
+
+#: frontend/src/pages/Today.vue:10 hozur/api/pwa.py:47
+msgid "Your user is not linked to an employee"
+msgstr ""
+
 #. Option for the 'Device Type' (Select) field in DocType 'Attendance Device'
 #: hozur/hozur/doctype/attendance_device/attendance_device.json
 msgid "ZKTeco"
@@ -4551,6 +4916,10 @@ msgstr ""
 #. Type'
 #: hozur/hozur/doctype/leave_type/leave_type.json
 msgid "e.g. Hajj (Article 67)"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:15
+msgid "e.g. Main entrance"
 msgstr ""
 
 #. Description of the 'Reason' (Small Text) field in DocType 'Attendance
@@ -4643,17 +5012,41 @@ msgstr ""
 msgid "{0} is required"
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:310 frontend/src/pages/Devices.vue:151
+msgid "{0} new punches"
+msgstr ""
+
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:63
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:75
 #: hozur/hozur/doctype/punch_import/punch_import.js:10
 msgid "{0} new punches, {1} already stored, {2} duplicates."
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:340
+msgid "{0} rows: {1} new, {2} already stored, {3} duplicates, {4} errors"
+msgstr ""
+
 #: hozur/hozur/doctype/attendance_device/attendance_device.js:51
 msgid "{0} users on the device, {1} new, {2} matched to employees by employee code."
 msgstr ""
 
+#: frontend/src/pages/DeviceForm.vue:302
+msgid "{0} users read, {1} new, {2} mapped automatically"
+msgstr ""
+
+#: frontend/src/pages/Devices.vue:135
+msgid "{0} users, {1} records"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:154
+msgid "{0} without an employee"
+msgstr ""
+
 #: hozur/utils.py:31
 msgid "{0}: {1} is not a valid Jalali date (expected e.g. 1405/07/14)"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:179
+msgid "— no employee —"
 msgstr ""
 

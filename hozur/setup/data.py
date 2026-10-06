@@ -74,6 +74,9 @@ LEAVE_TYPES = (
 
 # The four standard report templates of the design doc. Column titles default to the
 # translated field labels.
+# Ready-made punch file templates (editable data). The ZKTeco USB format is fixed by the device.
+IMPORT_TEMPLATES = ({"template_name": "فلش ZKTeco (attlog.dat)", "file_format": "ZKTeco USB (attlog.dat)"},)
+
 REPORT_TEMPLATES = (
 	{
 		"template_name": "کارکرد ماهانه برای حقوق",

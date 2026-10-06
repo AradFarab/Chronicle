@@ -70,9 +70,13 @@ app_include_js = ["/assets/hozur/js/approvals.js"]
 # home_page = "login"
 
 # website user home page (by Role)
-# role_home_page = {
-# 	"Role": "home_page"
-# }
+# People without desk access land in the PWA after login.
+role_home_page = {
+	"Hozur Employee": "hozur",
+	"Hozur Manager": "hozur",
+	"Hozur CEO": "hozur",
+	"Hozur Operator": "hozur",
+}
 
 # Generators
 # ----------
@@ -305,3 +309,6 @@ ignore_links_on_delete = ["Audit Entry"]
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
+
+# The PWA: every /hozur/... path is served by www/hozur.html (built from frontend/).
+website_route_rules = [{"from_route": "/hozur/<path:app_path>", "to_route": "hozur"}]

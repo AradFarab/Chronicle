@@ -40,10 +40,37 @@ Useful commands inside the container (from `/home/frappe/frappe-bench`):
 
 ```bash
 bench --site hozur.localhost migrate                 # after changing doctypes / hooks
-bench --site hozur.localhost run-tests --app hozur   # Frappe (doctype) tests
 bench --site hozur.localhost console                 # IPython with frappe loaded
-bench build --app hozur                              # rebuild desk assets
+bench build --app hozur                              # rebuild desk assets and the PWA
 ```
+
+Tests run on a separate, empty site so they never meet your own data:
+
+```bash
+bench new-site test.localhost --db-root-username root --db-root-password 123 \
+	--admin-password admin --install-app hozur          # once
+bench --site test.localhost set-config allow_tests 1   # once
+bench --site test.localhost run-tests --app hozur      # Frappe (doctype + API) tests
+```
+
+### The PWA (`/hozur`)
+
+The app for employees, managers and operators is a Vue 3 + frappe-ui PWA in `frontend/`.
+`bench build --app hozur` builds it into `hozur/public/frontend` and `hozur/www/hozur.html`
+(both generated, not committed); open http://hozur.localhost:8000/hozur.
+
+While working on it, run the Vite dev server instead (hot reload, API calls are proxied
+to the bench on port 8000):
+
+```bash
+cd apps/hozur/frontend
+yarn dev            # http://hozur.localhost:8080/hozur
+yarn typecheck      # vue-tsc
+yarn test           # vitest
+```
+
+User-facing strings are English source text wrapped in `__()`; the Persian comes from
+`hozur/locale/fa.po` like the rest of the app.
 
 Stop with `docker compose -f docker/dev/compose.yml down`. Add `-v` to also delete the
 bench and the database (next bootstrap starts from scratch).

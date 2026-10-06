@@ -1,0 +1,29 @@
+{
+	"name": "hozur-ui",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"license": "GPL-3.0",
+	"scripts": {
+		"dev": "vite",
+		"build": "vue-tsc --noEmit && vite build",
+		"typecheck": "vue-tsc --noEmit",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"frappe-ui": "1.0.0",
+		"jalaali-js": "^2.0.1",
+		"vue": "^3.5.43",
+		"vue-router": "^4.6.4"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^6.0.9",
+		"autoprefixer": "^10.4.21",
+		"postcss": "^8.5.10",
+		"tailwindcss": "^3.4.19",
+		"typescript": "~5.9.3",
+		"vite": "^7.3.2",
+		"vitest": "^3.2.4",
+		"vue-tsc": "^3.3.12"
+	}
+}
