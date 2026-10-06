@@ -71,8 +71,20 @@ class FakeConn:
 		FakeConn.calls.append(("disconnect",))
 
 
+class FakeSocket:
+	def close(self):
+		pass
+
+
+def fake_create_connection(address, timeout=None):
+	if address[0] == "10.0.0.98":
+		raise TimeoutError("timed out")
+	return FakeSocket()
+
+
 @pytest.fixture(autouse=True)
 def fake_pyzk(monkeypatch):
+	monkeypatch.setattr("hozur.devices.zkteco.socket.create_connection", fake_create_connection)
 	module = types.ModuleType("zk")
 
 	class ZK:
@@ -139,6 +151,8 @@ def test_set_time_only_through_sync_time():
 def test_connection_errors_become_device_errors():
 	with pytest.raises(DeviceError, match="Cannot connect"):
 		adapter(host="10.0.0.99").health()
+	with pytest.raises(DeviceError, match="Cannot connect"):
+		adapter(host="10.0.0.98").health()  # fails at the quick probe
 	with pytest.raises(DeviceError, match="IP address"):
 		adapter(host=None).health()
 	with pytest.raises(DeviceError, match="comm key"):

@@ -6,6 +6,7 @@ can reach the device. Logs are never cleared.
 
 from __future__ import annotations
 
+import socket
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -80,10 +81,19 @@ class ZKTecoAdapter(DeviceAdapter):
 	def _connect(self, allow_write: bool = False):
 		if not self.config.host:
 			raise DeviceError("Device IP address is not set")
+		port = int(self.config.port or 4370)
+		if not self.config.use_udp:
+			# One quick probe: pyzk retries several times before giving up on a dead address.
+			try:
+				socket.create_connection(
+					(self.config.host, port), timeout=int(self.config.timeout or 10)
+				).close()
+			except OSError as e:
+				raise DeviceError(f"Cannot connect to {self.config.host}:{port}: {e}") from e
 		try:
 			conn = self._zk().connect()
 		except Exception as e:
-			raise DeviceError(f"Cannot connect to {self.config.host}:{self.config.port or 4370}: {e}") from e
+			raise DeviceError(f"Cannot connect to {self.config.host}:{port}: {e}") from e
 		guarded = _GuardedConnection(conn, allow_write)
 		try:
 			yield guarded
