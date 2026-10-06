@@ -50,6 +50,7 @@ if [ ! -d "sites/$SITE" ]; then
 		--mariadb-user-host-login-scope=%
 fi
 bench --site "$SITE" set-config developer_mode 1 --parse
+bench --site "$SITE" set-config allow_tests 1 --parse
 bench use "$SITE"
 
 if [ -e apps/hozur ] && ! bench --site "$SITE" list-apps | grep -q '^hozur'; then
