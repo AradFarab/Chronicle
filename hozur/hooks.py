@@ -35,7 +35,7 @@ app_license = "gpl-3.0"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/hozur/css/hozur.css"
-# app_include_js = "/assets/hozur/js/hozur.js"
+app_include_js = ["/assets/hozur/js/approvals.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/hozur/css/hozur.css"
@@ -147,14 +147,20 @@ after_migrate = "hozur.setup.install.after_migrate"
 # added to EMPLOYEE_SCOPED_DOCTYPES as they are built.
 EMPLOYEE_SCOPED_DOCTYPES = []
 
+# Requests (hozur.approvals.ApprovableRequest): visible to the employee scope and to the
+# people in their approval chain; listed in the approval inbox.
+hozur_request_doctypes = ["Attendance Correction"]
+
 permission_query_conditions = {
 	"Employee": "hozur.permissions.employee_query",
 	**{dt: "hozur.permissions.employee_condition" for dt in EMPLOYEE_SCOPED_DOCTYPES},
+	**{dt: "hozur.approvals.request_query" for dt in hozur_request_doctypes},
 }
 
 has_permission = {
 	"Employee": "hozur.permissions.has_employee_doc_permission",
 	**{dt: "hozur.permissions.has_employee_permission" for dt in EMPLOYEE_SCOPED_DOCTYPES},
+	**{dt: "hozur.approvals.has_request_permission" for dt in hozur_request_doctypes},
 }
 
 # Document Events
@@ -173,6 +179,8 @@ AUDITED_DOCTYPES = [
 	"Attendance Device",
 	"Device User Map",
 	"Punch Import Template",
+	"Approval Process",
+	"Approval Override",
 ]
 
 doc_events = {

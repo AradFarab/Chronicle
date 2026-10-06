@@ -1,7 +1,7 @@
 import frappe
 
 from hozur.calendar_sync import install_calendar
-from hozur.setup.data import ROLES, ROOT_DEPARTMENT
+from hozur.setup.data import DEFAULT_PROCESSES, ROLES, ROOT_DEPARTMENT, STANDARD_PROCESSES
 
 
 def after_install():
@@ -10,6 +10,7 @@ def after_install():
 	ensure_roles()
 	ensure_root_department()
 	install_calendar()
+	ensure_approval_processes()
 
 
 def after_migrate():
@@ -17,6 +18,33 @@ def after_migrate():
 	ensure_roles()
 	ensure_root_department()
 	install_calendar()
+	ensure_approval_processes()
+
+
+def ensure_approval_processes():
+	"""The four standard processes of the design doc, and a default for each request type."""
+	for name, steps in STANDARD_PROCESSES.items():
+		if frappe.db.exists("Approval Process", name):
+			continue
+		doc = frappe.get_doc(
+			{
+				"doctype": "Approval Process",
+				"process_name": name,
+				"is_standard": 1,
+				"steps": [{"approver_type": s} for s in steps],
+			}
+		)
+		doc.flags.skip_audit = True
+		doc.insert(ignore_permissions=True)
+	settings = frappe.get_single("Hozur Settings")
+	changed = False
+	for field, process in DEFAULT_PROCESSES.items():
+		if not settings.get(field):
+			settings.set(field, process)
+			changed = True
+	if changed:
+		settings.flags.ignore_permissions = settings.flags.skip_audit = True
+		settings.save()
 
 
 def ensure_settings():

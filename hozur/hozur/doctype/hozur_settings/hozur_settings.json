@@ -10,7 +10,15 @@
   "clock_drift_warning_seconds",
   "section_calendar",
   "calendar_update_url",
-  "last_calendar_update"
+  "last_calendar_update",
+  "section_approvals",
+  "daily_leave_process",
+  "hourly_leave_process",
+  "overtime_process",
+  "column_break_approvals",
+  "mission_process",
+  "correction_process",
+  "operator_entry_process"
  ],
  "fields": [
   {
@@ -48,12 +56,59 @@
    "fieldtype": "Data",
    "label": "Last Calendar Update",
    "read_only": 1
+  },
+  {
+   "description": "Default approval process for each request type. Per-person exceptions are set in Approval Override.",
+   "fieldname": "section_approvals",
+   "fieldtype": "Section Break",
+   "label": "Approvals"
+  },
+  {
+   "fieldname": "daily_leave_process",
+   "fieldtype": "Link",
+   "label": "Daily Leave",
+   "options": "Approval Process"
+  },
+  {
+   "fieldname": "hourly_leave_process",
+   "fieldtype": "Link",
+   "label": "Hourly Leave",
+   "options": "Approval Process"
+  },
+  {
+   "fieldname": "overtime_process",
+   "fieldtype": "Link",
+   "label": "Overtime",
+   "options": "Approval Process"
+  },
+  {
+   "fieldname": "column_break_approvals",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mission_process",
+   "fieldtype": "Link",
+   "label": "Mission",
+   "options": "Approval Process"
+  },
+  {
+   "fieldname": "correction_process",
+   "fieldtype": "Link",
+   "label": "Attendance Correction",
+   "options": "Approval Process"
+  },
+  {
+   "description": "Optional. Process for requests an operator enters on someone's behalf (e.g. manual punch times). Empty: the normal process applies.",
+   "fieldname": "operator_entry_process",
+   "fieldtype": "Link",
+   "label": "Requests Entered by an Operator",
+   "options": "Approval Process"
   }
  ],
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-06 17:47:33.000000",
+ "modified": "2026-10-06 18:06:50.000000",
  "modified_by": "Administrator",
  "module": "Hozur",
  "name": "Hozur Settings",
