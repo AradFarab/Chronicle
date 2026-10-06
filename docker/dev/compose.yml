@@ -1,0 +1,65 @@
+# Development stack for hozur, adapted from frappe_docker's devcontainer-example
+# (https://github.com/frappe/frappe_docker/tree/main/devcontainer-example).
+#
+#   docker compose -f docker/dev/compose.yml up -d
+#   docker compose -f docker/dev/compose.yml exec frappe bash /workspace/hozur/docker/dev/bootstrap.sh
+#
+# The bench lives in a named volume (fast on macOS); this repository is bind-mounted
+# at /workspace/hozur and soft-linked into the bench as apps/hozur.
+# Credentials below are for local development only.
+
+name: hozur-dev
+
+services:
+  mariadb:
+    image: docker.io/mariadb:11.8
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+    environment:
+      MYSQL_ROOT_PASSWORD: "123"
+      MARIADB_AUTO_UPGRADE: "1"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis-cache:
+    image: docker.io/redis:alpine
+
+  redis-queue:
+    image: docker.io/redis:alpine
+    volumes:
+      - redis-queue-data:/data
+
+  frappe:
+    # Debian trixie + pyenv (Python 3.14) + nvm (Node 24) + bench + WeasyPrint libs.
+    image: docker.io/frappe/bench:latest
+    command: sleep infinity
+    environment:
+      SHELL: /bin/bash
+      TZ: Asia/Tehran
+    volumes:
+      - ../..:/workspace/hozur:cached
+      - bench:/home/frappe/frappe-bench
+    working_dir: /home/frappe/frappe-bench
+    ports:
+      - "8000:8000" # Frappe web (http://hozur.localhost:8000)
+      - "9000:9000" # socket.io
+      - "8080:8080" # Vite dev server for frontend/
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+
+volumes:
+  mariadb-data:
+  redis-queue-data:
+  bench:
