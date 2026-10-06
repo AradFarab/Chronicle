@@ -103,3 +103,9 @@ jobs:
           bench --site test_site run-tests --app hozur
         env:
           TYPE: server
+
+      - name: Run engine, Jalali and exporter tests (pytest)
+        working-directory: /home/runner/frappe-bench/apps/hozur
+        run: |
+          ../../env/bin/python -m pip install --quiet "pytest~=8.4"
+          ../../env/bin/python -m pytest

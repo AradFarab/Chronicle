@@ -153,12 +153,14 @@ hozur_request_doctypes = ["Attendance Correction", "Leave Application", "Mission
 
 permission_query_conditions = {
 	"Employee": "hozur.permissions.employee_query",
+	"Report Template": "hozur.reports.api.template_query",
 	**{dt: "hozur.permissions.employee_condition" for dt in EMPLOYEE_SCOPED_DOCTYPES},
 	**{dt: "hozur.approvals.request_query" for dt in hozur_request_doctypes},
 }
 
 has_permission = {
 	"Employee": "hozur.permissions.has_employee_doc_permission",
+	"Report Template": "hozur.reports.api.has_template_permission",
 	**{dt: "hozur.permissions.has_employee_permission" for dt in EMPLOYEE_SCOPED_DOCTYPES},
 	**{dt: "hozur.approvals.has_request_permission" for dt in hozur_request_doctypes},
 }

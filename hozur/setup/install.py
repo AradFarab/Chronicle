@@ -2,7 +2,14 @@ import frappe
 
 from hozur.calendar_sync import install_calendar
 from hozur.rule_sets import seed_baseline
-from hozur.setup.data import DEFAULT_PROCESSES, LEAVE_TYPES, ROLES, ROOT_DEPARTMENT, STANDARD_PROCESSES
+from hozur.setup.data import (
+	DEFAULT_PROCESSES,
+	LEAVE_TYPES,
+	REPORT_TEMPLATES,
+	ROLES,
+	ROOT_DEPARTMENT,
+	STANDARD_PROCESSES,
+)
 
 
 def after_install():
@@ -14,6 +21,7 @@ def after_install():
 	ensure_approval_processes()
 	seed_baseline()
 	ensure_leave_types()
+	ensure_report_templates()
 
 
 def after_migrate():
@@ -24,6 +32,23 @@ def after_migrate():
 	ensure_approval_processes()
 	seed_baseline()
 	ensure_leave_types()
+	ensure_report_templates()
+
+
+def ensure_report_templates():
+	for template in REPORT_TEMPLATES:
+		if frappe.db.exists("Report Template", template["template_name"]):
+			continue
+		doc = frappe.get_doc(
+			{
+				"doctype": "Report Template",
+				**{k: v for k, v in template.items() if k != "columns"},
+				"is_standard": 1,
+				"columns": [{"field": f} for f in template["columns"]],
+			}
+		)
+		doc.flags.skip_audit = True
+		doc.insert(ignore_permissions=True)
 
 
 def ensure_leave_types():
