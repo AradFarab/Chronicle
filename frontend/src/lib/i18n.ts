@@ -1,8 +1,8 @@
 /**
- * Translations for the PWA. Source strings are English (like the rest of the app) and are
- * extracted into hozur/locale/main.pot; the user's language comes rendered into the page.
+ * Translations for the PWA. Source strings are English (like the server) and are extracted
+ * into backend/hozur/locale/main.pot; the catalog comes from /api/translations/<language>.
  */
-let messages: Record<string, string> = window.hozur_messages ?? {}
+let messages: Record<string, string> = {}
 
 export function setMessages(value: Record<string, string>): void {
   messages = value

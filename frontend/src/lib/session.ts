@@ -1,46 +1,58 @@
 import { reactive } from "vue"
-import { call } from "./api"
+import { api } from "./api"
 
-export interface BootEmployee {
-  name: string
+export interface MeEmployee {
+  id: number
+  code: string
   full_name: string
-  department: string | null
-  designation: string | null
-  branch: string | null
+  department_id: number | null
+  branch_id: number | null
 }
 
-export interface Boot {
-  user: string
-  full_name: string
-  employee: BootEmployee | null
+export interface Me {
+  user: { id: number; username: string; full_name: string; language: string } | null
+  roles: string[]
+  employee: MeEmployee | null
   organization: string
   today: string
   is_operator: boolean
-  is_system_manager: boolean
-  is_ceo: boolean
+  is_admin: boolean
   is_manager: boolean
+  warnings: string[]
 }
 
-const empty: Boot = {
-  user: "Guest",
-  full_name: "",
+const empty: Me = {
+  user: null,
+  roles: [],
   employee: null,
   organization: "",
   today: "",
   is_operator: false,
-  is_system_manager: false,
-  is_ceo: false,
+  is_admin: false,
   is_manager: false,
+  warnings: [],
 }
 
-/** Rendered into the page by hozur/www/hozur.py; refreshed from the API when missing. */
-export const session = reactive<Boot>({ ...empty, ...(window.hozur_boot ?? {}) })
+export const session = reactive<Me>({ ...empty })
 
-export async function refreshSession(): Promise<void> {
-  Object.assign(session, await call<Boot>("hozur.api.pwa.boot"))
+/** Load who is logged in; false when nobody is. */
+export async function refreshSession(): Promise<boolean> {
+  try {
+    Object.assign(session, await api.get<Me>("/me"))
+    return true
+  } catch {
+    Object.assign(session, empty)
+    return false
+  }
+}
+
+export async function login(username: string, password: string): Promise<void> {
+  await api.post("/auth/login", { username, password })
+  await refreshSession()
 }
 
 export async function logout(): Promise<void> {
-  await call("logout")
-  window.location.href = "/login?redirect-to=/hozur"
+  await api.post("/auth/logout").catch(() => undefined)
+  Object.assign(session, empty)
+  window.location.href = "/login"
 }

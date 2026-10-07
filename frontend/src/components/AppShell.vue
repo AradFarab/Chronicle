@@ -103,12 +103,28 @@ const items = computed<NavItem[]>(() => {
 			count: counts.approvals,
 		},
 	]
+	if (session.is_manager || session.is_operator) {
+		list.push({ name: "reports", label: __("Reports"), icon: "lucide-chart-column", match: ["reports"] })
+	}
 	if (session.is_operator) {
 		list.push({
-			name: "devices",
-			label: __("Devices"),
-			icon: "lucide-fingerprint",
-			match: ["devices", "device", "new-device"],
+			name: "manage",
+			label: __("Manage"),
+			icon: "lucide-settings",
+			match: [
+				"manage",
+				"resource",
+				"organization",
+				"calendar",
+				"periods",
+				"users",
+				"settings",
+				"approval-defaults",
+				"audit",
+				"devices",
+				"device",
+				"new-device",
+			],
 			count: counts.unmappedUsers,
 		})
 	}

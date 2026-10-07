@@ -11,9 +11,9 @@
 				>{{ initial }}</span
 			>
 			<span v-if="!compact" class="min-w-0 flex-1">
-				<span class="block truncate text-sm font-medium">{{ session.full_name }}</span>
+				<span class="block truncate text-sm font-medium">{{ session.user?.full_name }}</span>
 				<span class="block truncate text-xs text-ink-gray-5">{{
-					session.employee?.designation || session.user
+					session.employee?.code || session.user?.username
 				}}</span>
 			</span>
 		</button>
@@ -23,15 +23,18 @@
 <script setup lang="ts">
 import { Dropdown, type DropdownOption } from "frappe-ui"
 import { computed } from "vue"
+import { useRouter } from "vue-router"
 import { __ } from "@/lib/i18n"
 import { logout, session } from "@/lib/session"
 import { useTheme } from "@/lib/theme"
 
 defineProps<{ compact?: boolean }>()
 
+const router = useRouter()
+
 const { colorScheme, cycle } = useTheme()
 
-const initial = computed(() => (session.full_name || session.user || "?").trim().charAt(0))
+const initial = computed(() => (session.user?.full_name || session.user?.username || "?").trim().charAt(0))
 
 const themeLabel = computed(
 	() =>
@@ -55,13 +58,7 @@ const options = computed(() => {
 			onClick: cycle,
 		},
 	]
-	if (session.is_system_manager) {
-		list.push({
-			label: __("Settings (Desk)"),
-			icon: "lucide-settings",
-			onClick: () => (window.location.href = "/app/hozur"),
-		})
-	}
+	list.push({ label: __("Change password"), icon: "lucide-key-round", onClick: () => router.push({ name: "account" }) })
 	list.push({ label: __("Log out"), icon: "lucide-log-out", onClick: logout })
 	return list
 })

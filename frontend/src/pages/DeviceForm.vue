@@ -2,33 +2,32 @@
 	<div class="space-y-4">
 		<div class="flex items-center gap-2">
 			<Button :aria-label="__('Back')" icon="lucide-arrow-right" :route="{ name: 'devices' }" />
-			<h1 class="flex-1 truncate text-lg font-bold">{{ isNew ? __("Add a device") : name }}</h1>
+			<h1 class="flex-1 truncate text-lg font-bold">{{ isNew ? __("Add a device") : title }}</h1>
 		</div>
 
 		<!-- settings: everything about a device is data, edited here (no code change) -->
 		<form class="hz-card space-y-4" @submit.prevent="save">
 			<h2 class="font-semibold">{{ __("Settings") }}</h2>
 			<TextInput
-				v-if="isNew"
-				v-model="form.device_name"
+				v-model="form.name"
 				:label="__('Device Name')"
 				:placeholder="__('e.g. Main entrance')"
 				required
 			/>
 			<div class="grid gap-4 sm:grid-cols-2">
-				<Select v-model="form.adapter_type" :label="__('Device Type')" :options="options.adapter_types" />
-				<Select v-model="form.branch" :label="__('Branch')" :options="branchOptions" />
+				<Select v-model="form.adapter_type" :label="__('Device Type')" :options="adapterOptions" />
+				<Select v-model="form.branch_id" :label="__('Branch')" :options="branchOptions" />
 			</div>
 			<div>
 				<Select
 					v-model="form.direction_mode"
 					:label="__('Punch Direction')"
-					:options="options.direction_modes"
+					:options="directionModes"
 				/>
 				<p class="mt-1.5 text-xs text-ink-gray-5">
 					{{
 						__(
-							"Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Ignore: punches are then paired by order."
+							"Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Pair by order."
 						)
 					}}
 				</p>
@@ -46,6 +45,7 @@
 						type="password"
 						autocomplete="new-password"
 						:label="__('Comm Key')"
+						:placeholder="hasCommKey ? __('Stored; leave empty to keep it') : undefined"
 					/>
 					<p class="mt-1.5 text-xs text-ink-gray-5">
 						{{ __("Device communication password (Menu > Comm. > Comm Key). Leave empty if not set.") }}
@@ -120,6 +120,9 @@
 					}}
 				</p>
 				<Select v-model="importTemplate" :label="__('Import Template')" :options="templateOptions" />
+				<p v-if="!templateOptions.length" class="text-xs text-ink-amber-7">
+					{{ __("Define an import template first (Manage > Import Templates).") }}
+				</p>
 				<input
 					ref="fileInput"
 					type="file"
@@ -165,20 +168,23 @@
 					{{ isNetwork ? __("Press “Read Users from Device”.") : __("Users appear after the first import.") }}
 				</p>
 				<ul class="divide-y divide-outline-gray-1">
-					<li v-for="u in users" :key="u.name" class="flex flex-wrap items-center gap-2 py-2">
+					<li v-for="u in users" :key="u.id ?? 'new-' + u.device_user_id" class="flex flex-wrap items-center gap-2 py-2">
 						<span class="hz-num w-14 font-semibold" dir="ltr">{{ fa(u.device_user_id) }}</span>
-						<span class="min-w-0 flex-1 truncate text-sm text-ink-gray-6" dir="auto">{{
-							u.device_user_name || "—"
-						}}</span>
+						<span class="min-w-0 flex-1 truncate text-sm text-ink-gray-6" dir="auto">
+							{{ u.device_user_name || "—" }}
+							<span v-if="u.valid_from || u.valid_to" class="hz-num block text-xs text-ink-gray-5">
+								{{ __("From {0} to {1}", [fa(u.valid_from || "…"), fa(u.valid_to || "…")]) }}
+							</span>
+						</span>
 						<select
 							class="h-8 w-full rounded-3 border border-transparent bg-surface-gray-2 px-2 text-sm sm:w-56"
-							:class="u.employee ? '' : 'ring-1 ring-outline-amber-3'"
-							:value="u.employee ?? ''"
+							:class="u.employee_id ? '' : 'ring-1 ring-outline-amber-3'"
+							:value="u.employee_id ?? ''"
 							@change="mapUser(u, ($event.target as HTMLSelectElement).value)"
 						>
 							<option value="">{{ __("— no employee —") }}</option>
-							<option v-for="e in employees" :key="e.name" :value="e.name">
-								{{ e.full_name }} ({{ fa(e.name) }})
+							<option v-for="e in employees" :key="e.id" :value="e.id">
+								{{ e.full_name }} ({{ fa(e.code) }})
 							</option>
 						</select>
 					</li>
@@ -190,68 +196,125 @@
 
 <script setup lang="ts">
 import { Button, ErrorMessage, Select, Switch, TextInput, toast } from "frappe-ui"
-import { computed, onMounted, reactive, ref } from "vue"
+import { computed, onMounted, reactive, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import JalaliDatePicker from "@/components/JalaliDatePicker.vue"
-import { call, uploadFile } from "@/lib/api"
+import { api } from "@/lib/api"
 import { refreshCounts } from "@/lib/counts"
+import { directionModeLabel } from "@/lib/format"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
-import type { Option } from "@/lib/types"
+import type { Employee } from "@/lib/types"
 
-const props = defineProps<{ name?: string }>()
+const props = defineProps<{ id?: number }>()
 const router = useRouter()
-const isNew = computed(() => !props.name)
+const isNew = computed(() => !props.id)
+
+interface Device {
+	id: number
+	name: string
+	adapter_type: string
+	branch_id: number | null
+	enabled: boolean
+	direction_mode: string
+	host: string | null
+	port: number
+	has_comm_key: boolean
+	polling_interval_minutes: number
+	timeout_seconds: number
+	use_udp: boolean
+}
+
+interface Adapter {
+	code: string
+	label: string
+	network: boolean
+}
+
+interface SyncResult {
+	ok: boolean
+	created: number
+	existing: number
+	duplicates: number
+	message: string | null
+}
 
 const form = reactive({
-	device_name: "",
-	adapter_type: "ZKTeco",
-	branch: "" as string | null,
-	enabled: 1,
-	direction_mode: "From Device",
+	name: "",
+	adapter_type: "zkteco",
+	branch_id: "" as number | "",
+	enabled: true,
+	direction_mode: "from_device",
 	host: "",
 	port: 4370,
-	comm_key: "",
+	comm_key: "", // write-only: sent only when typed
 	polling_interval_minutes: 5,
 	timeout_seconds: 10,
-	use_udp: 0,
+	use_udp: false,
 })
-const enabled = computed({ get: () => !!form.enabled, set: (v: boolean) => (form.enabled = v ? 1 : 0) })
-const useUdp = computed({ get: () => !!form.use_udp, set: (v: boolean) => (form.use_udp = v ? 1 : 0) })
-const isNetwork = computed(() => form.adapter_type !== "File Import")
+const title = ref("")
+const hasCommKey = ref(false)
+const enabled = computed({ get: () => form.enabled, set: (v: boolean) => (form.enabled = v) })
+const useUdp = computed({ get: () => form.use_udp, set: (v: boolean) => (form.use_udp = v) })
 
-const options = reactive({
-	adapter_types: [] as Option[],
-	direction_modes: [] as Option[],
-	branches: [] as string[],
-	import_templates: [] as string[],
-})
+const adapters = ref<Adapter[]>([])
+const branches = ref<{ id: number; name: string }[]>([])
+const templates = ref<{ id: number; name: string }[]>([])
+const isNetwork = computed(
+	() => adapters.value.find((a) => a.code === form.adapter_type)?.network ?? form.adapter_type !== "file_import"
+)
+const adapterOptions = computed(() => adapters.value.map((a) => ({ value: a.code, label: __(a.label) })))
+const directionModes = computed(() =>
+	["from_device", "always_in", "always_out", "pair_by_order"].map((m) => ({ value: m, label: directionModeLabel(m) }))
+)
 const branchOptions = computed(() => [
 	{ value: "", label: __("All branches") },
-	...options.branches.map((b) => ({ value: b, label: b })),
+	...branches.value.map((b) => ({ value: b.id, label: b.name })),
 ])
-const templateOptions = computed(() => options.import_templates.map((t) => ({ value: t, label: t })))
+const templateOptions = computed(() => templates.value.map((t) => ({ value: t.id, label: t.name })))
 
 const saving = ref(false)
 const error = ref("")
 const busy = ref("")
 
+function fill(d: Device) {
+	Object.assign(form, {
+		name: d.name,
+		adapter_type: d.adapter_type,
+		branch_id: d.branch_id ?? "",
+		enabled: d.enabled,
+		direction_mode: d.direction_mode,
+		host: d.host ?? "",
+		port: d.port,
+		comm_key: "",
+		polling_interval_minutes: d.polling_interval_minutes,
+		timeout_seconds: d.timeout_seconds,
+		use_udp: d.use_udp,
+	})
+	title.value = d.name
+	hasCommKey.value = d.has_comm_key
+}
+
 async function loadDevice() {
-	if (!props.name) return
-	Object.assign(form, await call("hozur.api.pwa.device", { name: props.name }))
-	form.branch = form.branch || ""
+	if (!props.id) return
+	// there is no single-device endpoint: the list is small
+	const device = (await api.get<Device[]>("/devices")).find((d) => d.id === props.id)
+	if (!device) throw new Error(__("Not found"))
+	fill(device)
 }
 
 async function save() {
 	saving.value = true
 	error.value = ""
 	try {
-		const result = await call<{ name: string }>("hozur.api.pwa.save_device", {
-			values: { ...form, name: props.name, branch: form.branch || null },
-		})
+		const { comm_key, ...values } = form
+		const body = { ...values, branch_id: form.branch_id || null, ...(comm_key ? { comm_key } : {}) }
+		const device = props.id
+			? await api.patch<Device>(`/devices/${props.id}`, body)
+			: await api.post<Device>("/devices", body)
 		toast.success(__("Saved"))
-		if (isNew.value) router.replace({ name: "device", params: { name: result.name } })
-		else await loadDevice()
+		if (isNew.value) router.replace({ name: "device", params: { id: device.id } })
+		else fill(device)
 	} catch (e) {
 		error.value = (e as Error).message
 	} finally {
@@ -280,38 +343,39 @@ const healthItems = computed(() => {
 		{ label: __("Firmware"), value: h.firmware || "—" },
 		{ label: __("Users on Device"), value: fa(h.user_count ?? 0) },
 		{ label: __("Log Records on Device"), value: fa(`${h.record_count ?? 0} / ${h.record_capacity || "?"}`) },
-		{ label: __("Device Time"), value: h.device_time ? fa(h.device_time.join(" ")) : "—" },
+		{ label: __("Device Time"), value: h.device_time ? fa(h.device_time.join(" ").slice(0, 16)) : "—" },
 		{ label: __("Clock Difference (Seconds)"), value: fa(h.clock_drift_seconds ?? 0) },
 	]
 })
 const resyncFrom = ref<string | null>(null)
 
 async function run(action: "test" | "users" | "sync" | "clock" | "resync") {
+	if (!props.id) return
 	busy.value = action
-	const device = props.name
+	const path = `/devices/${props.id}`
 	try {
 		if (action === "test") {
-			health.value = await call<Health>("hozur.devices.service.test_connection", { device })
-			toast.success(__("Connected: {0}", [health.value.model || device || ""]))
+			health.value = await api.post<Health>(`${path}/test`)
+			toast.success(__("Connected: {0}", [health.value.model || title.value]))
 		} else if (action === "users") {
-			const r = await call<{ users: number; created: number; auto_mapped: number }>(
-				"hozur.devices.service.read_device_users",
-				{ device }
-			)
+			const r = await api.post<{ users: number; created: number; auto_mapped: number }>(`${path}/read-users`)
 			toast.success(
 				fa(__("{0} users read, {1} new, {2} mapped automatically", [r.users, r.created, r.auto_mapped]))
 			)
 			await loadUsers()
+			refreshCounts(true)
 		} else if (action === "sync" || action === "resync") {
-			const r = await call<{ created: number }>(
-				action === "sync" ? "hozur.devices.service.sync_now" : "hozur.devices.service.resync_from",
-				action === "sync" ? { device } : { device, jdate: resyncFrom.value }
-			)
-			toast.success(fa(__("{0} new punches", [r.created])))
+			const r =
+				action === "sync"
+					? await api.post<SyncResult>(`${path}/sync`)
+					: await api.post<SyncResult>(`${path}/resync`, { jdate: resyncFrom.value })
+			if (r.ok) toast.success(fa(__("{0} new punches", [r.created])))
+			else toast.error(r.message || __("Error"), { duration: 10000 })
 			await loadUsers()
+			refreshCounts(true)
 		} else {
-			const r = await call<{ set_to: [string, string] }>("hozur.devices.service.set_device_clock", { device })
-			toast.success(fa(__("Device clock set to {0} {1}", r.set_to)))
+			const r = await api.post<{ set_to: [string, string] }>(`${path}/set-clock`)
+			toast.success(fa(__("Device clock set to {0} {1}", [r.set_to[0], r.set_to[1].slice(0, 5)])))
 		}
 	} catch (e) {
 		toast.error((e as Error).message, { duration: 10000 })
@@ -321,39 +385,39 @@ async function run(action: "test" | "users" | "sync" | "clock" | "resync") {
 }
 
 // file import ------------------------------------------------------------------------------
-const importTemplate = ref<string | null>(null)
+const importTemplate = ref<number | null>(null)
 const file = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement>()
 const importResult = ref<{
+	status: string
 	total_rows: number
-	created: number
-	existing: number
-	duplicates: number
-	errors: number
-	error_log: string
+	created_count: number
+	existing_count: number
+	duplicate_count: number
+	error_count: number
+	error_log: string | null
 } | null>(null)
 
 const importSummary = computed(() => {
 	const r = importResult.value
 	if (!r) return ""
-	const counts = [r.total_rows, r.created, r.existing, r.duplicates, r.errors]
+	const counts = [r.total_rows, r.created_count, r.existing_count, r.duplicate_count, r.error_count]
 	return fa(__("{0} rows: {1} new, {2} already stored, {3} duplicates, {4} errors", counts))
 })
 
 async function importFile() {
-	if (!file.value || !importTemplate.value) return
+	if (!props.id || !file.value || !importTemplate.value) return
 	busy.value = "import"
 	importResult.value = null
 	try {
-		const fileUrl = await uploadFile(file.value)
-		importResult.value = await call("hozur.api.pwa.import_punches", {
-			device: props.name,
-			template: importTemplate.value,
-			file_url: fileUrl,
-		})
+		const data = new FormData()
+		data.append("template_id", String(importTemplate.value))
+		data.append("file", file.value)
+		importResult.value = await api.upload(`/devices/${props.id}/import`, data)
 		file.value = null
 		if (fileInput.value) fileInput.value.value = ""
 		await loadUsers()
+		refreshCounts(true)
 	} catch (e) {
 		toast.error((e as Error).message, { duration: 10000 })
 	} finally {
@@ -363,27 +427,49 @@ async function importFile() {
 
 // device users -----------------------------------------------------------------------------
 interface DeviceUser {
-	name: string
+	id: number | null // null: punches arrived for this device user but nobody mapped it yet
 	device_user_id: string
 	device_user_name: string | null
-	employee: string | null
+	employee_id: number | null
+	valid_from: string | null
+	valid_to: string | null
 }
 const users = ref<DeviceUser[]>([])
-const employees = ref<{ name: string; full_name: string }[]>([])
-const unmappedCount = computed(() => users.value.filter((u) => !u.employee).length)
+const employees = ref<Employee[]>([])
+const unmappedCount = computed(() => users.value.filter((u) => !u.employee_id).length)
 
 async function loadUsers() {
-	if (!props.name) return
-	users.value = await call<DeviceUser[]>("hozur.api.pwa.device_users", { device: props.name })
+	if (!props.id) return
+	const [mapped, unmapped] = await Promise.all([
+		api.get<DeviceUser[]>(`/devices/${props.id}/users`),
+		api.get<{ device_id: number; device_user_id: string }[]>("/devices/users/unmapped"),
+	])
+	const known = new Set(mapped.map((u) => u.device_user_id))
+	const waiting = unmapped
+		.filter((u) => u.device_id === props.id && !known.has(u.device_user_id))
+		.map((u) => ({
+			id: null,
+			device_user_id: u.device_user_id,
+			device_user_name: null,
+			employee_id: null,
+			valid_from: null,
+			valid_to: null,
+		}))
+	users.value = [...mapped, ...waiting]
 }
 
 async function mapUser(u: DeviceUser, employee: string) {
+	const employee_id = employee ? Number(employee) : null
 	try {
-		const r = await call<{ employee: string | null }>("hozur.api.pwa.map_device_user", {
-			name: u.name,
-			employee: employee || null,
-		})
-		u.employee = r.employee
+		const r = u.id
+			? await api.patch<DeviceUser>(`/devices/users/${u.id}`, { employee_id })
+			: await api.post<DeviceUser>("/devices/users", {
+					device_id: props.id,
+					device_user_id: u.device_user_id,
+					employee_id,
+			  })
+		u.id = r.id
+		u.employee_id = r.employee_id
 		toast.success(__("Saved"))
 		refreshCounts(true)
 	} catch (e) {
@@ -392,15 +478,34 @@ async function mapUser(u: DeviceUser, employee: string) {
 	}
 }
 
+// the device's own data; runs again when a new device is saved (same page, new id)
+async function loadExisting() {
+	if (!props.id) return
+	const [templateRows, employeeRows] = await Promise.all([
+		api.get<{ id: number; name: string }[]>("/devices/import-templates"),
+		api.get<Employee[]>("/admin/employees"),
+		loadDevice(),
+		loadUsers(),
+	])
+	templates.value = templateRows
+	importTemplate.value = templateRows[0]?.id ?? null
+	employees.value = employeeRows
+}
+
+watch(
+	() => props.id,
+	() => loadExisting().catch((e) => (error.value = (e as Error).message))
+)
+
 onMounted(async () => {
 	try {
-		Object.assign(options, await call("hozur.api.pwa.device_options"))
-		importTemplate.value = options.import_templates[0] ?? null
-		await loadDevice()
-		if (props.name) {
-			await loadUsers()
-			employees.value = await call("hozur.api.pwa.employees", { limit: 1000 })
-		}
+		const [adapterRows, branchRows] = await Promise.all([
+			api.get<Adapter[]>("/devices/adapters"),
+			api.get<{ id: number; name: string }[]>("/admin/branches"),
+		])
+		adapters.value = adapterRows
+		branches.value = branchRows
+		await loadExisting()
 	} catch (e) {
 		error.value = (e as Error).message
 	}
