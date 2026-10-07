@@ -1,0 +1,67 @@
+"""The web application: the JSON API under /api and, in production, the built PWA."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from fastapi import Depends, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+
+from hozur import __version__
+from hozur.api.deps import csrf_guard
+from hozur.api.routes import auth, calendar, me, requests
+from hozur.config import get_settings
+from hozur.i18n import DEFAULT_LANGUAGE, translate
+from hozur.services.errors import HozurError
+
+
+def _language(request: Request) -> str:
+	return getattr(request.state, "language", None) or DEFAULT_LANGUAGE
+
+
+def create_app() -> FastAPI:
+	app = FastAPI(title="Hozur", version=__version__, dependencies=[Depends(csrf_guard)])
+
+	@app.exception_handler(HozurError)
+	async def hozur_error(request: Request, exc: HozurError):
+		return JSONResponse(
+			{"message": exc.translated(_language(request)), "error": type(exc).__name__},
+			status_code=exc.status_code,
+		)
+
+	@app.exception_handler(RequestValidationError)
+	async def bad_input(request: Request, exc: RequestValidationError):
+		return JSONResponse(
+			{
+				"message": translate("Some fields are missing or invalid", _language(request)),
+				"detail": exc.errors(),
+			},
+			status_code=422,
+		)
+
+	@app.get("/api/health", tags=["system"])
+	def health() -> dict:
+		return {"ok": True, "version": __version__}
+
+	for module in (auth, me, requests, calendar):
+		app.include_router(module.router)
+
+	dist = get_settings().frontend_dist
+	if dist and Path(dist).is_dir():
+		_serve_pwa(app, Path(dist))
+	return app
+
+
+def _serve_pwa(app: FastAPI, dist: Path) -> None:
+	"""Static assets as files; every other path gets index.html (client-side routing)."""
+	app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
+	index = dist / "index.html"
+
+	@app.get("/{path:path}", include_in_schema=False)
+	def spa(path: str):
+		candidate = (dist / path).resolve()
+		if path and candidate.is_file() and dist.resolve() in candidate.parents:
+			return FileResponse(candidate)
+		return FileResponse(index)

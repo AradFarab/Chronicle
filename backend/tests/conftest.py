@@ -45,3 +45,11 @@ def db(db_engine):
 		session.close()
 		transaction.rollback()
 		connection.close()
+
+
+@pytest.fixture
+def org(db):
+	"""A small company with users for every role (see orgfactory.build_org)."""
+	from orgfactory import build_org
+
+	return build_org(db)
