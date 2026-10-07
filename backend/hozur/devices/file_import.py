@@ -2,7 +2,7 @@
 
 The operator describes a file once (Punch Import Template: which column holds the user id,
 the date and the time, and in which calendar) and every later file of that kind is read the
-same way. No frappe import here: hozur.devices.service turns ParsedPunch rows into Raw Punches.
+same way. Pure Python: hozur.services.devices turns ParsedPunch rows into raw punches.
 """
 
 from __future__ import annotations
@@ -16,11 +16,11 @@ from datetime import datetime
 from hozur.devices.base import IN, OUT, UNKNOWN, DeviceAdapter, DeviceError, _, register
 from hozur.jalali.dates import InvalidJalaliDate, from_gregorian, normalize_jdate, to_ascii_digits
 
-ZKTECO_USB = "ZKTeco USB (attlog.dat)"
+ZKTECO_USB = "zkteco_usb"
 # Windows-1256 has no Persian yeh/kaf: older Persian software writes the Arabic letters.
 _ARABIC_TO_PERSIAN = str.maketrans({"ي": "ی", "ى": "ی", "ك": "ک"})
-CSV, EXCEL = "CSV", "Excel"
-DELIMITERS = {"Comma": ",", "Tab": "\t", "Semicolon": ";", "Pipe": "|"}
+CSV, EXCEL = "csv", "excel"
+DELIMITERS = {"comma": ",", "tab": "\t", "semicolon": ";", "pipe": "|"}
 
 
 @dataclass(frozen=True)
@@ -43,7 +43,7 @@ class ParseResult:
 class FileImportAdapter(DeviceAdapter):
 	"""Placeholder for devices whose punches arrive as files: nothing to poll."""
 
-	code = "File Import"
+	code = "file_import"
 	label = "File Import (USB, Excel, CSV)"
 	network = False
 
@@ -68,7 +68,7 @@ def normalize_text(value: str) -> str:
 
 
 def read_table(
-	content: bytes, file_format: str, delimiter: str = "Comma", encoding: str = "UTF-8"
+	content: bytes, file_format: str, delimiter: str = "comma", encoding: str = "utf-8"
 ) -> list[list[str]]:
 	"""Raw file bytes -> rows of cell strings (Arabic yeh/kaf normalized to Persian)."""
 	if file_format == EXCEL:
@@ -78,7 +78,7 @@ def read_table(
 		ws = wb.worksheets[0]
 		rows = [["" if c is None else _cell_text(c) for c in row] for row in ws.iter_rows(values_only=True)]
 	else:
-		text = content.decode("cp1256" if encoding == "Windows-1256" else "utf-8-sig", errors="replace")
+		text = content.decode("cp1256" if encoding == "windows-1256" else "utf-8-sig", errors="replace")
 		if file_format == ZKTECO_USB:
 			rows = [re.split(r"\t", line.strip()) for line in text.splitlines() if line.strip()]
 		else:
@@ -167,7 +167,7 @@ def parse_rows(rows: list[list[str]], template: dict) -> ParseResult:
 			"datetime_column": "2",
 			"date_column": None,
 			"time_column": None,
-			"date_calendar": "Gregorian",
+			"date_calendar": "gregorian",
 			"date_format": "YYYY-MM-DD",
 			"direction_column": "4",
 			"in_values": "0,3,4",
@@ -191,8 +191,8 @@ def parse_rows(rows: list[list[str]], template: dict) -> ParseResult:
 		raise DeviceError(
 			_("The template needs a user id column and either a date-time column or date and time columns")
 		)
-	calendar = template.get("date_calendar") or "Jalali"
-	date_format = template.get("date_format") or ("YYYY/MM/DD" if calendar == "Jalali" else "YYYY-MM-DD")
+	calendar = template.get("date_calendar") or "jalali"
+	date_format = template.get("date_format") or ("YYYY/MM/DD" if calendar == "jalali" else "YYYY-MM-DD")
 	in_values, out_values = _values(template.get("in_values")), _values(template.get("out_values"))
 
 	for offset, row in enumerate(rows):
@@ -209,7 +209,7 @@ def parse_rows(rows: list[list[str]], template: dict) -> ParseResult:
 			else:
 				date_part, time_part = cells[col_date], cells[col_time]
 			time = _time(time_part)
-			if calendar == "Gregorian":
+			if calendar == "gregorian":
 				day = _gregorian(date_part, date_format)
 				hh, mm, ss = (int(x) for x in time.split(":"))
 				ts = day.replace(hour=hh, minute=mm, second=ss)

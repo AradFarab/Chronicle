@@ -106,8 +106,8 @@ def adapter(host="10.0.0.1", comm_key=None):
 
 
 def test_registered():
-	assert get_adapter_class("ZKTeco") is ZKTecoAdapter
-	assert {"ZKTeco", "File Import"} <= set(REGISTRY)
+	assert get_adapter_class("zkteco") is ZKTecoAdapter
+	assert {"zkteco", "file_import"} <= set(REGISTRY)
 
 
 def test_fetch_since_filters_and_maps_direction():

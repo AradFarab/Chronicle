@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-07 15:34+0000\n"
+"POT-Creation-Date: 2026-10-07 15:41+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -126,6 +126,10 @@ msgstr ""
 msgid "Choose the branch"
 msgstr ""
 
+#: backend/hozur/services/devices.py:496
+msgid "Choose the device and enter the device user id"
+msgstr ""
+
 #: backend/hozur/services/requests.py:120
 msgid "Choose the leave type"
 msgstr ""
@@ -242,12 +246,20 @@ msgstr ""
 msgid "Device error: {0}"
 msgstr ""
 
+#: backend/hozur/services/devices.py:88
+msgid "Device not found"
+msgstr ""
+
 #: frontend/src/pages/DeviceForm.vue:72
 msgid "Device tools"
 msgstr ""
 
 #: frontend/src/pages/DeviceForm.vue:152
 msgid "Device users"
+msgstr ""
+
+#: backend/hozur/services/devices.py:355
+msgid "Device {0} receives punches by file import"
 msgstr ""
 
 #: frontend/src/components/AppShell.vue:109 frontend/src/pages/Today.vue:17
@@ -294,12 +306,20 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
+#: backend/hozur/services/devices.py:126 backend/hozur/services/devices.py:585
+msgid "Enter a name"
+msgstr ""
+
 #: backend/hozur/calendar/service.py:370
 msgid "Enter a title"
 msgstr ""
 
 #: backend/hozur/services/users.py:48
 msgid "Enter a username"
+msgstr ""
+
+#: backend/hozur/services/devices.py:133
+msgid "Enter the device IP address"
 msgstr ""
 
 #: backend/hozur/services/requests.py:242
@@ -438,6 +458,10 @@ msgstr ""
 msgid "Incomplete"
 msgstr ""
 
+#: backend/hozur/services/devices.py:214
+msgid "Invalid punch time {0}"
+msgstr ""
+
 #: backend/hozur/reports/catalog.py:51 frontend/src/components/DayNumbers.vue:22
 msgid "Last Out"
 msgstr ""
@@ -550,7 +574,7 @@ msgstr ""
 msgid "Night Work"
 msgstr ""
 
-#: backend/hozur/devices/base.py:115
+#: backend/hozur/devices/base.py:115 backend/hozur/services/devices.py:131
 msgid "No adapter registered for device type {0}"
 msgstr ""
 
@@ -592,6 +616,10 @@ msgstr ""
 
 #: backend/hozur/services/requests.py:339
 msgid "Not enough leave: {0} days available, {1} requested"
+msgstr ""
+
+#: backend/hozur/services/devices.py:487 backend/hozur/services/devices.py:579
+msgid "Not found"
 msgstr ""
 
 #: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/services/access.py:133 backend/hozur/services/requests.py:379
@@ -842,12 +870,16 @@ msgstr ""
 msgid "The day is not over; the numbers are final after your last punch."
 msgstr ""
 
-#: backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220
+#: backend/hozur/services/devices.py:498 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220
 msgid "The end date is before the start date"
 msgstr ""
 
 #: backend/hozur/services/requests.py:132 backend/hozur/services/requests.py:211
 msgid "The end time must be after the start time"
+msgstr ""
+
+#: backend/hozur/services/devices.py:632
+msgid "The file could not be read: {0}"
 msgstr ""
 
 #: backend/hozur/calendar/sources.py:161
@@ -904,6 +936,10 @@ msgstr ""
 
 #: backend/hozur/services/requests.py:151
 msgid "There is no working day in this leave"
+msgstr ""
+
+#: backend/hozur/services/devices.py:669
+msgid "This device has punches; disable it instead of deleting it"
 msgstr ""
 
 #: backend/hozur/devices/file_import.py:51

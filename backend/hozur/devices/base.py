@@ -1,9 +1,9 @@
-"""Device adapter interface (CLAUDE.md rule 5). No frappe import here.
+"""Device adapter interface (CLAUDE.md rule 5). Pure Python: no database or web imports.
 
 Every attendance source implements DeviceAdapter and registers itself with @register.
-The Frappe side (hozur.devices.service) only talks to this interface, so supporting a new
+The app (hozur.services.devices) only talks to this interface, so supporting a new
 device brand means adding one adapter; configuring another device of a supported type is
-pure data on the Attendance Device form.
+pure data on the device settings.
 
 Adapters must never clear or modify the logs stored on a device.
 """
@@ -58,7 +58,7 @@ class DeviceHealth:
 
 
 def _(text: str) -> str:
-	"""Marks a message for translation extraction; the caller translates it (no frappe here)."""
+	"""Marks a message for translation extraction; the caller translates it ."""
 	return text
 
 

@@ -1,4 +1,4 @@
-"""Labor rule parameters (CLAUDE.md rule 2). Pure Python: must not import frappe.
+"""Labor rule parameters (CLAUDE.md rule 2). Pure Python: no database or web imports.
 
 The legal values themselves are data (data/labor_law_1369.json, seeded as the read-only
 baseline Labor Rule Set). This module only knows, for each parameter, in which direction a

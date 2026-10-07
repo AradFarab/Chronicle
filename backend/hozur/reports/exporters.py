@@ -1,4 +1,4 @@
-"""Report exporters: Excel, text (CSV / delimited / fixed width) and PDF. No frappe import.
+"""Report exporters: Excel, text (CSV / delimited / fixed width) and PDF. Pure Python.
 
 columns: [{"key", "label", "kind", "width"}]; rows: [{key: raw value}] where minutes are ints.
 """

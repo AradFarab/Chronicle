@@ -1,4 +1,4 @@
-"""Rules that look at more than one day. Pure Python: must not import frappe."""
+"""Rules that look at more than one day. Pure Python: no database or web imports."""
 
 from __future__ import annotations
 

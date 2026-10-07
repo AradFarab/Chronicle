@@ -32,17 +32,17 @@ def test_csv_with_jalali_date_and_time_columns_and_persian_digits():
 	content = "کد,تاریخ,ساعت,نوع\n101,۱۴۰۵/۰۷/۱۴,۷:۵۸,ورود\n101,1405/7/14,16:31:02,خروج\n102,1405/07/14,08:10,\n".encode()
 	template = {
 		"file_format": CSV,
-		"delimiter": "Comma",
+		"delimiter": "comma",
 		"has_header": 1,
 		"user_id_column": "کد",
 		"date_column": "تاریخ",
 		"time_column": "C",
-		"date_calendar": "Jalali",
+		"date_calendar": "jalali",
 		"direction_column": "4",
 		"in_values": "ورود",
 		"out_values": "خروج",
 	}
-	result = parse_rows(read_table(content, CSV, "Comma"), template)
+	result = parse_rows(read_table(content, CSV, "comma"), template)
 	assert not result.errors
 	assert [(p.device_user_id, p.jdate, p.time, p.direction) for p in result.punches] == [
 		("101", "1405/07/14", "07:58:00", IN),
@@ -79,7 +79,7 @@ def test_excel_with_gregorian_datetime_column():
 		"has_header": 1,
 		"user_id_column": "A",
 		"datetime_column": "When",
-		"date_calendar": "Gregorian",
+		"date_calendar": "gregorian",
 		"date_format": "YYYY-MM-DD",
 	}
 	result = parse_rows(read_table(buf.getvalue(), EXCEL), template)
@@ -96,7 +96,7 @@ def test_windows_1256_file_with_arabic_yeh_matches_persian_headers():
 		"date_column": "تاریخ",
 		"time_column": "ساعت",
 	}
-	rows = read_table(content, CSV, "Comma", "Windows-1256")
+	rows = read_table(content, CSV, "comma", "windows-1256")
 	assert rows[0][1] == "تاریخ"
 	result = parse_rows(rows, template)
 	assert [p.device_user_id for p in result.punches] == ["5"]

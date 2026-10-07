@@ -1,7 +1,7 @@
 """Attendance devices: the adapter interface (base) and the built-in adapters.
 
 Importing this package registers the built-in adapters. Ingestion into the database lives
-in hozur.devices.service.
+in hozur.services.devices.
 """
 
 from hozur.devices import file_import, zkteco

@@ -1,4 +1,4 @@
-"""Engine inputs and outputs. Pure Python: must not import frappe.
+"""Engine inputs and outputs. Pure Python: no database or web imports.
 
 Times inside the engine are minutes from the start of the attendance day (0-1440, and
 beyond 1440 for the early hours of the next day in overnight shifts). Punches come in
@@ -75,7 +75,7 @@ class Absence:
 	"""An approved leave or mission. Daily when start/end are None, else an hourly window."""
 
 	kind: str  # "leave" or "mission"
-	type: str  # leave type code (e.g. "Earned", "Sick") or "mission"
+	type: str  # leave type key (the app passes the leave_type id as text) or "mission"
 	start: int | None = None
 	end: int | None = None
 	paid: bool = True  # unpaid leave does not count as work time

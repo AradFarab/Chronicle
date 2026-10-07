@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-07 15:34+0000\n"
+"POT-Creation-Date: 2026-10-07 15:41+0000\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -127,6 +127,10 @@ msgstr "نحوه پرداخت این تعطیلی را انتخاب کنید"
 msgid "Choose the branch"
 msgstr "شعبه را انتخاب کنید"
 
+#: backend/hozur/services/devices.py:496
+msgid "Choose the device and enter the device user id"
+msgstr "دستگاه را انتخاب و شناسهٔ کاربر دستگاه را وارد کنید"
+
 #: backend/hozur/services/requests.py:120
 msgid "Choose the leave type"
 msgstr "نوع مرخصی را انتخاب کنید"
@@ -243,6 +247,10 @@ msgstr "رمز ارتباطی دستگاه (منو > ارتباطات > Comm Key
 msgid "Device error: {0}"
 msgstr "خطای دستگاه: {0}"
 
+#: backend/hozur/services/devices.py:88
+msgid "Device not found"
+msgstr "دستگاه پیدا نشد"
+
 #: frontend/src/pages/DeviceForm.vue:72
 msgid "Device tools"
 msgstr "ابزارهای دستگاه"
@@ -250,6 +258,10 @@ msgstr "ابزارهای دستگاه"
 #: frontend/src/pages/DeviceForm.vue:152
 msgid "Device users"
 msgstr "کاربران دستگاه"
+
+#: backend/hozur/services/devices.py:355
+msgid "Device {0} receives punches by file import"
+msgstr "تردد دستگاه {0} با ورود فایل وارد می‌شود"
 
 #: frontend/src/components/AppShell.vue:109 frontend/src/pages/Today.vue:17
 msgid "Devices"
@@ -295,6 +307,10 @@ msgstr "کارمند پیدا نشد"
 msgid "Enabled"
 msgstr "فعال"
 
+#: backend/hozur/services/devices.py:126 backend/hozur/services/devices.py:585
+msgid "Enter a name"
+msgstr "نام را بنویسید"
+
 #: backend/hozur/calendar/service.py:370
 msgid "Enter a title"
 msgstr "عنوان را بنویسید"
@@ -302,6 +318,10 @@ msgstr "عنوان را بنویسید"
 #: backend/hozur/services/users.py:48
 msgid "Enter a username"
 msgstr "نام کاربری را بنویسید"
+
+#: backend/hozur/services/devices.py:133
+msgid "Enter the device IP address"
+msgstr "نشانی IP دستگاه را وارد کنید"
 
 #: backend/hozur/services/requests.py:242
 msgid "Enter the overtime minutes"
@@ -439,6 +459,10 @@ msgstr "ورود"
 msgid "Incomplete"
 msgstr "ناقص"
 
+#: backend/hozur/services/devices.py:214
+msgid "Invalid punch time {0}"
+msgstr "ساعت تردد نامعتبر است: {0}"
+
 #: backend/hozur/reports/catalog.py:51 frontend/src/components/DayNumbers.vue:22
 msgid "Last Out"
 msgstr "آخرین خروج"
@@ -551,7 +575,7 @@ msgstr "ماه بعد"
 msgid "Night Work"
 msgstr "شب‌کاری"
 
-#: backend/hozur/devices/base.py:115
+#: backend/hozur/devices/base.py:115 backend/hozur/services/devices.py:131
 msgid "No adapter registered for device type {0}"
 msgstr "برای نوع دستگاه {0} رابطی ثبت نشده است"
 
@@ -594,6 +618,10 @@ msgstr "عادی"
 #: backend/hozur/services/requests.py:339
 msgid "Not enough leave: {0} days available, {1} requested"
 msgstr "مرخصی کافی نیست: {0} روز مانده، {1} روز درخواست شده"
+
+#: backend/hozur/services/devices.py:487 backend/hozur/services/devices.py:579
+msgid "Not found"
+msgstr "پیدا نشد"
 
 #: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/services/access.py:133 backend/hozur/services/requests.py:379
 msgid "Not permitted"
@@ -843,13 +871,17 @@ msgstr "تأییدکنندهٔ مرحلهٔ {0} حساب کاربری ندارد
 msgid "The day is not over; the numbers are final after your last punch."
 msgstr "روز هنوز تمام نشده است؛ اعداد پس از آخرین تردد شما قطعی می‌شوند."
 
-#: backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220
+#: backend/hozur/services/devices.py:498 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220
 msgid "The end date is before the start date"
 msgstr "تاریخ پایان قبل از تاریخ شروع است"
 
 #: backend/hozur/services/requests.py:132 backend/hozur/services/requests.py:211
 msgid "The end time must be after the start time"
 msgstr "ساعت پایان باید بعد از ساعت شروع باشد"
+
+#: backend/hozur/services/devices.py:632
+msgid "The file could not be read: {0}"
+msgstr "فایل خوانده نشد: {0}"
 
 #: backend/hozur/calendar/sources.py:161
 msgid "The holiday file has no holiday list"
@@ -906,6 +938,10 @@ msgstr "پوسته: روشن"
 #: backend/hozur/services/requests.py:151
 msgid "There is no working day in this leave"
 msgstr "این مرخصی هیچ روز کاری ندارد"
+
+#: backend/hozur/services/devices.py:669
+msgid "This device has punches; disable it instead of deleting it"
+msgstr "این دستگاه تردد ثبت‌شده دارد؛ به‌جای حذف، غیرفعالش کنید"
 
 #: backend/hozur/devices/file_import.py:51
 msgid "This device receives punches by file import; there is nothing to connect to"
@@ -1717,9 +1753,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Device user {0} on {1} is already mapped for an overlapping period ({2})"
 #~ msgstr "کاربر {0} در دستگاه {1} برای بازه‌ای هم‌پوشان نگاشت شده است ({2})"
 
-#~ msgid "Device {0} receives punches by file import"
-#~ msgstr "تردد دستگاه {0} با ورود فایل وارد می‌شود"
-
 #~ msgid "Direct Manager"
 #~ msgstr "مدیر مستقیم"
 
@@ -2049,9 +2082,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Invalid Date"
 #~ msgstr "تاریخ نامعتبر"
-
-#~ msgid "Invalid punch time {0}"
-#~ msgstr "ساعت تردد نامعتبر است: {0}"
 
 #~ msgid "Iran Holiday"
 #~ msgstr "تعطیلی"

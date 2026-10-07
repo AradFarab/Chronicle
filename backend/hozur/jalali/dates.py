@@ -1,4 +1,4 @@
-"""Jalali date helpers. Pure Python: must not import frappe.
+"""Jalali date helpers. Pure Python: no database or web imports.
 
 Business dates are strings in the form ``1405/07/14`` (ASCII digits, zero-padded).
 That form sorts correctly and supports range filters without conversion.

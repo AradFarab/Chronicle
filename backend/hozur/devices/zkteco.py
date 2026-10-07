@@ -58,7 +58,7 @@ class _GuardedConnection:
 
 @register
 class ZKTecoAdapter(DeviceAdapter):
-	code = "ZKTeco"
+	code = "zkteco"
 	label = "ZKTeco (TCP 4370)"
 	network = True
 

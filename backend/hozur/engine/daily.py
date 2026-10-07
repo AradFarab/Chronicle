@@ -1,4 +1,4 @@
-"""Daily attendance calculation. Pure Python: must not import frappe.
+"""Daily attendance calculation. Pure Python: no database or web imports.
 
 calculate_day(day, shift, punches, rules, employee, absences, overtime) -> DailyResult
 
