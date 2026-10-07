@@ -1,0 +1,188 @@
+{
+ "name": "قانون کار ۱۳۶۹",
+ "effective_from": "1369/08/29",
+ "source": "attendance-software-iran-labor-law-rules.md (به‌روز تا مهر ۱۴۰۵)",
+ "note": "legal_check: در فایل قوانین با † علامت خورده یا از متن رسمی تطبیق نشده؛ قبل از انتشار با rrk.ir چک شود",
+ "parameters": {
+  "max_daily_minutes": {
+   "value": 480,
+   "article": "51",
+   "description": "حداکثر ۸ ساعت کار در شبانه‌روز",
+   "legal_check": false
+  },
+  "max_weekly_minutes": {
+   "value": 2640,
+   "article": "51 تبصره ۱",
+   "description": "حداکثر ۴۴ ساعت در هفته؛ توزیع نابرابر با توافق",
+   "legal_check": false
+  },
+  "hard_harmful_daily_minutes": {
+   "value": 360,
+   "article": "52",
+   "description": "کار سخت و زیان‌آور: ۶ ساعت در روز",
+   "legal_check": false
+  },
+  "hard_harmful_weekly_minutes": {
+   "value": 2160,
+   "article": "52",
+   "description": "کار سخت و زیان‌آور: ۳۶ ساعت در هفته",
+   "legal_check": false
+  },
+  "intermittent_span_minutes": {
+   "value": 900,
+   "article": "54",
+   "description": "کار متناوب: از شروع تا پایان حداکثر ۱۵ ساعت",
+   "legal_check": false
+  },
+  "rotating_four_week_minutes": {
+   "value": 10560,
+   "article": "57",
+   "description": "نوبت‌کاری: جمع ۴ هفته متوالی حداکثر ۱۷۶ ساعت",
+   "legal_check": false
+  },
+  "night_start_minute": {
+   "value": 1320,
+   "article": "53",
+   "description": "شروع کار شب: ساعت ۲۲",
+   "legal_check": true
+  },
+  "night_end_minute": {
+   "value": 360,
+   "article": "53",
+   "description": "پایان کار شب: ساعت ۶",
+   "legal_check": true
+  },
+  "overtime_daily_cap_minutes": {
+   "value": 240,
+   "article": "59 تبصره",
+   "description": "اضافه‌کار حداکثر ۴ ساعت در روز مگر با توافق در موارد استثنایی",
+   "legal_check": false
+  },
+  "emergency_overtime_cap_minutes": {
+   "value": 480,
+   "article": "60",
+   "description": "اضافه‌کار اضطراری حداکثر ۸ ساعت در روز",
+   "legal_check": false
+  },
+  "overtime_premium_percent": {
+   "value": 40,
+   "article": "59",
+   "description": "۴۰٪ اضافه بر مزد ساعت عادی",
+   "legal_check": false
+  },
+  "night_premium_percent": {
+   "value": 35,
+   "article": "58",
+   "description": "شب‌کاری غیرنوبتی ۳۵٪",
+   "legal_check": false
+  },
+  "rest_day_premium_percent": {
+   "value": 40,
+   "article": "62 تبصره ۱",
+   "description": "جمعه‌کاری وقتی روز دیگری تعطیل هفتگی است ۴۰٪",
+   "legal_check": false
+  },
+  "shift_premium_two_percent": {
+   "value": 10,
+   "article": "55",
+   "description": "نوبت‌کاری صبح و عصر ۱۰٪",
+   "legal_check": false
+  },
+  "shift_premium_three_percent": {
+   "value": 15,
+   "article": "55",
+   "description": "نوبت‌کاری صبح، عصر و شب ۱۵٪",
+   "legal_check": false
+  },
+  "shift_premium_night_percent": {
+   "value": 22.5,
+   "article": "55",
+   "description": "نوبت‌کاری صبح و شب یا عصر و شب ۲۲٫۵٪",
+   "legal_check": false
+  },
+  "annual_leave_days": {
+   "value": 26,
+   "article": "64",
+   "description": "مرخصی استحقاقی ۲۶ روز کاری در سال",
+   "legal_check": false
+  },
+  "hard_harmful_annual_leave_weeks": {
+   "value": 5,
+   "article": "65",
+   "description": "مرخصی کار سخت و زیان‌آور ۵ هفته در سال",
+   "legal_check": false
+  },
+  "leave_carry_over_days": {
+   "value": 9,
+   "article": "66",
+   "description": "ذخیره مرخصی حداکثر ۹ روز",
+   "legal_check": false
+  },
+  "hajj_leave_days": {
+   "value": 30,
+   "article": "67",
+   "description": "مرخصی حج واجب یک ماه، یک بار",
+   "legal_check": false
+  },
+  "hourly_leave_minutes_per_day": {
+   "value": 440,
+   "article": "70",
+   "description": "هر ۷ ساعت و ۲۰ دقیقه مرخصی ساعتی یک روز (۴۴ ÷ ۶)",
+   "legal_check": false
+  },
+  "marriage_bereavement_leave_days": {
+   "value": 3,
+   "article": "73",
+   "description": "ازدواج یا فوت بستگان درجه یک ۳ روز",
+   "legal_check": false
+  },
+  "maternity_leave_days": {
+   "value": 270,
+   "article": "76",
+   "description": "زایمان ۹ ماه طبق قوانین جمعیت",
+   "legal_check": false
+  },
+  "maternity_multiple_birth_extra_days": {
+   "value": 14,
+   "article": "76",
+   "description": "چندقلو ۱۴ روز بیشتر",
+   "legal_check": false
+  },
+  "paternity_leave_days": {
+   "value": 14,
+   "article": "قوانین جمعیت",
+   "description": "پدر هنگام تولد فرزند ۱۴ روز",
+   "legal_check": true
+  },
+  "nursing_break_minutes": {
+   "value": 30,
+   "article": "78",
+   "description": "شیردهی نیم ساعت",
+   "legal_check": true
+  },
+  "nursing_every_minutes": {
+   "value": 180,
+   "article": "78",
+   "description": "بعد از هر ۳ ساعت کار",
+   "legal_check": true
+  },
+  "nursing_child_max_months": {
+   "value": 24,
+   "article": "78",
+   "description": "تا ۲۴ ماهگی فرزند",
+   "legal_check": true
+  },
+  "juvenile_daily_reduction_minutes": {
+   "value": 30,
+   "article": "83",
+   "description": "کارگر نوجوان نیم ساعت کمتر در روز",
+   "legal_check": true
+  },
+  "juvenile_max_age_years": {
+   "value": 18,
+   "article": "79-84",
+   "description": "کارگر نوجوان: ۱۵ تا ۱۸ سال",
+   "legal_check": true
+  }
+ }
+}

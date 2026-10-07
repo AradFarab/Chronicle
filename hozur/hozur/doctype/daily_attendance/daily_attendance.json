@@ -1,0 +1,442 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-10-06 18:19:49.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "jdate",
+  "weekday_name",
+  "status",
+  "column_break_org",
+  "department",
+  "branch",
+  "designation",
+  "jyear",
+  "jmonth",
+  "section_schedule",
+  "day_type",
+  "holiday_title",
+  "work_pattern",
+  "column_break_schedule",
+  "shift",
+  "rest_day",
+  "rule_set",
+  "section_presence",
+  "first_in",
+  "last_out",
+  "punch_count",
+  "required_minutes",
+  "worked_minutes",
+  "credited_minutes",
+  "column_break_presence",
+  "late_minutes",
+  "early_leave_minutes",
+  "absence_minutes",
+  "absent_day",
+  "section_absences",
+  "leave_minutes",
+  "leave_days",
+  "mission_minutes",
+  "nursing_minutes",
+  "column_break_absences",
+  "leaves",
+  "section_extra",
+  "extra_minutes",
+  "overtime_normal_minutes",
+  "overtime_exceptional_minutes",
+  "overtime_emergency_minutes",
+  "unapproved_extra_minutes",
+  "column_break_extra",
+  "night_work_minutes",
+  "rest_day_work_minutes",
+  "friday_premium_minutes",
+  "holiday_work_minutes",
+  "company_holiday_work_minutes",
+  "section_warnings",
+  "warnings",
+  "calculated_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "jdate",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date",
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "weekday_name",
+   "fieldtype": "Data",
+   "label": "Weekday",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Present\nAbsent\nIncomplete\nLeave\nMission\nHoliday\nRest Day\nNot Scheduled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_org",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "jyear",
+   "fieldtype": "Int",
+   "in_standard_filter": 1,
+   "label": "Year",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "jmonth",
+   "fieldtype": "Int",
+   "in_standard_filter": 1,
+   "label": "Month",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_schedule",
+   "fieldtype": "Section Break",
+   "label": "Schedule"
+  },
+  {
+   "fieldname": "day_type",
+   "fieldtype": "Data",
+   "label": "Day Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "holiday_title",
+   "fieldtype": "Small Text",
+   "label": "Holiday",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_pattern",
+   "fieldtype": "Link",
+   "label": "Work Pattern",
+   "options": "Work Pattern",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_schedule",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shift",
+   "fieldtype": "Link",
+   "label": "Shift",
+   "options": "Shift",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rest_day",
+   "fieldtype": "Check",
+   "label": "Weekly Rest Day",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rule_set",
+   "fieldtype": "Link",
+   "label": "Labor Rule Set",
+   "options": "Labor Rule Set",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_presence",
+   "fieldtype": "Section Break",
+   "label": "Presence"
+  },
+  {
+   "fieldname": "first_in",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "First In",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_out",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Last Out",
+   "read_only": 1
+  },
+  {
+   "fieldname": "punch_count",
+   "fieldtype": "Int",
+   "label": "Punches",
+   "read_only": 1
+  },
+  {
+   "fieldname": "required_minutes",
+   "fieldtype": "Int",
+   "label": "Required (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "worked_minutes",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Worked (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "credited_minutes",
+   "fieldtype": "Int",
+   "label": "Credited (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_presence",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "late_minutes",
+   "fieldtype": "Int",
+   "label": "Late (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "early_leave_minutes",
+   "fieldtype": "Int",
+   "label": "Early Leave (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "absence_minutes",
+   "fieldtype": "Int",
+   "label": "Absence (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "absent_day",
+   "fieldtype": "Check",
+   "in_standard_filter": 1,
+   "label": "Absent Day",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_absences",
+   "fieldtype": "Section Break",
+   "label": "Leave and Mission"
+  },
+  {
+   "fieldname": "leave_minutes",
+   "fieldtype": "Int",
+   "label": "Leave (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "leave_days",
+   "fieldtype": "Float",
+   "label": "Leave (Days)",
+   "precision": "4",
+   "read_only": 1
+  },
+  {
+   "fieldname": "mission_minutes",
+   "fieldtype": "Int",
+   "label": "Mission (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "nursing_minutes",
+   "fieldtype": "Int",
+   "label": "Nursing Break (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_absences",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "leaves",
+   "fieldtype": "Table",
+   "label": "Leave by Type",
+   "options": "Daily Attendance Leave",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_extra",
+   "fieldtype": "Section Break",
+   "label": "Extra Work"
+  },
+  {
+   "fieldname": "extra_minutes",
+   "fieldtype": "Int",
+   "label": "Extra Work (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "overtime_normal_minutes",
+   "fieldtype": "Int",
+   "label": "Overtime (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "overtime_exceptional_minutes",
+   "fieldtype": "Int",
+   "label": "Exceptional Overtime (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "overtime_emergency_minutes",
+   "fieldtype": "Int",
+   "label": "Emergency Overtime (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "unapproved_extra_minutes",
+   "fieldtype": "Int",
+   "label": "Unapproved Extra (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_extra",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "night_work_minutes",
+   "fieldtype": "Int",
+   "label": "Night Work (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rest_day_work_minutes",
+   "fieldtype": "Int",
+   "label": "Rest Day Work (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "friday_premium_minutes",
+   "fieldtype": "Int",
+   "label": "Friday Work (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "holiday_work_minutes",
+   "fieldtype": "Int",
+   "label": "Holiday Work (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "company_holiday_work_minutes",
+   "fieldtype": "Int",
+   "label": "Company Holiday Work (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_warnings",
+   "fieldtype": "Section Break",
+   "label": "Warnings"
+  },
+  {
+   "fieldname": "warnings",
+   "fieldtype": "Small Text",
+   "label": "Warnings",
+   "read_only": 1
+  },
+  {
+   "fieldname": "calculated_at",
+   "fieldtype": "Data",
+   "label": "Calculated At",
+   "read_only": 1
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-06 18:19:49.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Daily Attendance",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager"
+  },
+  {
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator"
+  },
+  {
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur CEO"
+  },
+  {
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Manager"
+  },
+  {
+   "read": 1,
+   "role": "Hozur Employee"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "jdate",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "employee_name"
+}

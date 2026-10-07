@@ -1,0 +1,205 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-10-06 17:47:33.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "jdate",
+  "title",
+  "holiday_type",
+  "status",
+  "column_break_scope",
+  "scope",
+  "province",
+  "branch",
+  "closure_pay_mode",
+  "jyear",
+  "jmonth",
+  "section_notes",
+  "note",
+  "change_reason",
+  "section_source",
+  "seed_key",
+  "edited_by_operator"
+ ],
+ "fields": [
+  {
+   "description": "Jalali date, e.g. 1405/07/14",
+   "fieldname": "jdate",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "holiday_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Holiday Type",
+   "options": "Official Solar\nOfficial Lunar\nOfficial Occasional\nOffice Closure\nCompany Internal",
+   "reqd": 1
+  },
+  {
+   "default": "Confirmed",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Confirmed\nPredicted",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_scope",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Country",
+   "fieldname": "scope",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Scope",
+   "options": "Country\nProvince\nCompany\nBranch",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.scope=='Province'",
+   "fieldname": "province",
+   "fieldtype": "Link",
+   "label": "Province",
+   "mandatory_depends_on": "eval:doc.scope=='Province'",
+   "options": "Province"
+  },
+  {
+   "depends_on": "eval:doc.scope=='Branch'",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "mandatory_depends_on": "eval:doc.scope=='Branch'",
+   "options": "Branch"
+  },
+  {
+   "depends_on": "eval:doc.holiday_type=='Office Closure'",
+   "description": "Paid Holiday: treated as an official holiday. Employer Paid: paid day off decided by the employer. Workday: the company works that day.",
+   "fieldname": "closure_pay_mode",
+   "fieldtype": "Select",
+   "label": "Closure Pay Mode",
+   "mandatory_depends_on": "eval:doc.holiday_type=='Office Closure'",
+   "options": "\nPaid Holiday\nEmployer Paid\nWorkday"
+  },
+  {
+   "fieldname": "jyear",
+   "fieldtype": "Int",
+   "in_standard_filter": 1,
+   "label": "Year",
+   "read_only": 1
+  },
+  {
+   "fieldname": "jmonth",
+   "fieldtype": "Int",
+   "label": "Month",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "label": "Note"
+  },
+  {
+   "description": "Required when changing an existing holiday; kept in the audit history",
+   "fieldname": "change_reason",
+   "fieldtype": "Small Text",
+   "label": "Reason for Change",
+   "no_copy": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_source",
+   "fieldtype": "Section Break",
+   "label": "Source"
+  },
+  {
+   "fieldname": "seed_key",
+   "fieldtype": "Data",
+   "label": "Seed Key",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "description": "Calendar updates from the project repository leave edited holidays untouched",
+   "fieldname": "edited_by_operator",
+   "fieldtype": "Check",
+   "label": "Edited by Operator",
+   "no_copy": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-06 17:47:33.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Iran Holiday",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Hozur Employee"
+  },
+  {
+   "read": 1,
+   "role": "Hozur Manager"
+  },
+  {
+   "read": 1,
+   "role": "Hozur CEO"
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "jdate,holiday_type,status",
+ "sort_field": "jdate",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

@@ -1,0 +1,205 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:shift_name",
+ "creation": "2026-10-06 18:19:49.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "shift_name",
+  "shift_type",
+  "color",
+  "section_times",
+  "start_time",
+  "end_time",
+  "latest_start_time",
+  "required_minutes",
+  "column_break_break",
+  "break_start_time",
+  "break_end_time",
+  "break_minutes",
+  "section_rules",
+  "grace_late_minutes",
+  "grace_early_minutes",
+  "column_break_rules",
+  "overtime_after_minutes",
+  "section_summary",
+  "scheduled_minutes",
+  "crosses_midnight"
+ ],
+ "fields": [
+  {
+   "fieldname": "shift_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Shift Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "Fixed",
+   "fieldname": "shift_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Shift Type",
+   "options": "Fixed\nFlexible",
+   "reqd": 1
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Color",
+   "label": "Color"
+  },
+  {
+   "fieldname": "section_times",
+   "fieldtype": "Section Break",
+   "label": "Times"
+  },
+  {
+   "description": "For a flexible shift: the earliest allowed start",
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Start",
+   "reqd": 1
+  },
+  {
+   "description": "Earlier than the start means the shift ends after midnight",
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "End",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.shift_type=='Flexible'",
+   "fieldname": "latest_start_time",
+   "fieldtype": "Time",
+   "label": "Latest Start",
+   "mandatory_depends_on": "eval:doc.shift_type=='Flexible'"
+  },
+  {
+   "depends_on": "eval:doc.shift_type=='Flexible'",
+   "fieldname": "required_minutes",
+   "fieldtype": "Int",
+   "label": "Required Work (Minutes)",
+   "mandatory_depends_on": "eval:doc.shift_type=='Flexible'"
+  },
+  {
+   "fieldname": "column_break_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Lunch / prayer break; not working time (Article 51)",
+   "fieldname": "break_start_time",
+   "fieldtype": "Time",
+   "label": "Break Start"
+  },
+  {
+   "fieldname": "break_end_time",
+   "fieldtype": "Time",
+   "label": "Break End"
+  },
+  {
+   "depends_on": "eval:doc.shift_type=='Flexible'",
+   "description": "For flexible shifts without a fixed break window",
+   "fieldname": "break_minutes",
+   "fieldtype": "Int",
+   "label": "Break (Minutes)"
+  },
+  {
+   "fieldname": "section_rules",
+   "fieldtype": "Section Break",
+   "label": "Allowances"
+  },
+  {
+   "default": "0",
+   "fieldname": "grace_late_minutes",
+   "fieldtype": "Int",
+   "label": "Allowed Late Arrival (Minutes)"
+  },
+  {
+   "default": "0",
+   "fieldname": "grace_early_minutes",
+   "fieldtype": "Int",
+   "label": "Allowed Early Leave (Minutes)"
+  },
+  {
+   "fieldname": "column_break_rules",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "Minutes after the end that do not count as extra work",
+   "fieldname": "overtime_after_minutes",
+   "fieldtype": "Int",
+   "label": "Overtime Counts After (Minutes)"
+  },
+  {
+   "fieldname": "section_summary",
+   "fieldtype": "Section Break",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "scheduled_minutes",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Scheduled Work (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "crosses_midnight",
+   "fieldtype": "Check",
+   "label": "Ends After Midnight",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-06 18:19:49.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Shift",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Hozur Employee"
+  },
+  {
+   "read": 1,
+   "role": "Hozur Manager"
+  },
+  {
+   "read": 1,
+   "role": "Hozur CEO"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

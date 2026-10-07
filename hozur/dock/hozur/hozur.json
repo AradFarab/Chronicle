@@ -1,0 +1,23 @@
+{
+ "app": "hozur",
+ "creation": "2026-10-06 18:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Dock",
+ "idx": 0,
+ "items": [
+  {
+   "added": 0,
+   "hidden": 0,
+   "icon": "users-duotone",
+   "link_to": "Hozur",
+   "link_type": "Sidebar",
+   "title": "Hozur"
+  }
+ ],
+ "modified": "2026-10-06 18:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "hozur",
+ "owner": "Administrator",
+ "standard": 1,
+ "user": ""
+}

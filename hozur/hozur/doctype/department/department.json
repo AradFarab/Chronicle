@@ -1,0 +1,171 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:department_name",
+ "creation": "2026-10-06 17:47:33.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "department_name",
+  "parent_department",
+  "is_group",
+  "column_break_people",
+  "manager",
+  "default_approver",
+  "section_deputy",
+  "deputy",
+  "column_break_deputy",
+  "deputy_from",
+  "deputy_to",
+  "lft",
+  "rgt",
+  "old_parent"
+ ],
+ "fields": [
+  {
+   "fieldname": "department_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Department Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "parent_department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Parent Department",
+   "options": "Department"
+  },
+  {
+   "description": "Can contain sub-departments",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "fieldname": "column_break_people",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Sees this department and all its sub-departments",
+   "fieldname": "manager",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Manager",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "default_approver",
+   "fieldtype": "Link",
+   "label": "Default Approver",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "section_deputy",
+   "fieldtype": "Section Break",
+   "label": "Deputy (Acting Manager)"
+  },
+  {
+   "fieldname": "deputy",
+   "fieldtype": "Link",
+   "label": "Deputy",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_deputy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "deputy",
+   "description": "Jalali date, e.g. 1405/07/14",
+   "fieldname": "deputy_from",
+   "fieldtype": "Data",
+   "label": "Deputy From"
+  },
+  {
+   "depends_on": "deputy",
+   "description": "Jalali date, e.g. 1405/07/14",
+   "fieldname": "deputy_to",
+   "fieldtype": "Data",
+   "label": "Deputy To"
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Old Parent",
+   "options": "Department",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "is_tree": 1,
+ "links": [],
+ "modified": "2026-10-06 17:47:33.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Department",
+ "naming_rule": "By fieldname",
+ "nsm_parent_field": "parent_department",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Hozur Employee"
+  },
+  {
+   "read": 1,
+   "role": "Hozur Manager"
+  },
+  {
+   "read": 1,
+   "role": "Hozur CEO"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

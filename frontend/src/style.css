@@ -1,0 +1,61 @@
+/* frappe-ui expects this while the colour scheme switches (see frappe-ui/style.css). */
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
+	transition: none !important;
+}
+
+@font-face {
+	font-family: "Vazirmatn";
+	src: url("/assets/hozur/fonts/vazirmatn/Vazirmatn-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Vazirmatn";
+	src: url("/assets/hozur/fonts/vazirmatn/Vazirmatn-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Vazirmatn";
+	src: url("/assets/hozur/fonts/vazirmatn/Vazirmatn-Bold.woff2") format("woff2");
+	font-weight: 600 700;
+	font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens. Colours come from frappe-ui's semantic scale (bg-surface-*, text-ink-*,
+   border-outline-*), which switches with [data-theme="dark"]. Only the brand is ours. */
+:root {
+	--hz-brand: #0f766e;
+	--hz-brand-ink: #ffffff;
+	--hz-radius: 0.75rem;
+	--hz-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+[data-theme="dark"] {
+	--hz-brand: #2dd4bf;
+	--hz-brand-ink: #042f2e;
+}
+
+html,
+body {
+	font-family: "Vazirmatn", Tahoma, system-ui, sans-serif;
+	-webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+	.hz-card {
+		@apply rounded-6 border border-outline-gray-1 bg-surface-base p-4;
+	}
+	.hz-brand {
+		background: var(--hz-brand);
+		color: var(--hz-brand-ink);
+	}
+	.hz-num {
+		font-variant-numeric: tabular-nums;
+	}
+}

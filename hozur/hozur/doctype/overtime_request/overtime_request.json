@@ -1,0 +1,259 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:OT-{#####}",
+ "creation": "2026-10-06 18:20:52.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "jdate",
+  "column_break_kind",
+  "overtime_kind",
+  "minutes",
+  "from_time",
+  "to_time",
+  "section_details",
+  "reason",
+  "assigned_by_manager",
+  "section_approval",
+  "status",
+  "pending_approver",
+  "pending_approver_user",
+  "column_break_approval",
+  "approval_process",
+  "entered_by_operator",
+  "approvals",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fetch_from": "employee.full_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "description": "Jalali date, e.g. 1405/07/14",
+   "fieldname": "jdate",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_kind",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Normal",
+   "description": "Exceptional: agreed beyond the daily cap (Article 59). Emergency: incidents named in Article 60, up to 8 hours, with the cause.",
+   "fieldname": "overtime_kind",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Kind",
+   "options": "Normal\nExceptional\nEmergency",
+   "reqd": 1
+  },
+  {
+   "fieldname": "minutes",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Minutes",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Time",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Time",
+   "label": "To Time"
+  },
+  {
+   "fieldname": "section_details",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason",
+   "mandatory_depends_on": "eval:doc.overtime_kind!='Normal'"
+  },
+  {
+   "description": "Article 59: the employee must accept overtime that a manager assigns",
+   "fieldname": "assigned_by_manager",
+   "fieldtype": "Check",
+   "label": "Assigned by Manager",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_approval",
+   "fieldtype": "Section Break",
+   "label": "Approval"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Draft\nPending\nApproved\nRejected\nCancelled",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "pending_approver",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Waiting For",
+   "no_copy": 1,
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "pending_approver_user",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Waiting For (User)",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_approval",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approval_process",
+   "fieldtype": "Link",
+   "label": "Approval Process",
+   "no_copy": 1,
+   "options": "Approval Process",
+   "read_only": 1
+  },
+  {
+   "fieldname": "entered_by_operator",
+   "fieldtype": "Check",
+   "label": "Entered by Operator",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "approvals",
+   "fieldtype": "Table",
+   "label": "Approval Steps",
+   "no_copy": 1,
+   "options": "Request Approval",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Overtime Request",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-10-06 18:20:52.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Overtime Request",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Employee",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Manager",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur CEO",
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "employee_name",
+ "track_changes": 1
+}

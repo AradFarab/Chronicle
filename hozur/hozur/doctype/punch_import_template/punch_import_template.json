@@ -1,0 +1,194 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:template_name",
+ "creation": "2026-10-06 17:56:58.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "template_name",
+  "file_format",
+  "delimiter",
+  "encoding",
+  "column_break_rows",
+  "has_header",
+  "skip_rows",
+  "section_columns",
+  "user_id_column",
+  "datetime_column",
+  "date_column",
+  "time_column",
+  "column_break_format",
+  "date_calendar",
+  "date_format",
+  "direction_column",
+  "in_values",
+  "out_values",
+  "section_notes",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Template Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "Excel",
+   "fieldname": "file_format",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "File Format",
+   "options": "CSV\nExcel\nZKTeco USB (attlog.dat)",
+   "reqd": 1
+  },
+  {
+   "default": "Comma",
+   "depends_on": "eval:doc.file_format=='CSV'",
+   "fieldname": "delimiter",
+   "fieldtype": "Select",
+   "label": "Delimiter",
+   "options": "Comma\nTab\nSemicolon\nPipe"
+  },
+  {
+   "default": "UTF-8",
+   "depends_on": "eval:doc.file_format!='Excel'",
+   "fieldname": "encoding",
+   "fieldtype": "Select",
+   "label": "Encoding",
+   "options": "UTF-8\nWindows-1256"
+  },
+  {
+   "fieldname": "column_break_rows",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:doc.file_format!='ZKTeco USB (attlog.dat)'",
+   "fieldname": "has_header",
+   "fieldtype": "Check",
+   "label": "First Row Is a Header"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.file_format!='ZKTeco USB (attlog.dat)'",
+   "fieldname": "skip_rows",
+   "fieldtype": "Int",
+   "label": "Rows to Skip at the Top"
+  },
+  {
+   "depends_on": "eval:doc.file_format!='ZKTeco USB (attlog.dat)'",
+   "description": "A column is given by number (1, 2, ...), by Excel letter (A, B, ...) or by its header text",
+   "fieldname": "section_columns",
+   "fieldtype": "Section Break",
+   "label": "Columns"
+  },
+  {
+   "fieldname": "user_id_column",
+   "fieldtype": "Data",
+   "label": "User ID Column",
+   "mandatory_depends_on": "eval:doc.file_format!='ZKTeco USB (attlog.dat)'"
+  },
+  {
+   "description": "Use this when date and time are in one column",
+   "fieldname": "datetime_column",
+   "fieldtype": "Data",
+   "label": "Date-Time Column"
+  },
+  {
+   "fieldname": "date_column",
+   "fieldtype": "Data",
+   "label": "Date Column"
+  },
+  {
+   "fieldname": "time_column",
+   "fieldtype": "Data",
+   "label": "Time Column"
+  },
+  {
+   "fieldname": "column_break_format",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Jalali",
+   "fieldname": "date_calendar",
+   "fieldtype": "Select",
+   "label": "Date Calendar",
+   "options": "Jalali\nGregorian"
+  },
+  {
+   "default": "YYYY/MM/DD",
+   "fieldname": "date_format",
+   "fieldtype": "Select",
+   "label": "Date Format",
+   "options": "YYYY/MM/DD\nYYYY-MM-DD\nDD/MM/YYYY\nMM/DD/YYYY"
+  },
+  {
+   "description": "Optional",
+   "fieldname": "direction_column",
+   "fieldtype": "Data",
+   "label": "Direction Column"
+  },
+  {
+   "description": "Comma separated, e.g. ورود,in,0",
+   "fieldname": "in_values",
+   "fieldtype": "Data",
+   "label": "Values Meaning In"
+  },
+  {
+   "description": "Comma separated, e.g. خروج,out,1",
+   "fieldname": "out_values",
+   "fieldtype": "Data",
+   "label": "Values Meaning Out"
+  },
+  {
+   "fieldname": "section_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-06 17:56:58.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Punch Import Template",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

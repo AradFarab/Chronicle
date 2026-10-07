@@ -1,0 +1,381 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:rule_set_name",
+ "creation": "2026-10-06 18:19:49.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "rule_set_name",
+  "effective_from",
+  "column_break_baseline",
+  "is_legal_baseline",
+  "description",
+  "section_hours",
+  "max_daily_minutes",
+  "max_weekly_minutes",
+  "hard_harmful_daily_minutes",
+  "hard_harmful_weekly_minutes",
+  "intermittent_span_minutes",
+  "rotating_four_week_minutes",
+  "section_night",
+  "night_start_minute",
+  "night_end_minute",
+  "section_overtime",
+  "overtime_daily_cap_minutes",
+  "emergency_overtime_cap_minutes",
+  "overtime_premium_percent",
+  "night_premium_percent",
+  "rest_day_premium_percent",
+  "shift_premium_two_percent",
+  "shift_premium_three_percent",
+  "shift_premium_night_percent",
+  "section_leave",
+  "annual_leave_days",
+  "hard_harmful_annual_leave_weeks",
+  "leave_carry_over_days",
+  "hajj_leave_days",
+  "hourly_leave_minutes_per_day",
+  "marriage_bereavement_leave_days",
+  "maternity_leave_days",
+  "maternity_multiple_birth_extra_days",
+  "paternity_leave_days",
+  "section_protected",
+  "nursing_break_minutes",
+  "nursing_every_minutes",
+  "nursing_child_max_months",
+  "juvenile_daily_reduction_minutes",
+  "juvenile_max_age_years",
+  "section_reason",
+  "change_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "rule_set_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Rule Set Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "description": "Jalali date, e.g. 1405/07/14",
+   "fieldname": "effective_from",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Effective From",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_baseline",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "The values of the law itself. Read-only; company rule sets may only be more generous.",
+   "fieldname": "is_legal_baseline",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Legal Baseline",
+   "read_only": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "section_hours",
+   "fieldtype": "Section Break",
+   "label": "Working Hours"
+  },
+  {
+   "description": "Article 51. Law: 480. May only be lowered.",
+   "fieldname": "max_daily_minutes",
+   "fieldtype": "Int",
+   "label": "Daily Work Limit (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 51 note 1. Law: 2640. May only be lowered.",
+   "fieldname": "max_weekly_minutes",
+   "fieldtype": "Int",
+   "label": "Weekly Work Limit (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 52. Law: 360. May only be lowered.",
+   "fieldname": "hard_harmful_daily_minutes",
+   "fieldtype": "Int",
+   "label": "Hard and Harmful Daily Limit (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 52. Law: 2160. May only be lowered.",
+   "fieldname": "hard_harmful_weekly_minutes",
+   "fieldtype": "Int",
+   "label": "Hard and Harmful Weekly Limit (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 54. Law: 900. May only be lowered.",
+   "fieldname": "intermittent_span_minutes",
+   "fieldtype": "Int",
+   "label": "Intermittent Work Span Limit (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 57. Law: 10560. May only be lowered.",
+   "fieldname": "rotating_four_week_minutes",
+   "fieldtype": "Int",
+   "label": "Rotating Shift 4-Week Limit (Minutes)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_night",
+   "fieldtype": "Section Break",
+   "label": "Night Work"
+  },
+  {
+   "description": "Article 53. Law: 1320. May only be lowered. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "night_start_minute",
+   "fieldtype": "Int",
+   "label": "Night Work Starts At (Minute of Day)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 53. Law: 360. May only be raised. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "night_end_minute",
+   "fieldtype": "Int",
+   "label": "Night Work Ends At (Minute of Day)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_overtime",
+   "fieldtype": "Section Break",
+   "label": "Overtime and Premiums"
+  },
+  {
+   "description": "Article 59 note. Law: 240. May only be lowered.",
+   "fieldname": "overtime_daily_cap_minutes",
+   "fieldtype": "Int",
+   "label": "Daily Overtime Cap (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 60. Law: 480. May only be lowered.",
+   "fieldname": "emergency_overtime_cap_minutes",
+   "fieldtype": "Int",
+   "label": "Emergency Overtime Cap (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 59. Law: 40. May only be raised.",
+   "fieldname": "overtime_premium_percent",
+   "fieldtype": "Float",
+   "label": "Overtime Premium (Percent)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 58. Law: 35. May only be raised.",
+   "fieldname": "night_premium_percent",
+   "fieldtype": "Float",
+   "label": "Night Work Premium (Percent)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 62 note 1. Law: 40. May only be raised.",
+   "fieldname": "rest_day_premium_percent",
+   "fieldtype": "Float",
+   "label": "Friday Work Premium (Percent)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 55. Law: 10. May only be raised.",
+   "fieldname": "shift_premium_two_percent",
+   "fieldtype": "Float",
+   "label": "Shift Premium (Morning and Evening) (Percent)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 55. Law: 15. May only be raised.",
+   "fieldname": "shift_premium_three_percent",
+   "fieldtype": "Float",
+   "label": "Shift Premium (Morning, Evening and Night) (Percent)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 55. Law: 22.5. May only be raised.",
+   "fieldname": "shift_premium_night_percent",
+   "fieldtype": "Float",
+   "label": "Shift Premium (With Night) (Percent)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_leave",
+   "fieldtype": "Section Break",
+   "label": "Leave"
+  },
+  {
+   "description": "Article 64. Law: 26. May only be raised.",
+   "fieldname": "annual_leave_days",
+   "fieldtype": "Int",
+   "label": "Annual Leave (Working Days)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 65. Law: 5. May only be raised.",
+   "fieldname": "hard_harmful_annual_leave_weeks",
+   "fieldtype": "Int",
+   "label": "Hard and Harmful Annual Leave (Weeks)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 66. Law: 9. May only be raised.",
+   "fieldname": "leave_carry_over_days",
+   "fieldtype": "Int",
+   "label": "Leave Carry-Over (Working Days)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 67. Law: 30. May only be raised.",
+   "fieldname": "hajj_leave_days",
+   "fieldtype": "Int",
+   "label": "Hajj Leave (Days)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 70. Law: 440. May only be raised.",
+   "fieldname": "hourly_leave_minutes_per_day",
+   "fieldtype": "Int",
+   "label": "Hourly Leave Minutes per Day (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 73. Law: 3. May only be raised.",
+   "fieldname": "marriage_bereavement_leave_days",
+   "fieldtype": "Int",
+   "label": "Marriage or Bereavement Leave (Days)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 76. Law: 270. May only be raised.",
+   "fieldname": "maternity_leave_days",
+   "fieldtype": "Int",
+   "label": "Maternity Leave (Days)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 76. Law: 14. May only be raised.",
+   "fieldname": "maternity_multiple_birth_extra_days",
+   "fieldtype": "Int",
+   "label": "Maternity Extra for Multiple Birth (Days)",
+   "reqd": 1
+  },
+  {
+   "description": "Article population laws. Law: 14. May only be raised. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "paternity_leave_days",
+   "fieldtype": "Int",
+   "label": "Paternity Leave (Days)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_protected",
+   "fieldtype": "Section Break",
+   "label": "Protected Groups"
+  },
+  {
+   "description": "Article 78. Law: 30. May only be raised. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "nursing_break_minutes",
+   "fieldtype": "Int",
+   "label": "Nursing Break (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 78. Law: 180. May only be lowered. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "nursing_every_minutes",
+   "fieldtype": "Int",
+   "label": "Nursing Break Every (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 78. Law: 24. May only be raised. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "nursing_child_max_months",
+   "fieldtype": "Int",
+   "label": "Nursing Until Child Age (Months)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 83. Law: 30. May only be raised. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "juvenile_daily_reduction_minutes",
+   "fieldtype": "Int",
+   "label": "Young Worker Daily Reduction (Minutes)",
+   "reqd": 1
+  },
+  {
+   "description": "Article 79-84. Law: 18. May only be raised. To be verified against the official text (LEGAL-CHECK).",
+   "fieldname": "juvenile_max_age_years",
+   "fieldtype": "Int",
+   "label": "Young Worker Up To Age (Years)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_reason",
+   "fieldtype": "Section Break",
+   "label": "Change"
+  },
+  {
+   "fieldname": "change_reason",
+   "fieldtype": "Small Text",
+   "label": "Reason for Change",
+   "no_copy": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-06 18:19:49.000000",
+ "modified_by": "Administrator",
+ "module": "Hozur",
+ "name": "Labor Rule Set",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hozur Operator",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Hozur Employee"
+  },
+  {
+   "read": 1,
+   "role": "Hozur Manager"
+  },
+  {
+   "read": 1,
+   "role": "Hozur CEO"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "effective_from",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,12 @@
+.DS_Store
+*.pyc
+*.egg-info
+*.swp
+tags
+node_modules
+__pycache__
+.venv*/
+.pytest_cache/
+.ruff_cache/
+hozur/public/frontend
+hozur/www/hozur.html
