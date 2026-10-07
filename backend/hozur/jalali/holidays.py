@@ -1,4 +1,6 @@
-"""Iranian official holiday definitions and seed data. Pure Python: must not import frappe."""
+"""Iranian official holiday definitions and the bundled seed. Pure Python (no database).
+
+The codes match the `holiday` table (hozur.db.models.calendar)."""
 
 from __future__ import annotations
 
@@ -8,16 +10,43 @@ from pathlib import Path
 
 SEED_FILE = Path(__file__).parent / "data" / "holidays.json"
 
-# Holiday types (Iran Holiday.holiday_type). Values are stored; labels are translated.
-OFFICIAL_SOLAR = "Official Solar"
-OFFICIAL_LUNAR = "Official Lunar"
-OFFICIAL_OCCASIONAL = "Official Occasional"  # declared by government, nationwide or per province (Article 63)
-OFFICE_CLOSURE = "Office Closure"  # e.g. air pollution; pay handling chosen by the operator
-COMPANY_INTERNAL = "Company Internal"  # paid, this company only
+# Holiday types. Values are stored; labels are translated.
+OFFICIAL_SOLAR = "official_solar"
+OFFICIAL_LUNAR = "official_lunar"
+OFFICIAL_OCCASIONAL = "official_occasional"  # declared by government, nationwide or per province (Article 63)
+OFFICE_CLOSURE = "office_closure"  # e.g. air pollution; pay handling chosen by the operator
+COMPANY_INTERNAL = "company_internal"  # paid, this company only
 HOLIDAY_TYPES = (OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL, OFFICE_CLOSURE, COMPANY_INTERNAL)
+OFFICIAL_TYPES = (OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL)
 
-CONFIRMED, PREDICTED = "Confirmed", "Predicted"
-SCOPES = ("Country", "Province", "Company", "Branch")
+CONFIRMED, PREDICTED = "confirmed", "predicted"
+COUNTRY, PROVINCE, BRANCH, COMPANY = "country", "province", "branch", "company"
+SCOPES = (COUNTRY, PROVINCE, BRANCH, COMPANY)
+
+# Hijri month names as they appear in official calendars (time.ir writes the lunar date of
+# an event in brackets, e.g. "عید غدیر [ ۱۸ ذوالحجه ]").
+HIJRI_MONTHS = (
+	"محرم",
+	"صفر",
+	"ربیع الاول",
+	"ربیع‌الاول",
+	"ربیع الثانی",
+	"ربیع‌الثانی",
+	"جمادی الاول",
+	"جمادی‌الاول",
+	"جمادی الاولی",
+	"جمادی الثانی",
+	"جمادی‌الثانی",
+	"جمادی الثانیه",
+	"رجب",
+	"شعبان",
+	"رمضان",
+	"شوال",
+	"ذوالقعده",
+	"ذی‌القعده",
+	"ذوالحجه",
+	"ذی‌الحجه",
+)
 
 # Official solar holidays: fixed Jalali dates, never need updating.
 SOLAR = (
@@ -66,7 +95,7 @@ def solar_holidays(year: int) -> list[dict]:
 			"title": title,
 			"holiday_type": OFFICIAL_SOLAR,
 			"status": CONFIRMED,
-			"scope": "Country",
+			"scope": COUNTRY,
 			"province": None,
 			"note": "",
 		}
@@ -94,8 +123,19 @@ def seed_years() -> tuple[int, int]:
 	return first, last
 
 
-# Office Closure.closure_pay_mode
-CLOSURE_PAID_HOLIDAY, CLOSURE_EMPLOYER_PAID, CLOSURE_WORKDAY = "Paid Holiday", "Employer Paid", "workday"
+# holiday.closure_pay_mode (office closures only)
+CLOSURE_PAID_HOLIDAY, CLOSURE_EMPLOYER_PAID, CLOSURE_WORKDAY = "paid_holiday", "employer_paid", "workday"
+
+SOLAR_DATES = frozenset((m, d) for m, d, _, _ in SOLAR)
+
+
+def classify_official(jdate: str, title: str) -> str:
+	"""Solar or lunar, for an official holiday from an outside source: lunar events carry their
+	hijri date in the title; otherwise a fixed solar date means a solar holiday."""
+	if any(month in title for month in HIJRI_MONTHS):
+		return OFFICIAL_LUNAR
+	month, day = int(jdate[5:7]), int(jdate[8:10])
+	return OFFICIAL_SOLAR if (month, day) in SOLAR_DATES else OFFICIAL_LUNAR
 
 
 def day_off_kind(holiday: dict) -> str | None:

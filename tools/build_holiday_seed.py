@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build hozur/jalali/data/holidays.json: Iranian official holidays for 1400-1410.
+"""Build backend/hozur/jalali/data/holidays.json: Iranian official holidays for 1400-1410.
 
 Dev tool, not used at runtime. Run from the repository root:
 
@@ -7,12 +7,12 @@ Dev tool, not used at runtime. Run from the repository root:
     .venv-tools/bin/python tools/build_holiday_seed.py
 
 Sources and status:
-- Solar holidays (10 per year) have fixed Jalali dates: always "Confirmed".
+- Solar holidays (10 per year) have fixed Jalali dates: always "confirmed".
 - 1405 comes verbatim from attendance-software-iran-labor-law-rules.md (section 5),
-  plus the government-declared Tir 1405 holidays listed there. "Confirmed".
+  plus the government-declared Tir 1405 holidays listed there. "confirmed".
 - Lunar holidays 1400-1404 use Iran's official AH month starts (roozbehp/qamari,
-  CC0, vendored in tools/data). "Confirmed".
-- Lunar holidays 1406-1410 are astronomical predictions for Tehran: "Predicted"
+  CC0, vendored in tools/data). "confirmed".
+- Lunar holidays 1406-1410 are astronomical predictions for Tehran: "predicted"
   (پیش‌بینی), to be confirmed by the operator each year. The visibility rule was
   tuned on official months AH 1400-1429 and matches 87% of AH 1430-1447.
 """
@@ -29,12 +29,12 @@ import ephem
 import jdatetime
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "backend"))
 
 from hozur.jalali.holidays import LUNAR, SOLAR
 
 QAMARI = ROOT / "tools" / "data" / "qamari-1440-1447.txt"
-OUTPUT = ROOT / "hozur" / "jalali" / "data" / "holidays.json"
+OUTPUT = ROOT / "backend" / "hozur" / "jalali" / "data" / "holidays.json"
 FIRST_YEAR, LAST_YEAR = 1400, 1410
 
 # Labor-law file, section 5: "فروردین ۱، ۲، ۳، ۴، ۱۲، ۱۳؛ خرداد ۶، ۱۴، ۱۵؛ تیر ۳، ۴؛ ..."
@@ -52,9 +52,9 @@ LIST_1405 = {
 
 # Same section: government-declared public holidays in Tir 1405 (Article 63 applies).
 OCCASIONAL_1405 = [
-	("1405/04/13", "Province", "تهران"),
-	("1405/04/14", "Province", "تهران"),
-	("1405/04/15", "Country", None),
+	("1405/04/13", "province", "تهران"),
+	("1405/04/14", "province", "تهران"),
+	("1405/04/15", "country", None),
 ]
 OCCASIONAL_TITLE = "تعطیل عمومی اعلامی هیئت دولت (مراسم تشییع)"
 
@@ -157,7 +157,7 @@ def lunar_events(starts) -> list[dict]:
 	return events
 
 
-def record(date, code, title, htype, status, scope="Country", province=None, note=""):
+def record(date, code, title, htype, status, scope="country", province=None, note=""):
 	return {
 		"key": f"{date}:{code}",
 		"date": date,
@@ -180,7 +180,7 @@ def build() -> tuple[list[dict], list[str]]:
 	holidays = []
 	for year in range(FIRST_YEAR, LAST_YEAR + 1):
 		solar = [
-			record(f"{year}/{m:02d}/{d:02d}", code, title, "Official Solar", "Confirmed")
+			record(f"{year}/{m:02d}/{d:02d}", code, title, "official_solar", "confirmed")
 			for m, d, code, title in SOLAR
 		]
 		year_lunar = [e for e in lunar if e["date"].startswith(f"{year}/")]
@@ -189,7 +189,7 @@ def build() -> tuple[list[dict], list[str]]:
 			lunar_recs = []
 			for e in year_lunar:
 				if e["date"] in allowed:
-					lunar_recs.append(record(e["date"], e["code"], e["title"], "Official Lunar", "Confirmed"))
+					lunar_recs.append(record(e["date"], e["code"], e["title"], "official_lunar", "confirmed"))
 				else:
 					warnings.append(
 						f"{e['date']} {e['title']}: computed, but not in the labor-law 1405 list; left out"
@@ -198,15 +198,15 @@ def build() -> tuple[list[dict], list[str]]:
 			for missing in sorted(allowed - covered):
 				warnings.append(f"{missing}: in the labor-law 1405 list but matched no event; added untitled")
 				lunar_recs.append(
-					record(missing, "labor-law-list", "تعطیل رسمی", "Official Lunar", "Confirmed")
+					record(missing, "labor-law-list", "تعطیل رسمی", "official_lunar", "confirmed")
 				)
 			occasional = [
 				record(
 					d,
 					f"occasional-{scope.lower()}",
 					OCCASIONAL_TITLE,
-					"Official Occasional",
-					"Confirmed",
+					"official_occasional",
+					"confirmed",
 					scope,
 					prov,
 				)
@@ -220,8 +220,8 @@ def build() -> tuple[list[dict], list[str]]:
 					e["date"],
 					e["code"],
 					e["title"],
-					"Official Lunar",
-					"Predicted" if predicted else "Confirmed",
+					"official_lunar",
+					"predicted" if predicted else "confirmed",
 				)
 				for e in year_lunar
 			]
