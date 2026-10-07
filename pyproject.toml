@@ -11,6 +11,7 @@ dependencies = [
     # "frappe~=16.0.0" # Installed and managed by bench.
     "jdatetime~=6.1",
     "pyzk==0.9",
+    "weasyprint~=68.0",  # PDF exports; needs the Pango system library
 ]
 
 [build-system]
@@ -23,7 +24,7 @@ pytest = "~=8.4"
 
 # These apt dependencies will be installed from Ubuntu repositories when you host your app on Frappe Cloud
 [deploy.dependencies.apt]
-packages = []
+packages = ["libpango-1.0-0", "libpangoft2-1.0-0"]
 
 [tool.ruff]
 line-length = 110

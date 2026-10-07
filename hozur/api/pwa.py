@@ -530,7 +530,9 @@ self.addEventListener("fetch", (event) => {
 """
 
 
-@frappe.whitelist(allow_guest=True, methods=["GET"])
+# Guest on purpose: the browser re-fetches the worker script on its own, also after logout. It
+# returns a constant script and touches no data.
+@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def service_worker():
 	"""Served from /api/method/... with a header that lets it control /hozur/."""
 	from werkzeug.wrappers import Response

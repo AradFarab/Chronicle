@@ -1,6 +1,7 @@
 """Which Labor Rule Set applies on a day, and the read-only legal baseline."""
 
 import frappe
+from frappe import _
 from frappe.utils.caching import request_cache
 
 from hozur.engine.rules import PARAMETERS, RuleSet, load_baseline
@@ -26,7 +27,7 @@ def get_rule_set(jdate: str) -> tuple[str, RuleSet]:
 	)
 	name = names[0] if names else baseline_name()
 	if not name:
-		frappe.throw("The legal baseline Labor Rule Set is missing; run bench migrate")
+		frappe.throw(_("The legal baseline Labor Rule Set is missing; run bench migrate"))
 	return name, rule_set_from_doc(frappe.get_cached_doc("Labor Rule Set", name))
 
 

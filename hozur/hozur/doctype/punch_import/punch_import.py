@@ -57,6 +57,7 @@ class PunchImport(Document):
 
 
 def _bytes(file_doc) -> bytes:
-	"""Raw bytes: the template decides the encoding (UTF-8 or Windows-1256)."""
-	with open(file_doc.get_full_path(), "rb") as f:
-		return f.read()
+	"""Raw bytes: the template decides the encoding (UTF-8 or Windows-1256). get_content checks
+	that the path stays inside the site's files; no encodings means no decoding."""
+	content = file_doc.get_content(encodings=[])
+	return content.encode() if isinstance(content, str) else content

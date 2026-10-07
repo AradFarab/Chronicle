@@ -9,11 +9,21 @@ hozur.approvals.setup_form = function (frm) {
 
 	const act = (action) => {
 		frappe.prompt(
-			{ fieldname: "comment", fieldtype: "Small Text", label: __("Comment"), reqd: action === "Reject" },
+			{
+				fieldname: "comment",
+				fieldtype: "Small Text",
+				label: __("Comment"),
+				reqd: action === "Reject",
+			},
 			async (values) => {
 				await frappe.call({
 					method: "hozur.approvals.act_on_request",
-					args: { doctype: frm.doctype, name: frm.doc.name, action, comment: values.comment },
+					args: {
+						doctype: frm.doctype,
+						name: frm.doc.name,
+						action,
+						comment: values.comment,
+					},
 					freeze: true,
 				});
 				frm.reload_doc();

@@ -194,8 +194,6 @@ class ApprovableRequest(Document):
 
 	def on_cancel(self):
 		previous = self.status
-		self.status = "Cancelled"
-		self.pending_approver = self.pending_approver_user = None
 		self.db_set({"status": "Cancelled", "pending_approver": None, "pending_approver_user": None})
 		audit.log(self.doctype, self.name, "Cancel")
 		self.on_cancelled(previous)

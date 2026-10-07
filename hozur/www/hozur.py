@@ -10,7 +10,8 @@ def get_context(context):
 		frappe.local.flags.redirect_location = "/login?redirect-to=/hozur"
 		raise frappe.Redirect
 	csrf_token = frappe.sessions.get_csrf_token()
-	frappe.db.commit()  # the CSRF token must be saved before the page uses it
+	# the CSRF token must be saved before the page uses it
+	frappe.db.commit()  # nosemgrep
 	context.boot = {
 		"csrf_token": csrf_token,
 		"hozur_boot": get_boot(),

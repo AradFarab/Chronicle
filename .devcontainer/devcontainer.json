@@ -1,5 +1,4 @@
 {
-  // Adapted from frappe_docker's devcontainer-example. See docker/dev/README.md.
   "name": "hozur (Frappe v16)",
   "dockerComposeFile": "../docker/dev/compose.yml",
   "service": "frappe",

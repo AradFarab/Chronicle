@@ -75,10 +75,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install MariaDB Client
+      - name: Install MariaDB Client and Pango (WeasyPrint)
         run: |
           sudo apt update
-          sudo apt-get install mariadb-client
+          sudo apt-get install mariadb-client libpango-1.0-0 libpangoft2-1.0-0
 
       - name: Setup
         run: |

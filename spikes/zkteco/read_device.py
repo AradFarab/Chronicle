@@ -162,14 +162,14 @@ def main() -> int:
 		print(f"\n  punches from user_ids not in the device user list: {', '.join(unknown)}")
 
 	if args.csv:
-		with open(args.csv, "w", newline="", encoding="utf-8") as f:
+		with open(args.csv, "w", newline="", encoding="utf-8") as f:  # nosemgrep
 			w = csv.DictWriter(f, fieldnames=list(rows[0]) if rows else ["device_timestamp"])
 			w.writeheader()
 			w.writerows(rows)
 		print(f"\nWrote {len(rows)} punches to {args.csv}")
 
 	if args.users_csv:
-		with open(args.users_csv, "w", newline="", encoding="utf-8") as f:
+		with open(args.users_csv, "w", newline="", encoding="utf-8") as f:  # nosemgrep
 			w = csv.writer(f)
 			w.writerow(["uid", "user_id", "name", "privilege", "card"])
 			for u in users:

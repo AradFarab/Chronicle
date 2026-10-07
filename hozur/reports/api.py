@@ -78,7 +78,12 @@ def fields(source: str = catalog.SUMMARY) -> list[dict]:
 
 
 @frappe.whitelist()
-def preview(template: str | None = None, spec=None, filters=None, limit: int = 500) -> dict:
+def preview(
+	template: str | None = None,
+	spec: str | dict | None = None,
+	filters: str | dict | None = None,
+	limit: int = 500,
+) -> dict:
 	spec = _spec(template, spec)
 	result = builder.build(spec, _filters(spec, filters))
 	result["total_rows"] = len(result["rows"])
@@ -125,7 +130,12 @@ def render(spec: dict, filters: dict, export_format: str | None = None) -> tuple
 
 
 @frappe.whitelist()
-def export(template: str | None = None, spec=None, filters=None, export_format: str | None = None):
+def export(
+	template: str | None = None,
+	spec: str | dict | None = None,
+	filters: str | dict | None = None,
+	export_format: str | None = None,
+):
 	spec = _spec(template, spec)
 	filename, content = render(spec, _filters(spec, filters), export_format)
 	frappe.response["type"] = "download"
