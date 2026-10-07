@@ -7,19 +7,19 @@
 
 @font-face {
 	font-family: "Vazirmatn";
-	src: url("/assets/hozur/fonts/vazirmatn/Vazirmatn-Regular.woff2") format("woff2");
+	src: url("/fonts/vazirmatn/Vazirmatn-Regular.woff2") format("woff2");
 	font-weight: 400;
 	font-display: swap;
 }
 @font-face {
 	font-family: "Vazirmatn";
-	src: url("/assets/hozur/fonts/vazirmatn/Vazirmatn-Medium.woff2") format("woff2");
+	src: url("/fonts/vazirmatn/Vazirmatn-Medium.woff2") format("woff2");
 	font-weight: 500;
 	font-display: swap;
 }
 @font-face {
 	font-family: "Vazirmatn";
-	src: url("/assets/hozur/fonts/vazirmatn/Vazirmatn-Bold.woff2") format("woff2");
+	src: url("/fonts/vazirmatn/Vazirmatn-Bold.woff2") format("woff2");
 	font-weight: 600 700;
 	font-display: swap;
 }

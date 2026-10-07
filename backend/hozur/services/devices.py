@@ -33,6 +33,7 @@ from hozur.jalali.dates import add_days, normalize_jdate, normalize_time, to_gre
 from hozur.secrets import decrypt, encrypt
 from hozur.services import audit, files, jobs, settings
 from hozur.services.errors import Conflict, NotFound, ValidationError
+from hozur.services.resources import flush
 
 SYNC_OVERLAP = timedelta(minutes=10)  # re-read a little before the last punch; dedup absorbs it
 FORCED_DIRECTION = {"always_in": IN, "always_out": OUT, "pair_by_order": UNKNOWN}
@@ -139,7 +140,7 @@ def save_device(
 		device.comm_key_encrypted = None
 	if not device_id:
 		session.add(device)
-	session.flush()
+	flush(session)
 	after = audit.snapshot(device)
 	for snap in (before, after):
 		if snap:
@@ -498,7 +499,7 @@ def save_mapping(
 		raise ValidationError(_("The end date is before the start date"))
 	if not map_id:
 		session.add(row)
-	session.flush()
+	flush(session)
 	audit.log(
 		session,
 		"device_user_map",
@@ -585,7 +586,7 @@ def save_template(
 		raise ValidationError(_("Enter a name"))
 	if not template_id:
 		session.add(row)
-	session.flush()
+	flush(session)
 	audit.log(
 		session,
 		"punch_import_template",

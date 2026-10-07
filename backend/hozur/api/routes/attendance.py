@@ -30,6 +30,8 @@ class PeriodAction(BaseModel):
 
 
 def _see(db, actor, employee_id: int, today: str) -> None:
+	if db.get(Employee, employee_id) is None:
+		raise NotFound(_("Employee not found"))
 	if not access.can_see(db, actor, employee_id, today):
 		raise PermissionDenied(_("Not permitted"))
 

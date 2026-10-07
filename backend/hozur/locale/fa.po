@@ -5,27 +5,47 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-07 15:49+0000\n"
+"POT-Creation-Date: 2026-10-07 16:07+0000\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: frontend/src/pages/Periods.vue:5
+msgid "A closed month cannot change: no request, correction or recalculation touches it until it is reopened."
+msgstr "ماه بسته‌شده تغییر نمی‌کند: هیچ درخواست، اصلاح یا محاسبهٔ دوباره‌ای تا بازشدن دوباره به آن دست نمی‌زند."
+
 #: backend/hozur/services/requests.py:255
 msgid "A correction cannot be for a future day"
 msgstr "اصلاح تردد برای روزهای آینده ممکن نیست"
+
+#: frontend/src/lib/resources.ts:325
+msgid "A department and its sub-departments"
+msgstr "یک واحد و زیرواحدهایش"
 
 #: backend/hozur/services/resources.py:289
 msgid "A department cannot be inside itself"
 msgstr "یک واحد نمی‌تواند زیرمجموعهٔ خودش باشد"
 
+#: frontend/src/lib/resources.ts:324
+msgid "A designation"
+msgstr "یک سمت"
+
 #: backend/hozur/services/resources.py:324
 msgid "A flexible shift needs the required minutes"
 msgstr "شیفت شناور به دقایق کار لازم نیاز دارد"
 
+#: frontend/src/lib/labels.ts:34
+msgid "A holiday file (JSON or CSV)"
+msgstr "فایل تعطیلات (JSON یا CSV)"
+
 #: backend/hozur/services/resources.py:157
 msgid "A linked record does not exist"
 msgstr "رکورد مرتبط وجود ندارد"
+
+#: frontend/src/pages/Reports.vue:154
+msgid "A new report…"
+msgstr "گزارش جدید…"
 
 #: frontend/src/lib/warnings.ts:6
 msgid "A punch has no pair: correct the day"
@@ -35,6 +55,10 @@ msgstr "یک تردد جفت ندارد؛ این روز را اصلاح کنید
 msgid "A rotating pattern needs the first day of the cycle"
 msgstr "الگوی چرخشی به روز اول چرخه نیاز دارد"
 
+#: frontend/src/lib/resources.ts:453
+msgid "A specific person"
+msgstr "شخص مشخص"
+
 #: backend/hozur/services/resources.py:253
 msgid "A standard record cannot be removed"
 msgstr "رکورد استاندارد قابل حذف نیست"
@@ -43,7 +67,11 @@ msgstr "رکورد استاندارد قابل حذف نیست"
 msgid "A value is not valid ({0})"
 msgstr "یکی از مقادیر معتبر نیست ({0})"
 
-#: backend/hozur/reports/catalog.py:60 frontend/src/pages/Month.vue:220
+#: frontend/src/components/ResourceForm.vue:24
+msgid "A value may be better for the worker than the law, never worse."
+msgstr "هر مقدار می‌تواند به سود کارگر از قانون بهتر باشد، ولی هرگز بدتر نه."
+
+#: backend/hozur/reports/catalog.py:60 frontend/src/pages/Month.vue:289
 msgid "Absence (Days)"
 msgstr "غیبت (روز)"
 
@@ -51,7 +79,7 @@ msgstr "غیبت (روز)"
 msgid "Absence (Hours)"
 msgstr "غیبت (ساعت)"
 
-#: frontend/src/pages/Month.vue:209
+#: frontend/src/lib/format.ts:59 frontend/src/pages/Month.vue:278
 msgid "Absent"
 msgstr "غایب"
 
@@ -59,13 +87,29 @@ msgstr "غایب"
 msgid "Accept"
 msgstr "می‌پذیرم"
 
+#: frontend/src/pages/Approvals.vue:99
+msgid "Accepted"
+msgstr "پذیرفته شد"
+
 #: frontend/src/components/UserMenu.vue:7
 msgid "Account"
 msgstr "حساب کاربری"
 
+#: frontend/src/lib/resources.ts:164 frontend/src/lib/resources.ts:85 frontend/src/pages/Users.vue:50
+msgid "Active"
+msgstr "فعال"
+
+#: frontend/src/pages/Calendar.vue:244
+msgid "Add"
+msgstr "افزودن"
+
 #: frontend/src/pages/DeviceForm.vue:5 frontend/src/pages/Devices.vue:6
 msgid "Add a device"
 msgstr "افزودن دستگاه"
+
+#: frontend/src/components/ResourceForm.vue:18
+msgid "Add a row"
+msgstr "افزودن ردیف"
 
 #: frontend/src/pages/NewRequest.vue:113
 msgid "Add a time"
@@ -83,15 +127,63 @@ msgstr "دستگاه را با نشانی IP و پورت آن اضافه کنی�
 msgid "Add the times the device missed. They count only after approval; device punches are never changed."
 msgstr "ساعت‌هایی را که دستگاه ثبت نکرده وارد کنید. این ساعت‌ها پس از تأیید حساب می‌شوند و ترددهای دستگاه هرگز تغییر نمی‌کنند."
 
-#: frontend/src/pages/DeviceForm.vue:230
+#: frontend/src/lib/resources.ts:84 frontend/src/pages/Organization.vue:14
+msgid "Address"
+msgstr "نشانی"
+
+#: frontend/src/pages/DeviceForm.vue:271
 msgid "All branches"
 msgstr "همه شعبه‌ها"
+
+#: frontend/src/pages/Settings.vue:24
+msgid "Allow leave beyond the balance"
+msgstr "اجازهٔ مرخصی بیش از مانده"
+
+#: frontend/src/lib/format.ts:89
+msgid "Always In"
+msgstr "همیشه ورود"
+
+#: frontend/src/lib/format.ts:90
+msgid "Always Out"
+msgstr "همیشه خروج"
+
+#: frontend/src/lib/resources.ts:506
+msgid "Annual leave (working days)"
+msgstr "مرخصی سالانه (روز کاری)"
+
+#: frontend/src/lib/resources.ts:507
+msgid "Annual leave for hard and harmful work (weeks)"
+msgstr "مرخصی سالانهٔ کار سخت و زیان‌آور (هفته)"
 
 #: backend/hozur/services/resources.py:153
 msgid "Another record already has this value"
 msgstr "رکورد دیگری همین مقدار را دارد"
 
-#: frontend/src/components/AppShell.vue:100 frontend/src/pages/Today.vue:88
+#: frontend/src/lib/resources.ts:318 frontend/src/pages/Calendar.vue:29 frontend/src/pages/Calendar.vue:69
+msgid "Applies to"
+msgstr "شامل"
+
+#: frontend/src/pages/Calendar.vue:138
+msgid "Apply the chosen changes"
+msgstr "اعمال تغییرات انتخاب‌شده"
+
+#: frontend/src/lib/resources.ts:464
+msgid "Approval exception"
+msgstr "استثنای تأیید"
+
+#: frontend/src/lib/resources.ts:463
+msgid "Approval exceptions"
+msgstr "استثناهای تأیید"
+
+#: frontend/src/lib/resources.ts:430 frontend/src/lib/resources.ts:479
+msgid "Approval process"
+msgstr "فرایند تأیید"
+
+#: frontend/src/lib/resources.ts:429
+msgid "Approval processes"
+msgstr "فرایندهای تأیید"
+
+#: frontend/src/components/AppShell.vue:100 frontend/src/lib/resources.ts:431 frontend/src/lib/resources.ts:465 frontend/src/pages/Manage.vue:55 frontend/src/pages/Today.vue:86
 msgid "Approvals"
 msgstr "تأییدها"
 
@@ -99,9 +191,29 @@ msgstr "تأییدها"
 msgid "Approve"
 msgstr "تأیید"
 
-#: frontend/src/pages/Approvals.vue:107
+#: frontend/src/lib/format.ts:66 frontend/src/pages/Approvals.vue:99 frontend/src/pages/Audit.vue:65
 msgid "Approved"
 msgstr "تأییدشده"
+
+#: frontend/src/lib/resources.ts:447
+msgid "Approver"
+msgstr "تأییدکننده"
+
+#: frontend/src/lib/resources.ts:190
+msgid "Article 59"
+msgstr "ماده ۵۹"
+
+#: frontend/src/lib/resources.ts:201
+msgid "Article 78"
+msgstr "ماده ۷۸"
+
+#: frontend/src/components/ResourceForm.vue:30
+msgid "Article {0}"
+msgstr "ماده {0}"
+
+#: frontend/src/lib/resources.ts:126
+msgid "Articles 52 and 61: shorter hours, no overtime"
+msgstr "مواد ۵۲ و ۶۱: ساعت کار کمتر، بدون اضافه‌کار"
 
 #: backend/hozur/services/users.py:167
 msgid "At least one active admin is needed"
@@ -111,11 +223,15 @@ msgstr "دست‌کم یک مدیر سیستم فعال لازم است"
 msgid "At work"
 msgstr "سر کار"
 
-#: frontend/src/pages/Devices.vue:4
+#: frontend/src/pages/Login.vue:8
+msgid "Attendance"
+msgstr "حضور و غیاب"
+
+#: frontend/src/pages/Devices.vue:4 frontend/src/pages/Manage.vue:49
 msgid "Attendance devices"
 msgstr "دستگاه‌های حضور و غیاب"
 
-#: frontend/src/pages/DeviceForm.vue:4
+#: frontend/src/components/PageHeader.vue:3 frontend/src/pages/Calendar.vue:4 frontend/src/pages/DeviceForm.vue:4 frontend/src/pages/ResourceList.vue:4
 msgid "Back"
 msgstr "بازگشت"
 
@@ -123,17 +239,57 @@ msgstr "بازگشت"
 msgid "Back to today"
 msgstr "بازگشت به امروز"
 
-#: backend/hozur/reports/catalog.py:40 frontend/src/pages/DeviceForm.vue:20
+#: frontend/src/lib/resources.ts:196
+msgid "Biometric consent date"
+msgstr "تاریخ رضایت‌نامهٔ بیومتریک"
+
+#: frontend/src/lib/resources.ts:193
+msgid "Birth date"
+msgstr "تاریخ تولد"
+
+#: backend/hozur/reports/catalog.py:40 frontend/src/lib/resources.ts:182 frontend/src/lib/resources.ts:75 frontend/src/pages/Calendar.vue:79 frontend/src/pages/DeviceForm.vue:19
 msgid "Branch"
 msgstr "شعبه"
+
+#: frontend/src/lib/resources.ts:74
+msgid "Branches"
+msgstr "شعبه‌ها"
+
+#: frontend/src/lib/resources.ts:240
+msgid "Break end"
+msgstr "پایان استراحت"
+
+#: frontend/src/lib/resources.ts:241
+msgid "Break minutes without punching"
+msgstr "دقایق استراحت بدون ثبت تردد"
+
+#: frontend/src/lib/resources.ts:239
+msgid "Break start"
+msgstr "شروع استراحت"
+
+#: frontend/src/lib/resources.ts:452 frontend/src/pages/Organization.vue:13 frontend/src/pages/Users.vue:93
+msgid "CEO"
+msgstr "مدیرعامل"
 
 #: backend/hozur/services/periods.py:82
 msgid "Calculations are still running; try again in a minute"
 msgstr "محاسبات هنوز در جریان است؛ یک دقیقهٔ دیگر دوباره امتحان کنید"
 
+#: frontend/src/pages/Manage.vue:46 frontend/src/pages/Manage.vue:47
+msgid "Calendar and periods"
+msgstr "تقویم و دوره‌ها"
+
+#: frontend/src/lib/resources.ts:420
+msgid "Can be hourly"
+msgstr "ساعتی هم ممکن است"
+
 #: frontend/src/pages/NewRequest.vue:122
 msgid "Cancel"
 msgstr "لغو"
+
+#: frontend/src/lib/format.ts:68 frontend/src/pages/Audit.vue:64
+msgid "Cancelled"
+msgstr "لغوشده"
 
 #: backend/hozur/devices/zkteco.py:93 backend/hozur/devices/zkteco.py:97
 msgid "Cannot connect to {0}:{1}: {2}"
@@ -142,6 +298,30 @@ msgstr "اتصال به {0}:{1} برقرار نشد: {2}. نشانی IP، پور
 #: backend/hozur/calendar/sources.py:133
 msgid "Cannot reach time.ir: {0}"
 msgstr "اتصال به time.ir برقرار نشد: {0}"
+
+#: frontend/src/lib/resources.ts:403
+msgid "Category"
+msgstr "دسته"
+
+#: frontend/src/pages/Calendar.vue:244
+msgid "Change"
+msgstr "تغییر"
+
+#: frontend/src/pages/Audit.vue:3 frontend/src/pages/Manage.vue:58
+msgid "Change history"
+msgstr "تاریخچهٔ تغییرات"
+
+#: frontend/src/components/UserMenu.vue:61 frontend/src/pages/Account.vue:3
+msgid "Change password"
+msgstr "تغییر رمز عبور"
+
+#: frontend/src/pages/Audit.vue:61
+msgid "Changed"
+msgstr "تغییر"
+
+#: frontend/src/components/FieldInput.vue:35
+msgid "Choose"
+msgstr "انتخاب کنید"
 
 #: frontend/src/components/JalaliDatePicker.vue:12
 msgid "Choose a date"
@@ -167,7 +347,7 @@ msgstr "نحوه پرداخت این تعطیلی را انتخاب کنید"
 msgid "Choose the branch"
 msgstr "شعبه را انتخاب کنید"
 
-#: backend/hozur/services/devices.py:496
+#: backend/hozur/services/devices.py:497
 msgid "Choose the device and enter the device user id"
 msgstr "دستگاه را انتخاب و شناسهٔ کاربر دستگاه را وارد کنید"
 
@@ -179,47 +359,111 @@ msgstr "نوع مرخصی را انتخاب کنید"
 msgid "Choose the province"
 msgstr "استان را انتخاب کنید"
 
+#: frontend/src/lib/resources.ts:83
+msgid "City"
+msgstr "شهر"
+
 #: frontend/src/components/JalaliDatePicker.vue:58
 msgid "Clear"
 msgstr "پاک کردن"
 
-#: frontend/src/pages/DeviceForm.vue:284
+#: frontend/src/pages/DeviceForm.vue:347
 msgid "Clock Difference (Seconds)"
 msgstr "اختلاف ساعت (ثانیه)"
+
+#: frontend/src/pages/Periods.vue:24
+msgid "Close"
+msgstr "بستن"
+
+#: frontend/src/pages/Periods.vue:78
+msgid "Close {0}? Nothing in it can change afterwards."
+msgstr "{0} بسته شود؟ پس از آن چیزی در آن تغییر نمی‌کند."
+
+#: frontend/src/pages/Audit.vue:67 frontend/src/pages/Periods.vue:68
+msgid "Closed"
+msgstr "بسته"
+
+#: frontend/src/lib/resources.ts:245
+msgid "Colour"
+msgstr "رنگ"
 
 #: backend/hozur/devices/file_import.py:114
 msgid "Column {0} not found in the file"
 msgstr "ستون {0} در فایل پیدا نشد"
 
-#: frontend/src/pages/DeviceForm.vue:48
+#: frontend/src/pages/Reports.vue:27
+msgid "Columns"
+msgstr "ستون‌ها"
+
+#: frontend/src/pages/DeviceForm.vue:47
 msgid "Comm Key"
 msgstr "رمز ارتباطی"
+
+#: frontend/src/lib/resources.ts:129
+msgid "Committee ruling date"
+msgstr "تاریخ رأی کمیته"
+
+#: frontend/src/lib/resources.ts:128
+msgid "Committee ruling number"
+msgstr "شمارهٔ رأی کمیته"
+
+#: frontend/src/pages/Manage.vue:42 frontend/src/pages/Organization.vue:3
+msgid "Company"
+msgstr "شرکت"
 
 #: backend/hozur/reports/catalog.py:71
 msgid "Company Holiday Work"
 msgstr "کار در تعطیلی شرکت"
 
-#: frontend/src/pages/DeviceForm.vue:295 frontend/src/pages/Devices.vue:134
+#: frontend/src/lib/labels.ts:10
+msgid "Company holiday"
+msgstr "تعطیلی شرکت"
+
+#: frontend/src/lib/labels.ts:27
+msgid "Confirmed"
+msgstr "قطعی"
+
+#: frontend/src/pages/DeviceForm.vue:359 frontend/src/pages/Devices.vue:167
 msgid "Connected: {0}"
 msgstr "اتصال برقرار شد: {0}"
 
-#: frontend/src/pages/DeviceForm.vue:37
+#: frontend/src/pages/DeviceForm.vue:36
 msgid "Connection"
 msgstr "اتصال"
+
+#: frontend/src/lib/resources.ts:171
+msgid "Contract"
+msgstr "نوع قرارداد"
+
+#: frontend/src/pages/Audit.vue:60
+msgid "Created"
+msgstr "ایجاد"
 
 #: backend/hozur/reports/catalog.py:56
 msgid "Credited Work"
 msgstr "کارکرد محاسبه‌شده"
 
-#: frontend/src/pages/NewRequest.vue:154
+#: frontend/src/pages/Account.vue:10
+msgid "Current password"
+msgstr "رمز عبور فعلی"
+
+#: frontend/src/lib/format.ts:118 frontend/src/pages/NewRequest.vue:155
 msgid "Daily"
 msgstr "روزانه"
 
-#: backend/hozur/reports/catalog.py:44 backend/hozur/services/requests.py:126 backend/hozur/services/requests.py:205 backend/hozur/services/requests.py:230 backend/hozur/services/requests.py:253 frontend/src/pages/NewRequest.vue:25 frontend/src/pages/NewRequest.vue:45 frontend/src/pages/NewRequest.vue:59 frontend/src/pages/NewRequest.vue:77
+#: frontend/src/lib/format.ts:107
+msgid "Daily Leave"
+msgstr "مرخصی روزانه"
+
+#: frontend/src/lib/resources.ts:64
+msgid "Daily leave"
+msgstr "مرخصی روزانه"
+
+#: backend/hozur/reports/catalog.py:44 backend/hozur/services/requests.py:126 backend/hozur/services/requests.py:205 backend/hozur/services/requests.py:230 backend/hozur/services/requests.py:253 frontend/src/lib/resources.ts:368 frontend/src/pages/Calendar.vue:26 frontend/src/pages/Calendar.vue:60 frontend/src/pages/NewRequest.vue:25 frontend/src/pages/NewRequest.vue:45 frontend/src/pages/NewRequest.vue:59 frontend/src/pages/NewRequest.vue:77
 msgid "Date"
 msgstr "تاریخ"
 
-#: backend/hozur/reports/catalog.py:44 backend/hozur/reports/catalog.py:45 backend/hozur/reports/catalog.py:46 backend/hozur/reports/catalog.py:47 backend/hozur/reports/catalog.py:48 backend/hozur/reports/catalog.py:49 backend/hozur/reports/catalog.py:50 backend/hozur/reports/catalog.py:51 backend/hozur/reports/catalog.py:52
+#: backend/hozur/reports/catalog.py:44 backend/hozur/reports/catalog.py:45 backend/hozur/reports/catalog.py:46 backend/hozur/reports/catalog.py:47 backend/hozur/reports/catalog.py:48 backend/hozur/reports/catalog.py:49 backend/hozur/reports/catalog.py:50 backend/hozur/reports/catalog.py:51 backend/hozur/reports/catalog.py:52 frontend/src/pages/Reports.vue:164
 msgid "Day"
 msgstr "روز"
 
@@ -227,7 +471,11 @@ msgstr "روز"
 msgid "Day Type"
 msgstr "نوع روز"
 
-#: backend/hozur/reports/catalog.py:80 backend/hozur/reports/catalog.py:81 backend/hozur/reports/catalog.py:82 backend/hozur/reports/catalog.py:83 backend/hozur/reports/catalog.py:84
+#: frontend/src/lib/resources.ts:296
+msgid "Day of the cycle"
+msgstr "روز چرخه"
+
+#: backend/hozur/reports/catalog.py:80 backend/hozur/reports/catalog.py:81 backend/hozur/reports/catalog.py:82 backend/hozur/reports/catalog.py:83 backend/hozur/reports/catalog.py:84 frontend/src/lib/resources.ts:284 frontend/src/pages/Reports.vue:169
 msgid "Days"
 msgstr "روز"
 
@@ -235,27 +483,87 @@ msgstr "روز"
 msgid "Days Employed"
 msgstr "روزهای اشتغال"
 
-#: backend/hozur/reports/catalog.py:81 frontend/src/pages/Month.vue:219
+#: backend/hozur/reports/catalog.py:81 frontend/src/pages/Month.vue:288
 msgid "Days Present"
 msgstr "روزهای حضور"
+
+#: frontend/src/pages/Reports.vue:168
+msgid "Decimal hours"
+msgstr "ساعت اعشاری"
 
 #: frontend/src/pages/Approvals.vue:32
 msgid "Decline"
 msgstr "نمی‌پذیرم"
 
-#: backend/hozur/reports/catalog.py:41
+#: frontend/src/pages/Approvals.vue:100
+msgid "Declined"
+msgstr "نپذیرفت"
+
+#: frontend/src/lib/resources.ts:419
+msgid "Deducted from the leave balance"
+msgstr "از ماندهٔ مرخصی کم می‌شود"
+
+#: frontend/src/pages/ApprovalDefaults.vue:3 frontend/src/pages/Manage.vue:55
+msgid "Default approval per request type"
+msgstr "تأیید پیش‌فرض هر نوع درخواست"
+
+#: frontend/src/lib/resources.ts:102
+msgid "Default approver"
+msgstr "تأییدکنندهٔ پیش‌فرض"
+
+#: frontend/src/pages/Settings.vue:25
+msgid "Default calendar source"
+msgstr "منبع پیش‌فرض تقویم"
+
+#: frontend/src/components/ResourceForm.vue:60 frontend/src/pages/Calendar.vue:90
+msgid "Delete"
+msgstr "حذف"
+
+#: frontend/src/components/ResourceForm.vue:170
+msgid "Delete this record?"
+msgstr "این رکورد حذف شود؟"
+
+#: frontend/src/components/ResourceForm.vue:175 frontend/src/pages/Audit.vue:62
+msgid "Deleted"
+msgstr "حذف شد"
+
+#: backend/hozur/reports/catalog.py:41 frontend/src/lib/resources.ts:183 frontend/src/lib/resources.ts:347 frontend/src/lib/resources.ts:91 frontend/src/pages/Reports.vue:10 frontend/src/pages/Reports.vue:163
 msgid "Department"
 msgstr "واحد"
 
-#: backend/hozur/reports/catalog.py:42
+#: frontend/src/lib/resources.ts:90
+msgid "Departments"
+msgstr "واحدها"
+
+#: frontend/src/lib/resources.ts:107
+msgid "Deputy"
+msgstr "جانشین"
+
+#: frontend/src/lib/resources.ts:108
+msgid "Deputy from"
+msgstr "جانشین از"
+
+#: frontend/src/lib/resources.ts:109
+msgid "Deputy until"
+msgstr "جانشین تا"
+
+#: frontend/src/lib/resources.ts:130 frontend/src/lib/resources.ts:303 frontend/src/lib/resources.ts:387 frontend/src/lib/resources.ts:424 frontend/src/lib/resources.ts:438
+msgid "Description"
+msgstr "توضیحات"
+
+#: backend/hozur/reports/catalog.py:42 frontend/src/lib/resources.ts:115 frontend/src/lib/resources.ts:184 frontend/src/lib/resources.ts:339
 msgid "Designation"
 msgstr "عنوان شغلی"
+
+#: frontend/src/lib/resources.ts:114
+msgid "Designations"
+msgstr "سمت‌ها"
 
 #: frontend/src/pages/NewRequest.vue:37
 msgid "Destination"
 msgstr "مقصد"
 
-#: frontend/src/lib/format.ts:48
+#: frontend/src/lib/format.ts:78
 msgid "Device"
 msgstr "دستگاه"
 
@@ -263,19 +571,19 @@ msgstr "دستگاه"
 msgid "Device IP address is not set"
 msgstr "نشانی IP دستگاه وارد نشده است"
 
-#: frontend/src/pages/DeviceForm.vue:14
+#: frontend/src/pages/DeviceForm.vue:13
 msgid "Device Name"
 msgstr "نام دستگاه"
 
-#: frontend/src/pages/DeviceForm.vue:283
+#: frontend/src/pages/DeviceForm.vue:346
 msgid "Device Time"
 msgstr "ساعت دستگاه"
 
-#: frontend/src/pages/DeviceForm.vue:19
+#: frontend/src/pages/DeviceForm.vue:18
 msgid "Device Type"
 msgstr "نوع دستگاه"
 
-#: frontend/src/pages/DeviceForm.vue:314
+#: frontend/src/pages/DeviceForm.vue:378
 msgid "Device clock set to {0} {1}"
 msgstr "ساعت دستگاه روی {0} {1} تنظیم شد"
 
@@ -287,7 +595,7 @@ msgstr "رمز ارتباطی دستگاه (منو > ارتباطات > Comm Key
 msgid "Device error: {0}"
 msgstr "خطای دستگاه: {0}"
 
-#: backend/hozur/services/devices.py:88
+#: backend/hozur/services/devices.py:89
 msgid "Device not found"
 msgstr "دستگاه پیدا نشد"
 
@@ -295,23 +603,31 @@ msgstr "دستگاه پیدا نشد"
 msgid "Device tools"
 msgstr "ابزارهای دستگاه"
 
-#: frontend/src/pages/DeviceForm.vue:152
+#: frontend/src/pages/DeviceForm.vue:155
 msgid "Device users"
 msgstr "کاربران دستگاه"
 
-#: backend/hozur/services/devices.py:355
+#: backend/hozur/services/devices.py:356
 msgid "Device {0} receives punches by file import"
 msgstr "تردد دستگاه {0} با ورود فایل وارد می‌شود"
 
-#: frontend/src/components/AppShell.vue:109 frontend/src/pages/Today.vue:17
+#: frontend/src/pages/Manage.vue:48 frontend/src/pages/Today.vue:17
 msgid "Devices"
 msgstr "دستگاه‌ها"
+
+#: frontend/src/lib/resources.ts:450
+msgid "Direct manager"
+msgstr "مدیر مستقیم"
 
 #: frontend/src/pages/Devices.vue:31
 msgid "Disabled"
 msgstr "غیرفعال"
 
-#: frontend/src/pages/DeviceForm.vue:159
+#: frontend/src/components/PunchList.vue:21
+msgid "Duplicate"
+msgstr "تکراری"
+
+#: frontend/src/pages/DeviceForm.vue:162
 msgid "Each device user must point to an employee; users whose ID equals an employee code are mapped automatically."
 msgstr "هر کاربر دستگاه باید به یک کارمند وصل شود؛ کاربرانی که شناسه‌شان با کد پرسنلی یکی است خودکار وصل می‌شوند."
 
@@ -323,7 +639,23 @@ msgstr "هر روز هفته فقط یک بار می‌تواند بیاید"
 msgid "Early Leave"
 msgstr "تعجیل"
 
-#: frontend/src/pages/NewRequest.vue:165
+#: frontend/src/lib/resources.ts:408
+msgid "Earned"
+msgstr "استحقاقی"
+
+#: frontend/src/pages/Organization.vue:9
+msgid "Economic code"
+msgstr "کد اقتصادی"
+
+#: frontend/src/lib/resources.ts:384
+msgid "Effective from"
+msgstr "معتبر از"
+
+#: frontend/src/lib/resources.ts:156
+msgid "Email"
+msgstr "ایمیل"
+
+#: frontend/src/lib/format.ts:122 frontend/src/pages/NewRequest.vue:166
 msgid "Emergency"
 msgstr "اضطراری"
 
@@ -335,7 +667,11 @@ msgstr "اضافه‌کار اضطراری"
 msgid "Emergency overtime above 8 hours was not counted (Article 60)"
 msgstr "اضافه‌کار اضطراری بیش از ۸ ساعت حساب نشد (ماده ۶۰)"
 
-#: frontend/src/pages/Month.vue:12 frontend/src/pages/NewRequest.vue:10 frontend/src/pages/Requests.vue:13
+#: frontend/src/lib/resources.ts:499
+msgid "Emergency overtime cap (minutes)"
+msgstr "سقف اضافه‌کار اضطراری (دقیقه)"
+
+#: frontend/src/lib/resources.ts:136 frontend/src/lib/resources.ts:331 frontend/src/lib/resources.ts:367 frontend/src/lib/resources.ts:470 frontend/src/pages/Month.vue:12 frontend/src/pages/NewRequest.vue:10 frontend/src/pages/Reports.vue:11 frontend/src/pages/Requests.vue:13 frontend/src/pages/Users.vue:91
 msgid "Employee"
 msgstr "پرسنل"
 
@@ -343,15 +679,31 @@ msgstr "پرسنل"
 msgid "Employee Code"
 msgstr "کد پرسنلی"
 
-#: backend/hozur/api/routes/admin.py:172 backend/hozur/api/routes/admin.py:249 backend/hozur/api/routes/attendance.py:143 backend/hozur/services/requests.py:102
+#: backend/hozur/api/routes/admin.py:186 backend/hozur/api/routes/admin.py:263 backend/hozur/api/routes/attendance.py:145 backend/hozur/api/routes/attendance.py:34 backend/hozur/services/requests.py:102
 msgid "Employee not found"
 msgstr "کارمند پیدا نشد"
+
+#: frontend/src/pages/Users.vue:47
+msgid "Employee record"
+msgstr "پروندهٔ پرسنلی"
+
+#: frontend/src/lib/resources.ts:135
+msgid "Employees"
+msgstr "پرسنل"
 
 #: frontend/src/pages/DeviceForm.vue:64
 msgid "Enabled"
 msgstr "فعال"
 
-#: backend/hozur/api/routes/admin.py:69 backend/hozur/services/devices.py:126 backend/hozur/services/devices.py:585
+#: frontend/src/lib/resources.ts:226
+msgid "End"
+msgstr "پایان"
+
+#: frontend/src/lib/resources.ts:181
+msgid "End date"
+msgstr "تاریخ پایان"
+
+#: backend/hozur/api/routes/admin.py:69 backend/hozur/services/devices.py:127 backend/hozur/services/devices.py:586
 msgid "Enter a name"
 msgstr "نام را بنویسید"
 
@@ -367,7 +719,7 @@ msgstr "نام کاربری را بنویسید"
 msgid "Enter both the start and the end of the break"
 msgstr "شروع و پایان استراحت را وارد کنید"
 
-#: backend/hozur/services/devices.py:133
+#: backend/hozur/services/devices.py:134
 msgid "Enter the device IP address"
 msgstr "نشانی IP دستگاه را وارد کنید"
 
@@ -411,7 +763,19 @@ msgstr "دلیل مأموریت را بنویسید"
 msgid "Enter the start and end time"
 msgstr "ساعت شروع و پایان را وارد کنید"
 
-#: frontend/src/pages/NewRequest.vue:164
+#: frontend/src/pages/ApprovalDefaults.vue:39
+msgid "Entered by an operator for someone"
+msgstr "ثبت اپراتور برای دیگری"
+
+#: frontend/src/lib/format.ts:71 frontend/src/pages/DeviceForm.vue:373 frontend/src/pages/Devices.vue:183
+msgid "Error"
+msgstr "خطا"
+
+#: frontend/src/pages/Reports.vue:172
+msgid "Excel"
+msgstr "اکسل"
+
+#: frontend/src/lib/format.ts:122 frontend/src/pages/NewRequest.vue:165
 msgid "Exceptional"
 msgstr "استثنایی"
 
@@ -423,21 +787,49 @@ msgstr "اضافه‌کار استثنایی"
 msgid "Extra Work"
 msgstr "کار اضافه"
 
+#: frontend/src/lib/resources.ts:513
+msgid "Extra maternity leave for twins or more (days)"
+msgstr "مرخصی زایمان اضافه برای دوقلو و بیشتر (روز)"
+
+#: frontend/src/lib/resources.ts:244
+msgid "Extra work counts after (minutes)"
+msgstr "کار اضافه از این مقدار به بعد حساب می‌شود (دقیقه)"
+
 #: frontend/src/lib/warnings.ts:17
 msgid "Extra work without an approved overtime request"
 msgstr "کار اضافه بدون درخواست اضافه‌کار تأییدشده"
 
-#: frontend/src/lib/format.ts:49
+#: frontend/src/lib/resources.ts:152
+msgid "Female"
+msgstr "زن"
+
+#: frontend/src/lib/format.ts:78
 msgid "File Import"
 msgstr "ورود فایل"
 
-#: frontend/src/pages/DeviceForm.vue:280
+#: frontend/src/pages/DeviceForm.vue:343
 msgid "Firmware"
 msgstr "نسخه فریم‌ور"
 
 #: backend/hozur/reports/catalog.py:50 frontend/src/components/DayNumbers.vue:21
 msgid "First In"
 msgstr "اولین ورود"
+
+#: frontend/src/lib/resources.ts:278
+msgid "First day of the cycle"
+msgstr "روز اول چرخه"
+
+#: frontend/src/lib/resources.ts:142
+msgid "First name"
+msgstr "نام"
+
+#: frontend/src/lib/resources.ts:221
+msgid "Fixed"
+msgstr "ثابت"
+
+#: frontend/src/lib/resources.ts:222
+msgid "Flexible"
+msgstr "شناور"
 
 #: frontend/src/pages/DeviceForm.vue:117
 msgid "For a USB export or an Excel/CSV file from another program. Punches already stored are skipped."
@@ -447,19 +839,79 @@ msgstr "برای خروجی فلش دستگاه یا فایل اکسل/CSV نر�
 msgid "Friday Work"
 msgstr "جمعه‌کاری"
 
+#: frontend/src/lib/resources.ts:354 frontend/src/pages/Reports.vue:8
+msgid "From"
+msgstr "از"
+
 #: backend/hozur/services/requests.py:143 backend/hozur/services/requests.py:216 frontend/src/pages/NewRequest.vue:20 frontend/src/pages/NewRequest.vue:40
 msgid "From Date"
 msgstr "از تاریخ"
+
+#: frontend/src/lib/format.ts:88
+msgid "From Device"
+msgstr "از خود دستگاه"
 
 #: backend/hozur/services/requests.py:128 backend/hozur/services/requests.py:207 backend/hozur/services/requests.py:236 frontend/src/pages/NewRequest.vue:27 frontend/src/pages/NewRequest.vue:47 frontend/src/pages/NewRequest.vue:62
 msgid "From Time"
 msgstr "از ساعت"
 
+#: frontend/src/pages/DeviceForm.vue:176
+msgid "From {0} to {1}"
+msgstr "از {0} تا {1}"
+
 #: backend/hozur/reports/catalog.py:38
 msgid "Full Name"
 msgstr "نام و نام خانوادگی"
 
-#: backend/hozur/reports/catalog.py:48
+#: frontend/src/lib/resources.ts:144 frontend/src/pages/Users.vue:37
+msgid "Full name"
+msgstr "نام کامل"
+
+#: frontend/src/lib/resources.ts:175
+msgid "Full time"
+msgstr "تمام‌وقت"
+
+#: frontend/src/lib/resources.ts:148
+msgid "Gender"
+msgstr "جنسیت"
+
+#: frontend/src/lib/resources.ts:243
+msgid "Grace for early leave (minutes)"
+msgstr "ارفاق خروج زودهنگام (دقیقه)"
+
+#: frontend/src/lib/resources.ts:242
+msgid "Grace for late arrival (minutes)"
+msgstr "ارفاق تأخیر ورود (دقیقه)"
+
+#: frontend/src/pages/Reports.vue:21
+msgid "Group by"
+msgstr "گروه‌بندی بر اساس"
+
+#: frontend/src/lib/resources.ts:412
+msgid "Hajj"
+msgstr "حج"
+
+#: frontend/src/lib/resources.ts:509
+msgid "Hajj leave (days)"
+msgstr "مرخصی حج (روز)"
+
+#: frontend/src/lib/resources.ts:123
+msgid "Hard and harmful work"
+msgstr "کار سخت و زیان‌آور"
+
+#: frontend/src/lib/resources.ts:492
+msgid "Hard and harmful work per day (minutes)"
+msgstr "کار سخت و زیان‌آور در روز (دقیقه)"
+
+#: frontend/src/lib/resources.ts:493
+msgid "Hard and harmful work per week (minutes)"
+msgstr "کار سخت و زیان‌آور در هفته (دقیقه)"
+
+#: frontend/src/lib/resources.ts:98
+msgid "Has sub-departments"
+msgstr "زیرواحد دارد"
+
+#: backend/hozur/reports/catalog.py:48 frontend/src/lib/format.ts:62 frontend/src/pages/Calendar.vue:58
 msgid "Holiday"
 msgstr "تعطیل"
 
@@ -471,19 +923,47 @@ msgstr "تعطیل‌کاری"
 msgid "Holiday not found"
 msgstr "تعطیلی پیدا نشد"
 
-#: backend/hozur/reports/catalog.py:82
+#: backend/hozur/reports/catalog.py:82 frontend/src/pages/Calendar.vue:5
 msgid "Holidays"
 msgstr "تعطیلات"
 
-#: frontend/src/pages/NewRequest.vue:155
+#: frontend/src/pages/Manage.vue:46
+msgid "Holidays and yearly refresh"
+msgstr "تعطیلات و به‌روزرسانی سالانه"
+
+#: frontend/src/lib/labels.ts:33
+msgid "Holidays shipped with the app"
+msgstr "تعطیلات همراه نرم‌افزار"
+
+#: frontend/src/lib/format.ts:118 frontend/src/lib/resources.ts:177 frontend/src/pages/NewRequest.vue:156
 msgid "Hourly"
 msgstr "ساعتی"
 
-#: frontend/src/components/AppShell.vue:122 frontend/src/components/AppShell.vue:8
+#: frontend/src/lib/format.ts:108
+msgid "Hourly Leave"
+msgstr "مرخصی ساعتی"
+
+#: frontend/src/lib/resources.ts:65
+msgid "Hourly leave"
+msgstr "مرخصی ساعتی"
+
+#: frontend/src/lib/resources.ts:510
+msgid "Hourly leave that makes one day (minutes)"
+msgstr "مرخصی ساعتی معادل یک روز (دقیقه)"
+
+#: frontend/src/pages/Reports.vue:167
+msgid "Hours:minutes"
+msgstr "ساعت:دقیقه"
+
+#: frontend/src/pages/Calendar.vue:66
+msgid "How is it paid?"
+msgstr "پرداخت چگونه است؟"
+
+#: frontend/src/components/AppShell.vue:138 frontend/src/components/AppShell.vue:8 frontend/src/pages/Login.vue:7
 msgid "Hozur"
 msgstr "حضور"
 
-#: frontend/src/pages/DeviceForm.vue:39
+#: frontend/src/pages/DeviceForm.vue:38
 msgid "IP Address"
 msgstr "نشانی IP"
 
@@ -495,7 +975,15 @@ msgstr "هویتی"
 msgid "Ignore"
 msgstr "نادیده بگیر"
 
-#: frontend/src/pages/DeviceForm.vue:136
+#: frontend/src/lib/format.ts:148
+msgid "Ignore a punch"
+msgstr "نادیده گرفتن تردد"
+
+#: frontend/src/components/PunchList.vue:22
+msgid "Ignored"
+msgstr "نادیده گرفته شد"
+
+#: frontend/src/pages/DeviceForm.vue:139
 msgid "Import"
 msgstr "ورود"
 
@@ -507,31 +995,59 @@ msgstr "قالب ورود"
 msgid "Import a punch file"
 msgstr "ورود فایل تردد"
 
-#: frontend/src/pages/NewRequest.vue:158
+#: frontend/src/lib/format.ts:82 frontend/src/pages/NewRequest.vue:159
 msgid "In"
 msgstr "ورود"
 
-#: frontend/src/pages/Month.vue:208
+#: frontend/src/lib/format.ts:58 frontend/src/pages/Month.vue:277
 msgid "Incomplete"
 msgstr "ناقص"
 
-#: backend/hozur/services/devices.py:214
+#: frontend/src/pages/Organization.vue:10
+msgid "Insurance workshop code"
+msgstr "کد کارگاه بیمه"
+
+#: backend/hozur/services/devices.py:215
 msgid "Invalid punch time {0}"
 msgstr "ساعت تردد نامعتبر است: {0}"
+
+#: frontend/src/lib/resources.ts:376
+msgid "Labor rule set"
+msgstr "مجموعه قواعد"
+
+#: frontend/src/lib/resources.ts:375
+msgid "Labor rule sets"
+msgstr "مجموعه‌های قواعد"
 
 #: backend/hozur/reports/catalog.py:51 frontend/src/components/DayNumbers.vue:22
 msgid "Last Out"
 msgstr "آخرین خروج"
 
-#: frontend/src/pages/Devices.vue:50
+#: frontend/src/pages/Devices.vue:46
 msgid "Last Read"
 msgstr "آخرین خواندن"
 
-#: backend/hozur/reports/catalog.py:57 frontend/src/components/DayNumbers.vue:27 frontend/src/pages/Month.vue:223
+#: frontend/src/pages/Users.vue:14
+msgid "Last login"
+msgstr "آخرین ورود"
+
+#: frontend/src/lib/resources.ts:143
+msgid "Last name"
+msgstr "نام خانوادگی"
+
+#: backend/hozur/reports/catalog.py:57 frontend/src/components/DayNumbers.vue:27 frontend/src/pages/Month.vue:292
 msgid "Late"
 msgstr "تأخیر"
 
-#: frontend/src/pages/Month.vue:101 frontend/src/pages/Month.vue:210 frontend/src/pages/NewRequest.vue:148
+#: frontend/src/lib/resources.ts:229
+msgid "Latest start"
+msgstr "دیرترین شروع"
+
+#: frontend/src/components/ResourceForm.vue:30
+msgid "Law: {0}"
+msgstr "قانون: {0}"
+
+#: frontend/src/lib/format.ts:60 frontend/src/lib/format.ts:99 frontend/src/pages/Month.vue:101 frontend/src/pages/Month.vue:279 frontend/src/pages/NewRequest.vue:149
 msgid "Leave"
 msgstr "مرخصی"
 
@@ -543,7 +1059,7 @@ msgstr "مرخصی (روز)"
 msgid "Leave (Hours)"
 msgstr "مرخصی (ساعت)"
 
-#: backend/hozur/reports/catalog.py:78 frontend/src/pages/Today.vue:77
+#: backend/hozur/reports/catalog.py:78 frontend/src/pages/Today.vue:75
 msgid "Leave Balance (Days)"
 msgstr "مانده مرخصی (روز)"
 
@@ -559,25 +1075,93 @@ msgstr "مرخصی و مأموریت"
 msgid "Leave by Type"
 msgstr "مرخصی به تفکیک نوع"
 
+#: frontend/src/lib/resources.ts:508
+msgid "Leave carried to the next year (days)"
+msgstr "مرخصی قابل انتقال به سال بعد (روز)"
+
+#: frontend/src/lib/resources.ts:393
+msgid "Leave type"
+msgstr "نوع مرخصی"
+
+#: frontend/src/lib/resources.ts:392
+msgid "Leave types"
+msgstr "انواع مرخصی"
+
+#: frontend/src/lib/resources.ts:166
+msgid "Left"
+msgstr "پایان همکاری"
+
+#: frontend/src/lib/resources.ts:385
+msgid "Legal baseline"
+msgstr "مبنای قانونی"
+
+#: frontend/src/lib/resources.ts:423
+msgid "Limit from the rule set (parameter)"
+msgstr "سقف از مجموعه قواعد (پارامتر)"
+
 #: frontend/src/pages/Approvals.vue:5 frontend/src/pages/Devices.vue:11 frontend/src/pages/Month.vue:69 frontend/src/pages/Requests.vue:18 frontend/src/pages/Today.vue:23
 msgid "Loading..."
 msgstr "در حال بارگذاری..."
 
-#: frontend/src/pages/DeviceForm.vue:282 frontend/src/pages/Devices.vue:58
+#: frontend/src/pages/DeviceForm.vue:345 frontend/src/pages/Devices.vue:54
 msgid "Log Records on Device"
 msgstr "تعداد لاگ روی دستگاه"
 
-#: frontend/src/components/UserMenu.vue:65
+#: frontend/src/pages/Login.vue:22
+msgid "Log in"
+msgstr "ورود"
+
+#: frontend/src/components/UserMenu.vue:62
 msgid "Log out"
 msgstr "خروج"
 
-#: frontend/src/lib/format.ts:50
+#: frontend/src/lib/resources.ts:494
+msgid "Longest span of split shifts (minutes)"
+msgstr "بیشترین فاصلهٔ کار منقطع (دقیقه)"
+
+#: frontend/src/lib/resources.ts:151
+msgid "Male"
+msgstr "مرد"
+
+#: frontend/src/components/AppShell.vue:112 frontend/src/pages/Manage.vue:3
+msgid "Manage"
+msgstr "مدیریت"
+
+#: frontend/src/lib/resources.ts:99 frontend/src/pages/Users.vue:92
+msgid "Manager"
+msgstr "مدیر"
+
+#: frontend/src/lib/resources.ts:451
+msgid "Manager of the parent department"
+msgstr "مدیر واحد بالادست"
+
+#: frontend/src/lib/format.ts:78
 msgid "Manual"
 msgstr "دستی"
 
-#: frontend/src/pages/Month.vue:90 frontend/src/pages/NewRequest.vue:151 frontend/src/pages/Today.vue:69
+#: frontend/src/lib/format.ts:111 frontend/src/lib/format.ts:99 frontend/src/pages/Month.vue:90 frontend/src/pages/NewRequest.vue:152 frontend/src/pages/Today.vue:67
 msgid "Manual entry"
 msgstr "ثبت دستی"
+
+#: frontend/src/lib/resources.ts:68
+msgid "Manual time entry"
+msgstr "ثبت دستی ساعت"
+
+#: frontend/src/lib/resources.ts:411
+msgid "Marriage or bereavement"
+msgstr "ازدواج یا فوت بستگان"
+
+#: frontend/src/lib/resources.ts:511
+msgid "Marriage or bereavement leave (days)"
+msgstr "مرخصی ازدواج یا فوت بستگان (روز)"
+
+#: frontend/src/lib/resources.ts:413
+msgid "Maternity"
+msgstr "زایمان"
+
+#: frontend/src/lib/resources.ts:512
+msgid "Maternity leave (days)"
+msgstr "مرخصی زایمان (روز)"
 
 #: backend/hozur/services/rule_sets.py:33
 msgid "Missing parameters: {0}"
@@ -587,7 +1171,7 @@ msgstr "پارامترهای جاافتاده: {0}"
 msgid "Missing request header"
 msgstr "سرآیند درخواست وجود ندارد"
 
-#: frontend/src/pages/Month.vue:211 frontend/src/pages/NewRequest.vue:149
+#: frontend/src/lib/format.ts:109 frontend/src/lib/format.ts:61 frontend/src/lib/format.ts:99 frontend/src/lib/resources.ts:66 frontend/src/pages/Month.vue:280 frontend/src/pages/NewRequest.vue:150
 msgid "Mission"
 msgstr "مأموریت"
 
@@ -599,7 +1183,11 @@ msgstr "مأموریت (روز)"
 msgid "Mission (Hours)"
 msgstr "مأموریت (ساعت)"
 
-#: frontend/src/pages/DeviceForm.vue:278
+#: frontend/src/lib/resources.ts:155
+msgid "Mobile"
+msgstr "موبایل"
+
+#: frontend/src/pages/DeviceForm.vue:341
 msgid "Model"
 msgstr "مدل"
 
@@ -607,31 +1195,111 @@ msgstr "مدل"
 msgid "Month"
 msgstr "ماه"
 
+#: frontend/src/pages/Manage.vue:47 frontend/src/pages/Periods.vue:3
+msgid "Monthly period lock"
+msgstr "قفل دورهٔ ماهانه"
+
 #: frontend/src/lib/warnings.ts:7
 msgid "More than 15 hours from first to last punch (Article 54)"
 msgstr "بیش از ۱۵ ساعت از اولین تا آخرین تردد (ماده ۵۴)"
+
+#: frontend/src/lib/resources.ts:421
+msgid "Most days in one request"
+msgstr "بیشترین روز در یک درخواست"
+
+#: frontend/src/lib/resources.ts:490
+msgid "Most work per day (minutes)"
+msgstr "حداکثر کار روزانه (دقیقه)"
+
+#: frontend/src/lib/resources.ts:491
+msgid "Most work per week (minutes)"
+msgstr "حداکثر کار هفتگی (دقیقه)"
 
 #: frontend/src/pages/Requests.vue:4
 msgid "My requests"
 msgstr "درخواست‌های من"
 
+#: frontend/src/lib/resources.ts:120 frontend/src/lib/resources.ts:213 frontend/src/lib/resources.ts:257 frontend/src/lib/resources.ts:383 frontend/src/lib/resources.ts:400 frontend/src/lib/resources.ts:437 frontend/src/lib/resources.ts:81 frontend/src/lib/resources.ts:96 frontend/src/pages/Organization.vue:5 frontend/src/pages/Users.vue:12
+msgid "Name"
+msgstr "نام"
+
+#: frontend/src/pages/Reports.vue:49
+msgid "Name to save this report"
+msgstr "نام برای ذخیرهٔ این گزارش"
+
 #: backend/hozur/reports/catalog.py:39
 msgid "National Code"
 msgstr "کد ملی"
+
+#: frontend/src/lib/resources.ts:145
+msgid "National code"
+msgstr "کد ملی"
+
+#: frontend/src/pages/Organization.vue:8
+msgid "National id of the company"
+msgstr "شناسهٔ ملی شرکت"
+
+#: frontend/src/pages/Calendar.vue:7 frontend/src/pages/ResourceList.vue:6 frontend/src/pages/Users.vue:4
+msgid "New"
+msgstr "جدید"
+
+#: frontend/src/pages/Calendar.vue:58
+msgid "New holiday"
+msgstr "تعطیلی جدید"
+
+#: frontend/src/pages/Account.vue:12
+msgid "New password"
+msgstr "رمز عبور جدید"
+
+#: frontend/src/pages/Users.vue:56
+msgid "New password (leave empty to keep)"
+msgstr "رمز عبور جدید (خالی بماند یعنی بدون تغییر)"
+
+#: frontend/src/pages/Account.vue:18
+msgid "New password again"
+msgstr "تکرار رمز عبور جدید"
 
 #: frontend/src/pages/NewRequest.vue:3 frontend/src/pages/Requests.vue:6
 msgid "New request"
 msgstr "درخواست جدید"
 
+#: frontend/src/pages/Users.vue:34
+msgid "New user"
+msgstr "کاربر جدید"
+
+#: frontend/src/components/ResourceForm.vue:96
+msgid "New {0}"
+msgstr "{0} جدید"
+
 #: frontend/src/components/JalaliDatePicker.vue:33 frontend/src/pages/Month.vue:6
 msgid "Next month"
 msgstr "ماه بعد"
+
+#: frontend/src/pages/Calendar.vue:13 frontend/src/pages/Periods.vue:10
+msgid "Next year"
+msgstr "سال بعد"
 
 #: backend/hozur/reports/catalog.py:67
 msgid "Night Work"
 msgstr "شب‌کاری"
 
-#: backend/hozur/devices/base.py:115 backend/hozur/services/devices.py:131
+#: frontend/src/lib/resources.ts:497
+msgid "Night work ends (minute of the day)"
+msgstr "پایان شب‌کاری (دقیقهٔ روز)"
+
+#: frontend/src/lib/resources.ts:501
+msgid "Night work premium (percent)"
+msgstr "فوق‌العادهٔ شب‌کاری (درصد)"
+
+#: frontend/src/lib/resources.ts:496
+msgid "Night work starts (minute of the day)"
+msgstr "شروع شب‌کاری (دقیقهٔ روز)"
+
+#: frontend/src/lib/resources.ts:505
+msgid "Night-shift premium (percent)"
+msgstr "فوق‌العادهٔ نوبت شب (درصد)"
+
+#: backend/hozur/devices/base.py:115 backend/hozur/services/devices.py:132
 msgid "No adapter registered for device type {0}"
 msgstr "برای نوع دستگاه {0} رابطی ثبت نشده است"
 
@@ -647,6 +1315,18 @@ msgstr "برای مرحله {0} ({1}) تأییدکننده‌ای پیدا نش�
 msgid "No device yet."
 msgstr "هنوز دستگاهی تعریف نشده است."
 
+#: frontend/src/pages/Reports.vue:161
+msgid "No grouping"
+msgstr "بدون گروه‌بندی"
+
+#: frontend/src/pages/Calendar.vue:51
+msgid "No holidays for this year"
+msgstr "برای این سال تعطیلی ثبت نشده است"
+
+#: frontend/src/pages/DeviceForm.vue:124
+msgid "No import template is defined yet."
+msgstr "هنوز الگوی ورود فایل تعریف نشده است."
+
 #: frontend/src/lib/warnings.ts:16
 msgid "No night work for young workers (Article 84)"
 msgstr "شب‌کاری برای کارگر نوجوان ممنوع است (ماده ۸۴)"
@@ -659,7 +1339,7 @@ msgstr "اضافه‌کار برای کارگر نوجوان ممنوع است (
 msgid "No overtime in hard and harmful work (Article 61)"
 msgstr "اضافه‌کار در کار سخت و زیان‌آور ممنوع است (ماده ۶۱)"
 
-#: frontend/src/components/PunchList.vue:20
+#: frontend/src/components/PunchList.vue:27
 msgid "No punches"
 msgstr "ترددی ثبت نشده"
 
@@ -667,21 +1347,37 @@ msgstr "ترددی ثبت نشده"
 msgid "No requests yet"
 msgstr "هنوز درخواستی ثبت نشده"
 
-#: frontend/src/pages/NewRequest.vue:163
+#: frontend/src/lib/format.ts:122 frontend/src/pages/NewRequest.vue:164
 msgid "Normal"
 msgstr "عادی"
+
+#: frontend/src/lib/labels.ts:23
+msgid "Normal workday (make up later)"
+msgstr "روز کاری عادی (جبران بعداً)"
+
+#: frontend/src/lib/format.ts:64
+msgid "Not Scheduled"
+msgstr "بدون برنامه"
 
 #: backend/hozur/services/requests.py:339
 msgid "Not enough leave: {0} days available, {1} requested"
 msgstr "مرخصی کافی نیست: {0} روز مانده، {1} روز درخواست شده"
 
-#: backend/hozur/api/routes/admin.py:149 backend/hozur/api/routes/admin.py:98 backend/hozur/api/routes/devices.py:164 backend/hozur/services/devices.py:487 backend/hozur/services/devices.py:579 backend/hozur/services/reports.py:312 backend/hozur/services/resources.py:198 backend/hozur/services/resources.py:628
+#: backend/hozur/api/routes/admin.py:163 backend/hozur/api/routes/admin.py:98 backend/hozur/api/routes/devices.py:169 backend/hozur/services/devices.py:488 backend/hozur/services/devices.py:580 backend/hozur/services/reports.py:312 backend/hozur/services/resources.py:198 backend/hozur/services/resources.py:628 frontend/src/pages/DeviceForm.vue:302 frontend/src/pages/ResourceList.vue:34
 msgid "Not found"
 msgstr "پیدا نشد"
 
-#: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/api/routes/attendance.py:133 backend/hozur/api/routes/attendance.py:34 backend/hozur/services/access.py:133 backend/hozur/services/reports.py:262 backend/hozur/services/reports.py:314 backend/hozur/services/reports.py:333 backend/hozur/services/requests.py:379 backend/hozur/services/resources.py:138
+#: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/api/routes/attendance.py:135 backend/hozur/api/routes/attendance.py:36 backend/hozur/services/access.py:133 backend/hozur/services/reports.py:262 backend/hozur/services/reports.py:314 backend/hozur/services/reports.py:333 backend/hozur/services/requests.py:379 backend/hozur/services/resources.py:138
 msgid "Not permitted"
 msgstr "دسترسی ندارید"
+
+#: frontend/src/lib/resources.ts:356 frontend/src/pages/Calendar.vue:83
+msgid "Note"
+msgstr "یادداشت"
+
+#: frontend/src/pages/ResourceList.vue:27
+msgid "Nothing here yet"
+msgstr "هنوز چیزی نیست"
 
 #: frontend/src/pages/Approvals.vue:7
 msgid "Nothing is waiting for you"
@@ -699,6 +1395,78 @@ msgstr "مراحل را ۱، ۲، ۳، ... شماره‌گذاری کنید"
 msgid "Nursing Breaks"
 msgstr "پاس شیردهی"
 
+#: frontend/src/lib/resources.ts:515
+msgid "Nursing break (minutes)"
+msgstr "پاس شیردهی (دقیقه)"
+
+#: frontend/src/lib/resources.ts:201
+msgid "Nursing breaks until"
+msgstr "پاس شیردهی تا"
+
+#: frontend/src/lib/resources.ts:517
+msgid "Nursing breaks until the child is (months)"
+msgstr "پاس شیردهی تا سن فرزند (ماه)"
+
+#: frontend/src/lib/format.ts:70
+msgid "OK"
+msgstr "موفق"
+
+#: frontend/src/lib/labels.ts:9
+msgid "Office closure"
+msgstr "تعطیلی اداری"
+
+#: frontend/src/lib/labels.ts:8
+msgid "Official (announced)"
+msgstr "رسمی (اعلامی)"
+
+#: frontend/src/lib/labels.ts:7
+msgid "Official (lunar)"
+msgstr "رسمی (قمری)"
+
+#: frontend/src/lib/labels.ts:6
+msgid "Official (solar)"
+msgstr "رسمی (شمسی)"
+
+#: frontend/src/pages/Calendar.vue:100
+msgid "Once a year, load the next year's official holidays. You see every change first; dates you edited by hand and closed months are never changed."
+msgstr "سالی یک بار تعطیلات رسمی سال بعد را بارگذاری کنید. اول همهٔ تغییرات را می‌بینید؛ تاریخ‌هایی که دستی ویرایش کرده‌اید و ماه‌های بسته هرگز تغییر نمی‌کنند."
+
+#: frontend/src/lib/resources.ts:422
+msgid "Once in the whole service"
+msgstr "یک بار در کل خدمت"
+
+#: frontend/src/lib/labels.ts:16
+msgid "One branch"
+msgstr "یک شعبه"
+
+#: frontend/src/lib/resources.ts:323
+msgid "One employee"
+msgstr "یک نفر"
+
+#: frontend/src/lib/resources.ts:516
+msgid "One nursing break every (minutes)"
+msgstr "یک پاس شیردهی در هر (دقیقه)"
+
+#: frontend/src/lib/labels.ts:15
+msgid "One province"
+msgstr "یک استان"
+
+#: frontend/src/pages/Reports.vue:158
+msgid "One row per day"
+msgstr "یک ردیف برای هر روز"
+
+#: frontend/src/pages/Reports.vue:157
+msgid "One row per person"
+msgstr "یک ردیف برای هر نفر"
+
+#: frontend/src/lib/resources.ts:361
+msgid "One-day shift changes"
+msgstr "تغییر شیفت یک‌روزه"
+
+#: frontend/src/pages/Settings.vue:22
+msgid "Only a warning: nothing happens automatically (Article 27)."
+msgstr "فقط هشدار است: هیچ اقدامی خودکار انجام نمی‌شود (ماده ۲۷)."
+
 #: backend/hozur/services/requests.py:430
 msgid "Only an operator can cancel this request"
 msgstr "فقط اپراتور می‌تواند این درخواست را لغو کند"
@@ -707,7 +1475,23 @@ msgstr "فقط اپراتور می‌تواند این درخواست را لغ�
 msgid "Only for older firmware"
 msgstr "فقط برای فریم‌ورهای قدیمی"
 
-#: frontend/src/pages/NewRequest.vue:159
+#: frontend/src/lib/resources.ts:193
+msgid "Only for young-worker rules"
+msgstr "فقط برای قواعد کارگران نوجوان"
+
+#: frontend/src/pages/Users.vue:94
+msgid "Operator"
+msgstr "اپراتور"
+
+#: frontend/src/lib/resources.ts:116 frontend/src/lib/resources.ts:137 frontend/src/lib/resources.ts:76 frontend/src/lib/resources.ts:92 frontend/src/pages/Manage.vue:42
+msgid "Organization"
+msgstr "شرکت"
+
+#: frontend/src/lib/resources.ts:415
+msgid "Other"
+msgstr "سایر"
+
+#: frontend/src/lib/format.ts:82 frontend/src/pages/NewRequest.vue:160
 msgid "Out"
 msgstr "خروج"
 
@@ -715,7 +1499,7 @@ msgstr "خروج"
 msgid "Overlaps leave request {0}"
 msgstr "با درخواست مرخصی {0} هم‌پوشانی دارد"
 
-#: backend/hozur/reports/catalog.py:62 frontend/src/components/DayNumbers.vue:32 frontend/src/pages/NewRequest.vue:150
+#: backend/hozur/reports/catalog.py:62 frontend/src/components/DayNumbers.vue:33 frontend/src/lib/format.ts:110 frontend/src/lib/format.ts:99 frontend/src/lib/resources.ts:67 frontend/src/pages/NewRequest.vue:151
 msgid "Overtime"
 msgstr "اضافه‌کار"
 
@@ -727,25 +1511,113 @@ msgstr "نوع اضافه‌کار"
 msgid "Overtime above the daily cap was not counted (Article 59)"
 msgstr "اضافه‌کار بیش از سقف روزانه حساب نشد (ماده ۵۹)"
 
+#: frontend/src/lib/resources.ts:498
+msgid "Overtime cap per day (minutes)"
+msgstr "سقف اضافه‌کار روزانه (دقیقه)"
+
+#: frontend/src/lib/resources.ts:192
+msgid "Overtime consent date"
+msgstr "تاریخ رضایت اضافه‌کار"
+
+#: frontend/src/lib/resources.ts:500
+msgid "Overtime premium (percent)"
+msgstr "فوق‌العادهٔ اضافه‌کار (درصد)"
+
 #: frontend/src/pages/NewRequest.vue:57
 msgid "Overtime you assign needs the employee's acceptance (Article 59)."
 msgstr "اضافه‌کاری که ارجاع می‌دهید باید به تأیید خود کارمند برسد (ماده ۵۹)."
+
+#: frontend/src/pages/Reports.vue:173
+msgid "PDF"
+msgstr "PDF"
 
 #: frontend/src/pages/NotFound.vue:3
 msgid "Page not found"
 msgstr "صفحه پیدا نشد"
 
+#: frontend/src/lib/resources.ts:418
+msgid "Paid"
+msgstr "با حقوق"
+
 #: backend/hozur/reports/catalog.py:84
 msgid "Paid Days (Attendance)"
 msgstr "روزهای کارکرد"
+
+#: frontend/src/lib/labels.ts:22
+msgid "Paid by the employer, counted as work"
+msgstr "به هزینهٔ کارفرما، کارکرد حساب می‌شود"
+
+#: frontend/src/lib/labels.ts:21
+msgid "Paid holiday"
+msgstr "تعطیلی با حقوق"
+
+#: frontend/src/lib/format.ts:91
+msgid "Pair by order"
+msgstr "جفت‌کردن به ترتیب"
+
+#: frontend/src/lib/resources.ts:386
+msgid "Parameters"
+msgstr "پارامترها"
+
+#: frontend/src/lib/resources.ts:97
+msgid "Parent department"
+msgstr "واحد بالادست"
+
+#: frontend/src/lib/resources.ts:176
+msgid "Part time"
+msgstr "پاره‌وقت"
+
+#: frontend/src/pages/Login.vue:15 frontend/src/pages/Users.vue:56
+msgid "Password"
+msgstr "رمز عبور"
+
+#: frontend/src/pages/Account.vue:49
+msgid "Password changed"
+msgstr "رمز عبور تغییر کرد"
+
+#: frontend/src/lib/resources.ts:414
+msgid "Paternity"
+msgstr "پدری"
+
+#: frontend/src/lib/resources.ts:514
+msgid "Paternity leave (days)"
+msgstr "مرخصی پدر شدن (روز)"
+
+#: frontend/src/lib/resources.ts:310
+msgid "Pattern assignment"
+msgstr "انتساب الگو"
+
+#: frontend/src/lib/resources.ts:309
+msgid "Pattern assignments"
+msgstr "انتساب الگوها"
+
+#: frontend/src/lib/format.ts:65
+msgid "Pending"
+msgstr "در انتظار تأیید"
+
+#: frontend/src/lib/resources.ts:456 frontend/src/pages/Reports.vue:162
+msgid "Person"
+msgstr "فرد"
+
+#: frontend/src/lib/resources.ts:141
+msgid "Personnel code"
+msgstr "کد پرسنلی"
+
+#: frontend/src/pages/Organization.vue:11
+msgid "Phone"
+msgstr "تلفن"
 
 #: backend/hozur/api/deps.py:51
 msgid "Please log in"
 msgstr "لطفاً وارد شوید"
 
-#: frontend/src/pages/DeviceForm.vue:40
+#: frontend/src/pages/DeviceForm.vue:39
 msgid "Port"
 msgstr "پورت"
+
+#: frontend/src/lib/labels.ts:28
+msgid "Predicted"
+msgstr "پیش‌بینی"
 
 #: frontend/src/pages/Month.vue:59
 msgid "Predicted holiday"
@@ -755,11 +1627,11 @@ msgstr "تعطیلی پیش‌بینی‌شده"
 msgid "Presence"
 msgstr "حضور"
 
-#: frontend/src/pages/Month.vue:207
+#: frontend/src/lib/format.ts:57 frontend/src/pages/Month.vue:276
 msgid "Present"
 msgstr "حاضر"
 
-#: frontend/src/pages/DeviceForm.vue:165
+#: frontend/src/pages/DeviceForm.vue:168
 msgid "Press “Read Users from Device”."
 msgstr "دکمه «خواندن کاربران از دستگاه» را بزنید."
 
@@ -767,9 +1639,21 @@ msgstr "دکمه «خواندن کاربران از دستگاه» را بزنی
 msgid "Previous month"
 msgstr "ماه قبل"
 
-#: frontend/src/pages/DeviceForm.vue:25
+#: frontend/src/pages/Calendar.vue:11 frontend/src/pages/Periods.vue:8
+msgid "Previous year"
+msgstr "سال قبل"
+
+#: frontend/src/lib/resources.ts:82 frontend/src/pages/Calendar.vue:73
+msgid "Province"
+msgstr "استان"
+
+#: frontend/src/pages/DeviceForm.vue:24
 msgid "Punch Direction"
 msgstr "جهت تردد"
+
+#: frontend/src/pages/Settings.vue:9
+msgid "Punches closer than this are duplicates (seconds)"
+msgstr "ترددهای نزدیک‌تر از این تکراری‌اند (ثانیه)"
 
 #: frontend/src/pages/NewRequest.vue:79
 msgid "Punches of this day"
@@ -791,35 +1675,91 @@ msgstr "خواندن دوباره"
 msgid "Read again from"
 msgstr "خواندن دوباره از تاریخ"
 
-#: frontend/src/pages/DeviceForm.vue:81 frontend/src/pages/Devices.vue:79
+#: frontend/src/pages/DeviceForm.vue:81 frontend/src/pages/Devices.vue:75
 msgid "Read punches now"
 msgstr "خواندن تردد همین حالا"
 
-#: frontend/src/pages/Approvals.vue:39 frontend/src/pages/NewRequest.vue:115 frontend/src/pages/NewRequest.vue:31 frontend/src/pages/NewRequest.vue:51 frontend/src/pages/NewRequest.vue:65
+#: frontend/src/lib/resources.ts:370 frontend/src/pages/Approvals.vue:39 frontend/src/pages/Audit.vue:18 frontend/src/pages/NewRequest.vue:115 frontend/src/pages/NewRequest.vue:31 frontend/src/pages/NewRequest.vue:51 frontend/src/pages/NewRequest.vue:65
 msgid "Reason"
 msgstr "دلیل"
 
-#: frontend/src/pages/Today.vue:40
+#: frontend/src/pages/Calendar.vue:285
+msgid "Reason for deleting"
+msgstr "دلیل حذف"
+
+#: frontend/src/pages/Periods.vue:82
+msgid "Reason for reopening"
+msgstr "دلیل بازکردن دوباره"
+
+#: frontend/src/components/ResourceForm.vue:47 frontend/src/lib/resources.ts:304 frontend/src/pages/Calendar.vue:84
+msgid "Reason for the change"
+msgstr "دلیل تغییر"
+
+#: frontend/src/pages/Audit.vue:6
+msgid "Record id"
+msgstr "شناسهٔ رکورد"
+
+#: frontend/src/pages/Today.vue:38
 msgid "Refresh"
 msgstr "به‌روزرسانی"
+
+#: frontend/src/pages/Calendar.vue:96
+msgid "Refresh the holidays of a year"
+msgstr "به‌روزرسانی تعطیلات یک سال"
+
+#: frontend/src/pages/Audit.vue:69
+msgid "Refreshed"
+msgstr "به‌روزرسانی"
+
+#: frontend/src/pages/Calendar.vue:17
+msgid "Refreshed {0}"
+msgstr "به‌روزرسانی {0}"
+
+#: frontend/src/pages/Organization.vue:6
+msgid "Registered name"
+msgstr "نام ثبتی"
 
 #: frontend/src/pages/Approvals.vue:32 frontend/src/pages/Approvals.vue:38 frontend/src/pages/Approvals.vue:47
 msgid "Reject"
 msgstr "رد"
 
-#: frontend/src/pages/Approvals.vue:107
+#: frontend/src/lib/format.ts:67 frontend/src/pages/Approvals.vue:100 frontend/src/pages/Audit.vue:66
 msgid "Rejected"
 msgstr "ردشده"
 
-#: frontend/src/pages/NewRequest.vue:108
+#: frontend/src/pages/Requests.vue:82
+msgid "Rejected: {0}"
+msgstr "رد شد: {0}"
+
+#: frontend/src/components/ResourceForm.vue:16 frontend/src/pages/Calendar.vue:244 frontend/src/pages/NewRequest.vue:108
 msgid "Remove"
 msgstr "حذف"
+
+#: frontend/src/pages/Periods.vue:26
+msgid "Reopen"
+msgstr "بازکردن"
+
+#: frontend/src/pages/Audit.vue:68 frontend/src/pages/Periods.vue:68
+msgid "Reopened"
+msgstr "دوباره باز شد"
+
+#: frontend/src/pages/Reports.vue:6
+msgid "Report"
+msgstr "گزارش"
 
 #: backend/hozur/services/reports.py:123
 msgid "Report field not allowed: {0}"
 msgstr "این فیلد در گزارش مجاز نیست: {0}"
 
-#: frontend/src/pages/Today.vue:82
+#: frontend/src/components/AppShell.vue:107 frontend/src/pages/Reports.vue:3
+msgid "Reports"
+msgstr "گزارش‌ها"
+
+#: frontend/src/lib/resources.ts:185
+msgid "Reports to"
+msgstr "گزارش به"
+
+#: frontend/src/pages/Today.vue:80
 msgid "Request leave"
 msgstr "درخواست مرخصی"
 
@@ -827,9 +1767,17 @@ msgstr "درخواست مرخصی"
 msgid "Request not found"
 msgstr "درخواست پیدا نشد"
 
-#: frontend/src/pages/NewRequest.vue:288
+#: frontend/src/pages/NewRequest.vue:294
 msgid "Request submitted: {0}"
 msgstr "درخواست ثبت شد: {0}"
+
+#: frontend/src/lib/resources.ts:473
+msgid "Request type"
+msgstr "نوع درخواست"
+
+#: frontend/src/pages/Requests.vue:95
+msgid "Request withdrawn"
+msgstr "درخواست پس گرفته شد"
 
 #: frontend/src/components/AppShell.vue:97
 msgid "Requests"
@@ -839,6 +1787,14 @@ msgstr "درخواست‌ها"
 msgid "Required"
 msgstr "موظف"
 
+#: frontend/src/lib/resources.ts:235
+msgid "Required minutes"
+msgstr "دقایق کار لازم"
+
+#: frontend/src/lib/format.ts:63
+msgid "Rest Day"
+msgstr "تعطیل هفتگی"
+
 #: backend/hozur/reports/catalog.py:68
 msgid "Rest Day Work"
 msgstr "کار در تعطیل هفتگی"
@@ -846,6 +1802,22 @@ msgstr "کار در تعطیل هفتگی"
 #: backend/hozur/reports/catalog.py:83
 msgid "Rest Days"
 msgstr "تعطیلات هفتگی"
+
+#: frontend/src/lib/resources.ts:502
+msgid "Rest day work premium (percent)"
+msgstr "فوق‌العادهٔ کار در روز تعطیل (درصد)"
+
+#: frontend/src/pages/Users.vue:13 frontend/src/pages/Users.vue:39
+msgid "Roles"
+msgstr "نقش‌ها"
+
+#: frontend/src/lib/resources.ts:266
+msgid "Rotating"
+msgstr "چرخشی"
+
+#: frontend/src/lib/resources.ts:495
+msgid "Rotating shifts: most work in four weeks (minutes)"
+msgstr "نوبت‌کاری: حداکثر کار در چهار هفته (دقیقه)"
 
 #: backend/hozur/services/requests.py:267
 msgid "Row {0}"
@@ -883,15 +1855,31 @@ msgstr "ردیف {0}: عملیات ناشناخته"
 msgid "Row {0}: unknown direction"
 msgstr "ردیف {0}: جهت ناشناخته"
 
-#: frontend/src/pages/DeviceForm.vue:66
+#: frontend/src/pages/Reports.vue:17
+msgid "Rows"
+msgstr "ردیف‌ها"
+
+#: frontend/src/lib/resources.ts:377 frontend/src/lib/resources.ts:394
+msgid "Rules"
+msgstr "قواعد"
+
+#: frontend/src/components/ResourceForm.vue:54 frontend/src/pages/Account.vue:22 frontend/src/pages/Calendar.vue:89 frontend/src/pages/DeviceForm.vue:66 frontend/src/pages/Organization.vue:16 frontend/src/pages/Settings.vue:29 frontend/src/pages/Users.vue:61
 msgid "Save"
 msgstr "ذخیره"
 
-#: frontend/src/pages/DeviceForm.vue:252 frontend/src/pages/DeviceForm.vue:387
+#: frontend/src/pages/Reports.vue:50
+msgid "Save as a report"
+msgstr "ذخیره به‌عنوان گزارش"
+
+#: frontend/src/components/ResourceForm.vue:159 frontend/src/pages/ApprovalDefaults.vue:47 frontend/src/pages/Calendar.vue:273 frontend/src/pages/DeviceForm.vue:315 frontend/src/pages/DeviceForm.vue:473 frontend/src/pages/Organization.vue:60 frontend/src/pages/Reports.vue:251 frontend/src/pages/Settings.vue:77 frontend/src/pages/Users.vue:157
 msgid "Saved"
 msgstr "ذخیره شد"
 
-#: frontend/src/pages/DeviceForm.vue:279
+#: frontend/src/pages/ResourceList.vue:8
+msgid "Search"
+msgstr "جستجو"
+
+#: frontend/src/pages/DeviceForm.vue:342
 msgid "Serial Number"
 msgstr "شماره سریال"
 
@@ -899,29 +1887,109 @@ msgstr "شماره سریال"
 msgid "Set Device Clock"
 msgstr "تنظیم ساعت دستگاه"
 
-#: frontend/src/pages/DeviceForm.vue:10
+#: frontend/src/pages/DeviceForm.vue:10 frontend/src/pages/Manage.vue:57 frontend/src/pages/Settings.vue:3
 msgid "Settings"
 msgstr "تنظیمات"
 
-#: frontend/src/components/UserMenu.vue:60
-msgid "Settings (Desk)"
-msgstr "تنظیمات (میز کار)"
-
-#: backend/hozur/reports/catalog.py:49
+#: backend/hozur/reports/catalog.py:49 frontend/src/lib/resources.ts:207
 msgid "Shift"
 msgstr "شیفت"
 
-#: backend/hozur/reports/catalog.py:46
+#: frontend/src/lib/resources.ts:300 frontend/src/lib/resources.ts:369
+msgid "Shift (empty = day off)"
+msgstr "شیفت (خالی = روز استراحت)"
+
+#: frontend/src/lib/resources.ts:362
+msgid "Shift change"
+msgstr "تغییر شیفت"
+
+#: frontend/src/lib/resources.ts:206
+msgid "Shifts"
+msgstr "شیفت‌ها"
+
+#: frontend/src/pages/Audit.vue:7 frontend/src/pages/Reports.vue:57
+msgid "Show"
+msgstr "نمایش"
+
+#: frontend/src/pages/Calendar.vue:110
+msgid "Show the changes"
+msgstr "نمایش تغییرات"
+
+#: frontend/src/pages/Reports.vue:24
+msgid "Show times as"
+msgstr "نمایش زمان به شکل"
+
+#: frontend/src/lib/resources.ts:409
+msgid "Sick"
+msgstr "استعلاجی"
+
+#: frontend/src/lib/format.ts:69
+msgid "Skipped"
+msgstr "ردشده از مرحله"
+
+#: frontend/src/pages/Calendar.vue:107
+msgid "Source"
+msgstr "منبع"
+
+#: frontend/src/pages/Calendar.vue:16
+msgid "Source: {0}"
+msgstr "منبع: {0}"
+
+#: frontend/src/lib/resources.ts:225
+msgid "Start"
+msgstr "شروع"
+
+#: frontend/src/lib/resources.ts:180
+msgid "Start date"
+msgstr "تاریخ شروع"
+
+#: backend/hozur/reports/catalog.py:46 frontend/src/lib/resources.ts:159 frontend/src/pages/Calendar.vue:30 frontend/src/pages/Calendar.vue:82
 msgid "Status"
 msgstr "وضعیت"
+
+#: frontend/src/lib/resources.ts:444
+msgid "Step"
+msgstr "مرحله"
+
+#: frontend/src/lib/resources.ts:441
+msgid "Steps"
+msgstr "مراحل"
+
+#: frontend/src/pages/DeviceForm.vue:48
+msgid "Stored; leave empty to keep it"
+msgstr "ذخیره شده؛ برای حفظ آن خالی بگذارید"
 
 #: frontend/src/pages/NewRequest.vue:121
 msgid "Submit"
 msgstr "ثبت"
 
-#: frontend/src/pages/DeviceForm.vue:75 frontend/src/pages/Devices.vue:76
+#: frontend/src/pages/Audit.vue:63
+msgid "Submitted"
+msgstr "ثبت"
+
+#: frontend/src/lib/resources.ts:165
+msgid "Suspended"
+msgstr "تعلیق"
+
+#: frontend/src/pages/Audit.vue:15 frontend/src/pages/Manage.vue:56 frontend/src/pages/Manage.vue:57 frontend/src/pages/Manage.vue:58
+msgid "System"
+msgstr "سیستم"
+
+#: frontend/src/pages/Users.vue:95
+msgid "System admin"
+msgstr "مدیر سیستم"
+
+#: frontend/src/pages/Audit.vue:5
+msgid "Table, e.g. employee"
+msgstr "جدول، مثلاً employee"
+
+#: frontend/src/pages/DeviceForm.vue:75 frontend/src/pages/Devices.vue:72
 msgid "Test Connection"
 msgstr "تست اتصال"
+
+#: frontend/src/pages/Reports.vue:174
+msgid "Text (CSV)"
+msgstr "متن (CSV)"
 
 #: backend/hozur/devices/zkteco.py:71
 msgid "The ZKTeco comm key must be a number"
@@ -939,15 +2007,19 @@ msgstr "تأییدکنندهٔ مرحلهٔ {0} حساب کاربری ندارد
 msgid "The break must be inside the shift"
 msgstr "استراحت باید داخل شیفت باشد"
 
+#: frontend/src/pages/Calendar.vue:333
+msgid "The calendar was refreshed"
+msgstr "تقویم به‌روز شد"
+
 #: backend/hozur/services/users.py:189
 msgid "The current password is wrong"
 msgstr "رمز عبور فعلی اشتباه است"
 
-#: frontend/src/pages/Today.vue:48
+#: frontend/src/pages/Today.vue:46
 msgid "The day is not over; the numbers are final after your last punch."
 msgstr "روز هنوز تمام نشده است؛ اعداد پس از آخرین تردد شما قطعی می‌شوند."
 
-#: backend/hozur/api/routes/attendance.py:122 backend/hozur/api/routes/attendance.py:60 backend/hozur/services/devices.py:498 backend/hozur/services/reports.py:258 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220 backend/hozur/services/resources.py:294
+#: backend/hozur/api/routes/attendance.py:124 backend/hozur/api/routes/attendance.py:62 backend/hozur/services/devices.py:499 backend/hozur/services/reports.py:258 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220 backend/hozur/services/resources.py:294
 msgid "The end date is before the start date"
 msgstr "تاریخ پایان قبل از تاریخ شروع است"
 
@@ -955,7 +2027,7 @@ msgstr "تاریخ پایان قبل از تاریخ شروع است"
 msgid "The end time must be after the start time"
 msgstr "ساعت پایان باید بعد از ساعت شروع باشد"
 
-#: backend/hozur/services/devices.py:632
+#: backend/hozur/services/devices.py:633
 msgid "The file could not be read: {0}"
 msgstr "فایل خوانده نشد: {0}"
 
@@ -1007,19 +2079,27 @@ msgstr "شیفت از سقف کار روزانه بیشتر است (ماده ۵�
 msgid "The template needs a user id column and either a date-time column or date and time columns"
 msgstr "قالب باید ستون شناسه کاربر و یا ستون تاریخ‌وساعت یا ستون‌های جداگانه تاریخ و ساعت داشته باشد"
 
+#: frontend/src/pages/Account.vue:43
+msgid "The two new passwords are not the same"
+msgstr "دو رمز جدید یکسان نیستند"
+
 #: backend/hozur/services/users.py:50
 msgid "The username {0} is taken"
 msgstr "نام کاربری {0} قبلاً گرفته شده است"
 
-#: frontend/src/components/UserMenu.vue:41
+#: frontend/src/lib/resources.ts:326
+msgid "The whole company"
+msgstr "کل شرکت"
+
+#: frontend/src/components/UserMenu.vue:44
 msgid "Theme: dark"
 msgstr "پوسته: تیره"
 
-#: frontend/src/components/UserMenu.vue:39
+#: frontend/src/components/UserMenu.vue:42
 msgid "Theme: follow the device"
 msgstr "پوسته: مطابق گوشی"
 
-#: frontend/src/components/UserMenu.vue:40
+#: frontend/src/components/UserMenu.vue:43
 msgid "Theme: light"
 msgstr "پوسته: روشن"
 
@@ -1027,7 +2107,7 @@ msgstr "پوسته: روشن"
 msgid "There is no working day in this leave"
 msgstr "این مرخصی هیچ روز کاری ندارد"
 
-#: backend/hozur/services/devices.py:669
+#: backend/hozur/services/devices.py:670
 msgid "This device has punches; disable it instead of deleting it"
 msgstr "این دستگاه تردد ثبت‌شده دارد؛ به‌جای حذف، غیرفعالش کنید"
 
@@ -1055,6 +2135,10 @@ msgstr "این درخواست در انتظار تأیید نیست"
 msgid "This request is waiting for someone else"
 msgstr "این درخواست منتظر تأیید شخص دیگری است"
 
+#: frontend/src/lib/resources.ts:504
+msgid "Three-shift premium (percent)"
+msgstr "فوق‌العادهٔ نوبت‌کاری سه‌نوبته (درصد)"
+
 #: frontend/src/pages/NewRequest.vue:103
 msgid "Time"
 msgstr "ساعت"
@@ -1066,6 +2150,10 @@ msgstr "مهلت اتصال (ثانیه)"
 #: frontend/src/pages/NewRequest.vue:101
 msgid "Times to add"
 msgstr "ساعت‌های افزودنی"
+
+#: frontend/src/pages/Calendar.vue:27 frontend/src/pages/Calendar.vue:61
+msgid "Title"
+msgstr "عنوان"
 
 #: backend/hozur/services/requests.py:144 backend/hozur/services/requests.py:217 frontend/src/pages/NewRequest.vue:21 frontend/src/pages/NewRequest.vue:41
 msgid "To Date"
@@ -1079,7 +2167,7 @@ msgstr "تا ساعت"
 msgid "Today"
 msgstr "امروز"
 
-#: frontend/src/pages/Today.vue:59
+#: frontend/src/pages/Today.vue:57
 msgid "Today's punches"
 msgstr "ترددهای امروز"
 
@@ -1087,11 +2175,19 @@ msgstr "ترددهای امروز"
 msgid "Total Overtime"
 msgstr "جمع اضافه‌کار"
 
-#: backend/hozur/reports/catalog.py:66 frontend/src/components/DayNumbers.vue:33
+#: frontend/src/lib/resources.ts:503
+msgid "Two-shift premium (percent)"
+msgstr "فوق‌العادهٔ نوبت‌کاری دونوبته (درصد)"
+
+#: frontend/src/lib/resources.ts:216 frontend/src/lib/resources.ts:260 frontend/src/pages/Calendar.vue:28 frontend/src/pages/Calendar.vue:62
+msgid "Type"
+msgstr "نوع"
+
+#: backend/hozur/reports/catalog.py:66 frontend/src/components/DayNumbers.vue:40
 msgid "Unapproved Extra Work"
 msgstr "کار اضافه تأییدنشده"
 
-#: frontend/src/pages/NewRequest.vue:160
+#: frontend/src/lib/format.ts:82 frontend/src/pages/NewRequest.vue:161
 msgid "Unknown"
 msgstr "نامشخص"
 
@@ -1151,47 +2247,115 @@ msgstr "نوع درخواست نامعتبر است"
 msgid "Unknown role {0}"
 msgstr "نقش {0} ناشناخته است"
 
-#: backend/hozur/api/routes/admin.py:115
+#: backend/hozur/api/routes/admin.py:129
 msgid "Unknown settings: {0}"
 msgstr "تنظیمات ناشناخته: {0}"
 
-#: frontend/src/pages/Devices.vue:62
+#: frontend/src/pages/Devices.vue:58
 msgid "Unmapped users"
 msgstr "کاربران بدون کارمند"
 
-#: frontend/src/pages/DeviceForm.vue:30
-msgid "Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Ignore: punches are then paired by order."
-msgstr "برای دستگاه‌های جدای ورودی و خروجی «همیشه ورود» یا «همیشه خروج» را بزنید. اگر افراد روی دستگاه ورود/خروج را انتخاب نمی‌کنند «نادیده» را بزنید تا ترددها به ترتیب جفت شوند."
+#: frontend/src/lib/resources.ts:410
+msgid "Unpaid"
+msgstr "بدون حقوق"
+
+#: frontend/src/lib/resources.ts:355 frontend/src/pages/Reports.vue:9
+msgid "Until"
+msgstr "تا"
+
+#: frontend/src/pages/DeviceForm.vue:29
+msgid "Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Pair by order."
+msgstr "برای دستگاه‌های جدای ورود و خروج «همیشه ورود» / «همیشه خروج» را بزنید. اگر افراد روی دستگاه ورود/خروج را انتخاب نمی‌کنند، «جفت‌کردن به ترتیب» را بزنید."
 
 #: frontend/src/pages/DeviceForm.vue:62
 msgid "Use UDP"
 msgstr "استفاده از UDP"
 
-#: frontend/src/pages/DeviceForm.vue:165
+#: frontend/src/pages/Login.vue:12 frontend/src/pages/Users.vue:11 frontend/src/pages/Users.vue:36
+msgid "Username"
+msgstr "نام کاربری"
+
+#: frontend/src/pages/Manage.vue:56 frontend/src/pages/Users.vue:3
+msgid "Users and roles"
+msgstr "کاربران و نقش‌ها"
+
+#: frontend/src/pages/DeviceForm.vue:168
 msgid "Users appear after the first import."
 msgstr "کاربران پس از اولین ورود فایل نمایش داده می‌شوند."
 
-#: frontend/src/pages/DeviceForm.vue:281 frontend/src/pages/Devices.vue:54
+#: frontend/src/pages/DeviceForm.vue:344 frontend/src/pages/Devices.vue:50
 msgid "Users on Device"
 msgstr "کاربران روی دستگاه"
 
-#: frontend/src/pages/Approvals.vue:3 frontend/src/pages/Today.vue:86
+#: frontend/src/lib/resources.ts:200
+msgid "Uses a card instead of biometrics"
+msgstr "به‌جای بیومتریک کارت دارد"
+
+#: frontend/src/pages/Approvals.vue:3 frontend/src/pages/Today.vue:84
 msgid "Waiting for my approval"
 msgstr "منتظر تأیید من"
 
-#: frontend/src/pages/Requests.vue:32
+#: frontend/src/pages/Requests.vue:33
 msgid "Waiting for {0}"
 msgstr "در انتظار {0}"
+
+#: frontend/src/pages/Settings.vue:21
+msgid "Warn after this many absent days in a row (0 = never)"
+msgstr "هشدار پس از این تعداد روز غیبت پیاپی (۰ = هرگز)"
+
+#: frontend/src/pages/Settings.vue:15
+msgid "Warn when a device clock is off by more than (seconds)"
+msgstr "هشدار وقتی ساعت دستگاه بیش از این اختلاف دارد (ثانیه)"
 
 #: backend/hozur/reports/catalog.py:52
 msgid "Warnings"
 msgstr "هشدارها"
 
-#: backend/hozur/reports/catalog.py:45
+#: backend/hozur/reports/catalog.py:45 frontend/src/lib/resources.ts:289
 msgid "Weekday"
 msgstr "روز هفته"
 
-#: backend/hozur/reports/catalog.py:55 frontend/src/components/DayNumbers.vue:24 frontend/src/pages/Month.vue:221
+#: frontend/src/lib/resources.ts:265
+msgid "Weekly"
+msgstr "هفتگی"
+
+#: frontend/src/lib/resources.ts:271
+msgid "Weekly rest day"
+msgstr "روز تعطیل هفتگی"
+
+#: frontend/src/lib/resources.ts:105
+msgid "When set, approves instead of the manager"
+msgstr "اگر تعیین شود، به‌جای مدیر تأیید می‌کند"
+
+#: frontend/src/pages/ApprovalDefaults.vue:5
+msgid "Which approval process each kind of request follows. Exceptions for one person are set under Approval exceptions."
+msgstr "هر نوع درخواست با کدام فرایند تأیید می‌شود. استثنای هر نفر در «استثناهای تأیید» تعیین می‌شود."
+
+#: frontend/src/lib/labels.ts:17
+msgid "Whole company"
+msgstr "کل شرکت"
+
+#: frontend/src/lib/labels.ts:14
+msgid "Whole country"
+msgstr "کل کشور"
+
+#: frontend/src/pages/Requests.vue:38
+msgid "Withdraw"
+msgstr "پس‌گرفتن"
+
+#: frontend/src/lib/resources.ts:251 frontend/src/lib/resources.ts:353
+msgid "Work pattern"
+msgstr "الگوی کاری"
+
+#: frontend/src/lib/resources.ts:250
+msgid "Work patterns"
+msgstr "الگوهای کاری"
+
+#: frontend/src/lib/resources.ts:208 frontend/src/lib/resources.ts:252 frontend/src/lib/resources.ts:311 frontend/src/lib/resources.ts:363
+msgid "Work schedules"
+msgstr "برنامهٔ کاری"
+
+#: backend/hozur/reports/catalog.py:55 frontend/src/components/DayNumbers.vue:24 frontend/src/pages/Month.vue:290
 msgid "Worked"
 msgstr "کارکرد"
 
@@ -1199,13 +2363,29 @@ msgstr "کارکرد"
 msgid "Worse for the worker than the law: {0}"
 msgstr "بدتر از حداقل قانونی برای کارگر: {0}"
 
+#: frontend/src/lib/resources.ts:198
+msgid "Written consent is needed before enrolling face or fingerprint"
+msgstr "پیش از ثبت چهره یا اثر انگشت رضایت کتبی لازم است"
+
+#: frontend/src/lib/resources.ts:188
+msgid "Written overtime consent on file"
+msgstr "رضایت کتبی اضافه‌کار در پرونده هست"
+
 #: backend/hozur/api/routes/auth.py:30
 msgid "Wrong username or password"
 msgstr "نام کاربری یا رمز عبور اشتباه است"
 
+#: frontend/src/pages/Calendar.vue:106
+msgid "Year"
+msgstr "سال"
+
 #: backend/hozur/calendar/service.py:168
 msgid "Year out of range"
 msgstr "سال خارج از محدوده"
+
+#: frontend/src/pages/Calendar.vue:6
+msgid "Yearly refresh"
+msgstr "به‌روزرسانی سالانه"
 
 #: backend/hozur/services/requests.py:110
 msgid "You can only assign overtime to your own team"
@@ -1215,25 +2395,61 @@ msgstr "فقط به افراد واحد خودتان می‌توانید اضا�
 msgid "You can only submit requests for yourself"
 msgstr "فقط برای خودتان می‌توانید درخواست ثبت کنید"
 
+#: frontend/src/lib/resources.ts:519
+msgid "Young worker age limit (years)"
+msgstr "سقف سن کارگر نوجوان (سال)"
+
+#: frontend/src/lib/resources.ts:518
+msgid "Young workers: shorter day (minutes)"
+msgstr "کارگران نوجوان: کاهش کار روزانه (دقیقه)"
+
 #: frontend/src/pages/Approvals.vue:19
 msgid "Your manager assigned this overtime; it needs your acceptance (Article 59)."
 msgstr "این اضافه‌کار را مدیرتان ارجاع داده و به موافقت شما نیاز دارد (ماده ۵۹)."
+
+#: frontend/src/pages/Account.vue:20
+msgid "Your other devices will be logged out."
+msgstr "از دستگاه‌های دیگرتان خارج می‌شوید."
 
 #: backend/hozur/services/requests.py:100 frontend/src/pages/Today.vue:10
 msgid "Your user is not linked to an employee"
 msgstr "کاربر شما به هیچ کارمندی وصل نیست"
 
-#: frontend/src/pages/DeviceForm.vue:15
+#: frontend/src/pages/Calendar.vue:132
+msgid "closed month"
+msgstr "ماه بسته"
+
+#: frontend/src/pages/DeviceForm.vue:14
 msgid "e.g. Main entrance"
 msgstr "مثلاً درِ ورودی اصلی"
+
+#: frontend/src/components/ResourceForm.vue:30
+msgid "note"
+msgstr "تبصره"
+
+#: frontend/src/lib/labels.ts:32
+msgid "time.ir (official calendar)"
+msgstr "time.ir (تقویم رسمی)"
+
+#: frontend/src/pages/Settings.vue:26
+msgid "time.ir address"
+msgstr "نشانی time.ir"
 
 #: backend/hozur/calendar/sources.py:135 backend/hozur/calendar/sources.py:85 backend/hozur/calendar/sources.py:93 backend/hozur/calendar/sources.py:99
 msgid "time.ir answered in an unexpected format: {0}"
 msgstr "پاسخ time.ir قالب نامنتظره‌ای داشت: {0}"
 
+#: frontend/src/pages/Settings.vue:27
+msgid "time.ir key"
+msgstr "کلید time.ir"
+
 #: backend/hozur/calendar/sources.py:138
 msgid "time.ir returned no holidays for {0}"
 msgstr "time.ir برای {0} تعطیلی برنگرداند"
+
+#: frontend/src/components/ResourceForm.vue:32
+msgid "to be checked"
+msgstr "نیازمند بررسی"
 
 #: backend/hozur/services/requests.py:180
 msgid "{0} can be taken only once during employment"
@@ -1242,6 +2458,14 @@ msgstr "{0} فقط یک بار در دوران همکاری مجاز است"
 #: backend/hozur/services/requests.py:125
 msgid "{0} cannot be taken by the hour"
 msgstr "{0} ساعتی ممکن نیست"
+
+#: frontend/src/pages/Calendar.vue:114
+msgid "{0} changes · {1} unchanged · {2} edited by hand (kept)"
+msgstr "{0} تغییر · {1} بدون تغییر · {2} ویرایش دستی (حفظ می‌شود)"
+
+#: frontend/src/lib/format.ts:133
+msgid "{0} days"
+msgstr "{0} روز"
 
 #: backend/hozur/services/requests.py:168
 msgid "{0} is at most {1} days"
@@ -1255,11 +2479,11 @@ msgstr "{0} تاریخ شمسی معتبری نیست"
 msgid "{0} is required"
 msgstr "{0} لازم است"
 
-#: backend/hozur/api/routes/admin.py:125 backend/hozur/services/rule_sets.py:38
+#: backend/hozur/api/routes/admin.py:139 backend/hozur/services/rule_sets.py:38
 msgid "{0} must be a number"
 msgstr "{0} باید عدد باشد"
 
-#: frontend/src/pages/DeviceForm.vue:310 frontend/src/pages/Devices.vue:151
+#: frontend/src/pages/DeviceForm.vue:372 frontend/src/pages/Devices.vue:182
 msgid "{0} new punches"
 msgstr "{0} تردد جدید"
 
@@ -1267,19 +2491,27 @@ msgstr "{0} تردد جدید"
 msgid "{0} requests in this month are still waiting for approval"
 msgstr "{0} درخواست در این ماه هنوز منتظر تأیید است"
 
-#: frontend/src/pages/DeviceForm.vue:340
+#: frontend/src/pages/Reports.vue:72
+msgid "{0} rows · {1} to {2}"
+msgstr "{0} ردیف · {1} تا {2}"
+
+#: frontend/src/pages/DeviceForm.vue:405
 msgid "{0} rows: {1} new, {2} already stored, {3} duplicates, {4} errors"
 msgstr "{0} ردیف: {1} جدید، {2} از قبل ثبت‌شده، {3} تکراری، {4} خطا"
 
-#: frontend/src/pages/DeviceForm.vue:302
+#: frontend/src/lib/format.ts:22
+msgid "{0} to {1}"
+msgstr "{0} تا {1}"
+
+#: frontend/src/pages/DeviceForm.vue:363
 msgid "{0} users read, {1} new, {2} mapped automatically"
 msgstr "{0} کاربر خوانده شد، {1} جدید، {2} خودکار وصل شد"
 
-#: frontend/src/pages/Devices.vue:135
+#: frontend/src/pages/Devices.vue:168
 msgid "{0} users, {1} records"
 msgstr "{0} کاربر، {1} رکورد"
 
-#: frontend/src/pages/DeviceForm.vue:154
+#: frontend/src/pages/DeviceForm.vue:157
 msgid "{0} without an employee"
 msgstr "{0} کاربر بدون کارمند"
 
@@ -1295,7 +2527,7 @@ msgstr "{0}: مقدار {1} معتبر نیست"
 msgid "{0}: {1} is not a valid Jalali date"
 msgstr "{0}: {1} تاریخ شمسی معتبری نیست"
 
-#: frontend/src/pages/DeviceForm.vue:179
+#: frontend/src/pages/DeviceForm.vue:185
 msgid "— no employee —"
 msgstr "— بدون کارمند —"
 
@@ -1335,14 +2567,8 @@ msgstr "— بدون کارمند —"
 #~ msgid "Action"
 #~ msgstr "عملیات"
 
-#~ msgid "Active"
-#~ msgstr "فعال"
-
 #~ msgid "Add Punch"
 #~ msgstr "افزودن تردد"
-
-#~ msgid "Address"
-#~ msgstr "نشانی"
 
 #~ msgid "Adjustment"
 #~ msgstr "اصلاح دستی"
@@ -1374,12 +2600,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Also applies to sub-departments without their own assignment"
 #~ msgstr "برای زیرواحدهایی که انتساب جدا ندارند هم اعمال می‌شود"
 
-#~ msgid "Always In"
-#~ msgstr "همیشه ورود"
-
-#~ msgid "Always Out"
-#~ msgstr "همیشه خروج"
-
 #~ msgid "Amended From"
 #~ msgstr "اصلاح‌شده از"
 
@@ -1403,9 +2623,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Approval Steps"
 #~ msgstr "مراحل تأیید"
-
-#~ msgid "Approver"
-#~ msgstr "تأییدکننده"
 
 #~ msgid "Approver Name"
 #~ msgstr "نام تأییدکننده"
@@ -1533,9 +2750,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "At least one holiday on this day is a prediction that the operator has not confirmed yet"
 #~ msgstr "دست‌کم یکی از تعطیلی‌های این روز پیش‌بینی است و اپراتور هنوز آن را قطعی نکرده"
 
-#~ msgid "Attendance"
-#~ msgstr "حضور و غیاب"
-
 #~ msgid "Attendance Correction"
 #~ msgstr "اصلاح تردد"
 
@@ -1590,9 +2804,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Break Start"
 #~ msgstr "شروع استراحت"
 
-#~ msgid "CEO"
-#~ msgstr "مدیرعامل"
-
 #~ msgid "CSV"
 #~ msgstr "CSV"
 
@@ -1620,20 +2831,11 @@ msgstr "— بدون کارمند —"
 #~ msgid "Can contain sub-departments"
 #~ msgstr "می‌تواند زیرواحد داشته باشد"
 
-#~ msgid "Cancelled"
-#~ msgstr "لغوشده"
-
 #~ msgid "Card Number"
 #~ msgstr "شماره کارت"
 
 #~ msgid "Carry Over"
 #~ msgstr "ذخیره"
-
-#~ msgid "Category"
-#~ msgstr "دسته"
-
-#~ msgid "Change"
-#~ msgstr "تغییر"
 
 #~ msgid "Changed Fields"
 #~ msgstr "فیلدهای تغییرکرده"
@@ -1644,14 +2846,8 @@ msgstr "— بدون کارمند —"
 #~ msgid "Chosen from the field list"
 #~ msgstr "از فهرست فیلدها انتخاب می‌شود"
 
-#~ msgid "City"
-#~ msgstr "شهر"
-
 #~ msgid "Close Period"
 #~ msgstr "بستن دوره"
-
-#~ msgid "Closed"
-#~ msgstr "بسته"
 
 #~ msgid "Closed By"
 #~ msgstr "بسته‌شده توسط"
@@ -1674,9 +2870,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Column Title"
 #~ msgstr "عنوان ستون"
 
-#~ msgid "Columns"
-#~ msgstr "ستون‌ها"
-
 #~ msgid "Comma"
 #~ msgstr "کاما"
 
@@ -1695,9 +2888,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Committee Ruling Number"
 #~ msgstr "شماره رأی کمیته"
 
-#~ msgid "Company"
-#~ msgstr "شرکت"
-
 #~ msgid "Company Holiday Work (Minutes)"
 #~ msgstr "کار در تعطیلی شرکت (دقیقه)"
 
@@ -1706,9 +2896,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Company limit; 0 means none"
 #~ msgstr "سقف شرکت؛ صفر یعنی بدون سقف"
-
-#~ msgid "Confirmed"
-#~ msgstr "قطعی"
 
 #~ msgid "Confirmed holiday file published in the project repository"
 #~ msgstr "فایل تعطیلات قطعی که در مخزن پروژه منتشر می‌شود"
@@ -1767,9 +2954,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Daily Attendance Leave"
 #~ msgstr "مرخصی کارکرد روزانه"
 
-#~ msgid "Daily Leave"
-#~ msgstr "مرخصی روزانه"
-
 #~ msgid "Daily Overtime Cap (Minutes)"
 #~ msgstr "سقف اضافه‌کار روزانه (دقیقه)"
 
@@ -1812,9 +2996,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Default approval process for each request type. Per-person exceptions are set in Approval Override."
 #~ msgstr "فرایند تأیید پیش‌فرض هر نوع درخواست. استثنای هر فرد در «استثنای فرایند تأیید» تنظیم می‌شود."
 
-#~ msgid "Delete"
-#~ msgstr "حذف"
-
 #~ msgid "Delimiter"
 #~ msgstr "جداکننده"
 
@@ -1824,9 +3005,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Department {0} still has employees"
 #~ msgstr "واحد {0} هنوز پرسنل دارد"
 
-#~ msgid "Deputy"
-#~ msgstr "جانشین"
-
 #~ msgid "Deputy (Acting Manager)"
 #~ msgstr "جانشین (سرپرست موقت)"
 
@@ -1835,9 +3013,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Deputy To"
 #~ msgstr "جانشینی تا"
-
-#~ msgid "Description"
-#~ msgstr "توضیحات"
 
 #~ msgid "Designation Name"
 #~ msgstr "نام عنوان شغلی"
@@ -1902,9 +3077,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Draft"
 #~ msgstr "پیش‌نویس"
 
-#~ msgid "Duplicate"
-#~ msgstr "تکراری"
-
 #~ msgid "Duplicate Punch Window (Seconds)"
 #~ msgstr "بازه تردد تکراری (ثانیه)"
 
@@ -1920,9 +3092,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Early Leave (Minutes)"
 #~ msgstr "تعجیل (دقیقه)"
 
-#~ msgid "Earned"
-#~ msgstr "استحقاقی"
-
 #~ msgid "Earned leave does; sick leave never does (Article 74)"
 #~ msgstr "مرخصی استحقاقی کم می‌شود؛ استعلاجی هرگز (ماده ۷۴)"
 
@@ -1937,9 +3106,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Effective From"
 #~ msgstr "اجرا از"
-
-#~ msgid "Email"
-#~ msgstr "ایمیل"
 
 #~ msgid "Emergency Overtime (Minutes)"
 #~ msgstr "اضافه‌کار اضطراری (دقیقه)"
@@ -1964,9 +3130,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Encoding"
 #~ msgstr "کدگذاری"
-
-#~ msgid "End"
-#~ msgstr "پایان"
 
 #~ msgid "End Date"
 #~ msgstr "تاریخ پایان"
@@ -2004,9 +3167,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Entry Type"
 #~ msgstr "نوع ردیف"
 
-#~ msgid "Error"
-#~ msgstr "خطا"
-
 #~ msgid "Errors"
 #~ msgstr "خطاها"
 
@@ -2015,9 +3175,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Exactly as sent by the device; kept as evidence"
 #~ msgstr "دقیقاً همان که دستگاه فرستاده؛ به‌عنوان سند نگه داشته می‌شود"
-
-#~ msgid "Excel"
-#~ msgstr "اکسل"
 
 #~ msgid "Exceptional Overtime (Minutes)"
 #~ msgstr "اضافه‌کار استثنایی (دقیقه)"
@@ -2040,9 +3197,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Failed"
 #~ msgstr "ناموفق"
 
-#~ msgid "Female"
-#~ msgstr "زن"
-
 #~ msgid "Field"
 #~ msgstr "فیلد"
 
@@ -2061,14 +3215,8 @@ msgstr "— بدون کارمند —"
 #~ msgid "First Row Is a Header"
 #~ msgstr "ردیف اول سرستون است"
 
-#~ msgid "Fixed"
-#~ msgstr "ثابت"
-
 #~ msgid "Fixed Width"
 #~ msgstr "طول ثابت"
-
-#~ msgid "Flexible"
-#~ msgstr "شناور"
 
 #~ msgid "For a flexible shift: the earliest allowed start"
 #~ msgstr "برای شیفت شناور: زودترین ورود مجاز"
@@ -2085,17 +3233,11 @@ msgstr "— بدون کارمند —"
 #~ msgid "Friday Work Premium (Percent)"
 #~ msgstr "فوق‌العاده جمعه‌کاری (درصد)"
 
-#~ msgid "From Device"
-#~ msgstr "از خود دستگاه"
-
 #~ msgid "From Jalali Date"
 #~ msgstr "از تاریخ شمسی"
 
 #~ msgid "Full-time"
 #~ msgstr "تمام‌وقت"
-
-#~ msgid "Gender"
-#~ msgstr "جنسیت"
 
 #~ msgid "Generate Calendar Year"
 #~ msgstr "ساخت سال تقویم"
@@ -2111,9 +3253,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "HH:MM"
 #~ msgstr "ساعت:دقیقه"
-
-#~ msgid "Hajj"
-#~ msgstr "حج"
 
 #~ msgid "Hajj Leave (Days)"
 #~ msgstr "مرخصی حج (روز)"
@@ -2141,9 +3280,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Holiday {0} deleted"
 #~ msgstr "تعطیلی {0} حذف شد"
-
-#~ msgid "Hourly Leave"
-#~ msgstr "مرخصی ساعتی"
 
 #~ msgid "Hourly Leave Minutes per Day (Minutes)"
 #~ msgstr "دقیقه مرخصی ساعتی برابر یک روز (دقیقه)"
@@ -2322,9 +3458,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Ledger entries cannot be deleted; add an adjustment instead"
 #~ msgstr "ردیف دفتر قابل حذف نیست؛ ردیف اصلاحی اضافه کنید"
 
-#~ msgid "Left"
-#~ msgstr "پایان همکاری"
-
 #~ msgid "Legal Baseline"
 #~ msgstr "مبنای قانونی"
 
@@ -2352,20 +3485,11 @@ msgstr "— بدون کارمند —"
 #~ msgid "MM/DD/YYYY"
 #~ msgstr "MM/DD/YYYY"
 
-#~ msgid "Male"
-#~ msgstr "مرد"
-
-#~ msgid "Manager"
-#~ msgstr "مدیر"
-
 #~ msgid "Marriage or Bereavement"
 #~ msgstr "ازدواج یا فوت بستگان"
 
 #~ msgid "Marriage or Bereavement Leave (Days)"
 #~ msgstr "مرخصی ازدواج یا فوت (روز)"
-
-#~ msgid "Maternity"
-#~ msgstr "زایمان"
 
 #~ msgid "Maternity Extra for Multiple Birth (Days)"
 #~ msgstr "افزایش زایمان چندقلو (روز)"
@@ -2396,9 +3520,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Mission {0} cancelled"
 #~ msgstr "مأموریت {0} لغو شد"
-
-#~ msgid "Mobile"
-#~ msgstr "موبایل"
 
 #~ msgid "Monday"
 #~ msgstr "دوشنبه"
@@ -2442,12 +3563,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "No approval process is set for {0}. Set one in Hozur Settings."
 #~ msgstr "برای {0} فرایند تأیید تعیین نشده است. در تنظیمات حضور تعیین کنید."
 
-#~ msgid "Not Scheduled"
-#~ msgstr "بدون برنامه"
-
-#~ msgid "Note"
-#~ msgstr "یادداشت"
-
 #~ msgid "Notes"
 #~ msgstr "یادداشت‌ها"
 
@@ -2462,9 +3577,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Nursing Until Child Age (Months)"
 #~ msgstr "شیردهی تا سن فرزند (ماه)"
-
-#~ msgid "OK"
-#~ msgstr "موفق"
 
 #~ msgid "Office Closure"
 #~ msgstr "تعطیلی موردی ادارات"
@@ -2514,14 +3626,8 @@ msgstr "— بدون کارمند —"
 #~ msgid "Optional. Process for requests an operator enters on someone's behalf (e.g. manual punch times). Empty: the normal process applies."
 #~ msgstr "اختیاری. فرایند درخواست‌هایی که اپراتور به جای دیگران ثبت می‌کند (مثل ورود دستی ساعت). خالی: همان فرایند عادی."
 
-#~ msgid "Organization"
-#~ msgstr "شرکت"
-
 #~ msgid "Organization Name"
 #~ msgstr "نام شرکت"
-
-#~ msgid "Other"
-#~ msgstr "سایر"
 
 #~ msgid "Overlaps assignment {0}. End that one first."
 #~ msgstr "با انتساب {0} هم‌پوشانی دارد؛ اول آن را تمام کنید."
@@ -2550,9 +3656,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Overtime {0} cancelled"
 #~ msgstr "اضافه‌کار {0} لغو شد"
 
-#~ msgid "PDF"
-#~ msgstr "PDF"
-
 #~ msgid "Paid Holiday"
 #~ msgstr "تعطیل با مزد"
 
@@ -2571,9 +3674,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Part-time"
 #~ msgstr "پاره‌وقت"
 
-#~ msgid "Paternity"
-#~ msgstr "پدری"
-
 #~ msgid "Paternity Leave (Days)"
 #~ msgstr "مرخصی پدری (روز)"
 
@@ -2582,9 +3682,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Pattern Type"
 #~ msgstr "نوع الگو"
-
-#~ msgid "Pending"
-#~ msgstr "در انتظار تأیید"
 
 #~ msgid "People"
 #~ msgstr "افراد"
@@ -2598,12 +3695,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Period {0} is closed. Reopen it formally before changing anything in it."
 #~ msgstr "دوره {0} بسته است. پیش از هر تغییری آن را رسماً باز کنید."
 
-#~ msgid "Person"
-#~ msgstr "فرد"
-
-#~ msgid "Phone"
-#~ msgstr "تلفن"
-
 #~ msgid "Pipe"
 #~ msgstr "خط عمودی"
 
@@ -2615,9 +3706,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Positive adds to the balance, negative uses it"
 #~ msgstr "مثبت به مانده اضافه می‌کند، منفی از آن کم می‌کند"
-
-#~ msgid "Predicted"
-#~ msgstr "پیش‌بینی"
 
 #~ msgid "Predicted Holiday"
 #~ msgstr "تعطیلی پیش‌بینی"
@@ -2636,9 +3724,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Protected Groups"
 #~ msgstr "گروه‌های حمایت‌شده"
-
-#~ msgid "Province"
-#~ msgstr "استان"
 
 #~ msgid "Province Name"
 #~ msgstr "نام استان"
@@ -2715,14 +3800,8 @@ msgstr "— بدون کارمند —"
 #~ msgid "Reference Type"
 #~ msgstr "نوع مرجع"
 
-#~ msgid "Reopen"
-#~ msgstr "بازکردن"
-
 #~ msgid "Reopen Period"
 #~ msgstr "بازکردن دوره"
-
-#~ msgid "Report"
-#~ msgstr "گزارش"
 
 #~ msgid "Report Template"
 #~ msgstr "قالب گزارش"
@@ -2751,9 +3830,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Required when changing an existing holiday; kept in the audit history"
 #~ msgstr "برای تغییر تعطیلی موجود لازم است؛ در تاریخچه نگه داشته می‌شود"
 
-#~ msgid "Rest Day"
-#~ msgstr "تعطیل هفتگی"
-
 #~ msgid "Rest Day Work (Minutes)"
 #~ msgstr "کار در تعطیل هفتگی (دقیقه)"
 
@@ -2771,9 +3847,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Role"
 #~ msgstr "نقش"
-
-#~ msgid "Rotating"
-#~ msgstr "چرخشی"
 
 #~ msgid "Rotating Shift 4-Week Limit (Minutes)"
 #~ msgstr "سقف ۴ هفته نوبت‌کاری (دقیقه)"
@@ -2826,6 +3899,9 @@ msgstr "— بدون کارمند —"
 #~ msgid "Set the device clock to the server time?"
 #~ msgstr "ساعت دستگاه با ساعت سرور تنظیم شود؟"
 
+#~ msgid "Settings (Desk)"
+#~ msgstr "تنظیمات (میز کار)"
+
 #~ msgid "Share With Roles"
 #~ msgstr "اشتراک با نقش‌ها"
 
@@ -2853,17 +3929,8 @@ msgstr "— بدون کارمند —"
 #~ msgid "Shift change {0}"
 #~ msgstr "تغییر شیفت {0}"
 
-#~ msgid "Sick"
-#~ msgstr "استعلاجی"
-
 #~ msgid "Sick leave never reduces the leave balance (Article 74)"
 #~ msgstr "مرخصی استعلاجی هرگز از مانده مرخصی کم نمی‌شود (ماده ۷۴)"
-
-#~ msgid "Skipped"
-#~ msgstr "ردشده از مرحله"
-
-#~ msgid "Source"
-#~ msgstr "منبع"
 
 #~ msgid "Specific Person"
 #~ msgstr "فرد مشخص"
@@ -2871,23 +3938,14 @@ msgstr "— بدون کارمند —"
 #~ msgid "Standard"
 #~ msgstr "استاندارد"
 
-#~ msgid "Start"
-#~ msgstr "شروع"
-
 #~ msgid "Start Date"
 #~ msgstr "تاریخ شروع"
 
 #~ msgid "Start and end cannot be the same"
 #~ msgstr "شروع و پایان نمی‌توانند یکی باشند"
 
-#~ msgid "Step"
-#~ msgstr "مرحله"
-
 #~ msgid "Step {0}: choose the person who approves"
 #~ msgstr "مرحله {0}: فرد تأییدکننده را انتخاب کنید"
-
-#~ msgid "Steps"
-#~ msgstr "مراحل"
 
 #~ msgid "Summary"
 #~ msgstr "خلاصه"
@@ -2897,9 +3955,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Sunday"
 #~ msgstr "یکشنبه"
-
-#~ msgid "Suspended"
-#~ msgstr "تعلیق"
 
 #~ msgid "System Manager"
 #~ msgstr "مدیر سیستم"
@@ -2967,9 +4022,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Times"
 #~ msgstr "ساعت‌ها"
 
-#~ msgid "Title"
-#~ msgstr "عنوان"
-
 #~ msgid "To Jalali Date"
 #~ msgstr "تا تاریخ شمسی"
 
@@ -2991,9 +4043,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Unknown device type {0}"
 #~ msgstr "نوع دستگاه نامعتبر: {0}"
 
-#~ msgid "Unpaid"
-#~ msgstr "بدون حقوق"
-
 #~ msgid "Update"
 #~ msgstr "ویرایش"
 
@@ -3002,6 +4051,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Usage"
 #~ msgstr "استفاده"
+
+#~ msgid "Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Ignore: punches are then paired by order."
+#~ msgstr "برای دستگاه‌های جدای ورودی و خروجی «همیشه ورود» یا «همیشه خروج» را بزنید. اگر افراد روی دستگاه ورود/خروج را انتخاب نمی‌کنند «نادیده» را بزنید تا ترددها به ترتیب جفت شوند."
 
 #~ msgid "Use the Close and Reopen buttons"
 #~ msgstr "از دکمه‌های بستن و بازکردن استفاده کنید"
@@ -3063,9 +4115,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Weekday Number"
 #~ msgstr "شماره روز هفته"
 
-#~ msgid "Weekly"
-#~ msgstr "هفتگی"
-
 #~ msgid "Weekly Rest Day"
 #~ msgstr "تعطیل هفتگی"
 
@@ -3122,9 +4171,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "YYYY/MM/DD"
 #~ msgstr "YYYY/MM/DD"
-
-#~ msgid "Year"
-#~ msgstr "سال"
 
 #~ msgid "You cannot change the shift of {0}"
 #~ msgstr "نمی‌توانید شیفت {0} را تغییر دهید"

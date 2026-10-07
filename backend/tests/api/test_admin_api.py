@@ -242,3 +242,14 @@ def test_change_own_password_keeps_this_session(client_for):
 	r = emp.post("/api/auth/password", json={"current_password": PASSWORD, "new_password": "another-long-1"})
 	assert r.status_code == 200, r.text
 	assert emp.get("/api/me").status_code == 200
+
+
+def test_device_errors_are_messages_not_crashes(client_for, org):
+	op = client_for("op")
+	r = op.post(
+		"/api/devices", json={"name": "X", "adapter_type": "zkteco", "host": "10.0.0.5", "branch_id": 999999}
+	)
+	assert r.status_code == 422
+	assert op.get(f"/api/devices/{org.device.id}").json()["name"] == "T-Device"
+	assert op.get("/api/devices/imports").status_code == 200
+	assert op.get("/api/attendance/day", params={"employee_id": 999999, "jdate": TODAY}).status_code == 404

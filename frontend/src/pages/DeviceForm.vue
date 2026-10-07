@@ -121,7 +121,7 @@
 				</p>
 				<Select v-model="importTemplate" :label="__('Import Template')" :options="templateOptions" />
 				<p v-if="!templateOptions.length" class="text-xs text-ink-amber-7">
-					{{ __("Define an import template first (Manage > Import Templates).") }}
+					{{ __("No import template is defined yet.") }}
 				</p>
 				<input
 					ref="fileInput"

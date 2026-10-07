@@ -27,7 +27,7 @@
 						<label class="text-sm">
 							{{ PARAMETER_LABELS[p.name] ?? p.name }}
 							<span class="text-xs text-ink-gray-5"
-								>· {{ __("Article {0}", [fa(p.article)]) }} · {{ __("Law: {0}", [fa(p.legal_value)]) }}</span
+								>· {{ __("Article {0}", [fa(p.article.replace("note", __("note")))]) }} · {{ __("Law: {0}", [fa(p.legal_value)]) }}</span
 							>
 							<span v-if="p.legal_check" class="text-xs text-ink-amber-3"> · {{ __("to be checked") }}</span>
 						</label>

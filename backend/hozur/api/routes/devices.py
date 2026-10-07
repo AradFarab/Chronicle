@@ -54,6 +54,11 @@ def create_device(values: dict[str, Any], actor: Operator, db: DB) -> dict:
 	return device_view(devices.save_device(db, values, actor.user_id))
 
 
+@router.get("/{device_id:int}")
+def get_device(device_id: int, actor: Operator, db: DB) -> dict:
+	return device_view(devices.get_device(db, device_id))
+
+
 @router.patch("/{device_id}")
 def update_device(device_id: int, values: dict[str, Any], actor: Operator, db: DB) -> dict:
 	return device_view(devices.save_device(db, values, actor.user_id, device_id))
