@@ -100,6 +100,20 @@ def set_approval_default(
 	return {"request_type": row.request_type, "process_id": row.process_id}
 
 
+# labor rule parameters ------------------------------------------------------------------------
+
+
+@router.get("/rule-parameters")
+def rule_parameters(actor: Actor, db: DB) -> list[dict]:
+	"""Every legal parameter with its article, unit, direction and the legal value (for the form)."""
+	from dataclasses import asdict
+
+	from hozur.engine.rules import PARAMETERS, baseline_rule_set
+
+	law = baseline_rule_set()
+	return [{**asdict(p), "legal_value": getattr(law, p.name)} for p in PARAMETERS]
+
+
 # settings ------------------------------------------------------------------------------------------
 
 

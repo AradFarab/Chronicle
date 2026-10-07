@@ -8,8 +8,11 @@ __pycache__
 .venv*/
 .pytest_cache/
 .ruff_cache/
-hozur/public/frontend
-hozur/www/hozur.html
 backend/.venv/
 backend/data/
 *.egg-info/
+
+# docker
+docker/.env
+frontend/dist/
+backend/build/

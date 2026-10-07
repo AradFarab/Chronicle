@@ -79,22 +79,26 @@ backend/
     engine/                # pure-Python labor-law engine
     jalali/                # date helpers, bundled holiday seed
     calendar/              # holiday sources (time.ir, bundled, file) and the yearly refresh
-    devices/               # adapter interface + adapters (zkteco.py, file_import.py) + ingestion
-    services/              # business logic: org, schedules, attendance, requests, approvals, leave, periods, audit
-    reports/               # catalog, builder, exporters (xlsx, csv/txt, pdf)
+    devices/               # adapter interface + adapters (zkteco.py, file_import.py)
+    services/              # business logic: resources (config tables), devices (ingestion), attendance,
+                           # requests, approvals, leave, periods, reports, users, audit, jobs
+    worker.py              # `hozur worker`: device polling, job queue, nightly work
+    reports/               # field catalog and exporters (xlsx, csv/txt, pdf); the builder is services/reports.py
     api/                   # FastAPI routers used by the PWA
     locale/                # fa.po
   tests/
 frontend/                  # Vue 3 + TS PWA (all roles, all admin screens)
-docker/                    # compose files for dev and production
+docker/                    # dev.yml (PostgreSQL for development), compose.yml (production)
 docs/
 ```
 
 ## Development environment
 
-- `docker compose -f docker/dev/compose.yml up -d` starts PostgreSQL (and the app); see `docker/dev/README.md`.
-- Backend: `cd backend && pip install -e '.[dev]'`, `alembic upgrade head`, `hozur serve`, `hozur worker`.
-- Tests: `pytest` in `backend/` (needs the dev PostgreSQL; engine and jalali tests run without it). Frontend: `yarn typecheck && yarn test` in `frontend/`.
+- `docker compose -f docker/dev.yml up -d` starts PostgreSQL 17 with the databases `hozur` and `hozur_test` (user/password `hozur`).
+- Backend: `cd backend && python -m venv .venv && .venv/bin/pip install -e '.[dev]'`, then `hozur db install` (migrations + reference data), `hozur create-user admin --role admin`, `hozur serve --reload` (API on :8000) and `hozur worker` (devices, jobs, nightly work).
+- Frontend: `cd frontend && yarn && yarn dev` (PWA on :8080, `/api` proxied to :8000).
+- Tests: `pytest` in `backend/` (DB tests use `hozur_test`; engine and jalali tests run without it). Frontend: `yarn typecheck && yarn test`. Translations: `python3 tools/i18n.py --check`.
+- Production: `Dockerfile` + `docker/compose.yml` (PostgreSQL, app, worker) on the company's own server.
 
 ## Working style
 
