@@ -10,3 +10,6 @@ __pycache__
 .ruff_cache/
 hozur/public/frontend
 hozur/www/hozur.html
+backend/.venv/
+backend/data/
+*.egg-info/

@@ -85,7 +85,9 @@ Resolution order for a person and day: override → employee → designation →
 ### Requests and approvals ("forms and processes")
 
 All four request kinds share one `request` row (class-table inheritance), so numbering, status,
-the approval chain, the inbox and the audit trail are the same for every kind.
+the approval chain, the inbox and the audit trail are the same for every kind. A correction
+needs no detail table: its day is the request's `start_jdate`, its lines are `correction_item`.
+The request number (`LV-00012`, `MS-…`, `OT-…`, `COR-…`) is a generated column.
 
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
@@ -93,7 +95,6 @@ the approval chain, the inbox and the audit trail are the same for every kind.
 | `leave_request` | 1:1 detail | daily: from/to dates; hourly: one date and from/to time (CHECK per unit) |
 | `mission_request` | 1:1 detail | same shape as leave |
 | `overtime_request` | 1:1 detail | `overtime_kind ∈ normal, exceptional, emergency`; `minutes > 0`; `assigned_by_manager` |
-| `correction_request` | 1:1 detail | one Jalali day |
 | `correction_item` | lines of a correction | `action ∈ add_punch, ignore_punch`; add needs `time`, ignore needs `raw_punch_id` (CHECK) |
 | `request_approval` | the approval chain of one request | unique (`request_id`, `step`); `status ∈ pending, approved, rejected, skipped` |
 | `approval_process` | named process | name unique |

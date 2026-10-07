@@ -1,0 +1,58 @@
+[project]
+name = "hozur"
+version = "0.2.0"
+description = "Iranian attendance (حضور و غیاب): devices, Jalali calendar, labor-law engine, PWA"
+authors = [{ name = "Arad Farab", email = "219307864+AradFarab@users.noreply.github.com" }]
+license = "GPL-3.0-only"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi~=0.142",
+    "uvicorn[standard]~=0.54",
+    "sqlalchemy~=2.1",
+    "alembic~=1.20",
+    "psycopg[binary]~=3.3",
+    "pydantic~=2.13",
+    "pydantic-settings~=2.15",
+    "argon2-cffi~=25.1",
+    "cryptography>=46",
+    "jdatetime~=6.1",
+    "pyzk==0.9",
+    "openpyxl~=3.1",
+    "weasyprint~=70.0",
+    "httpx~=0.28",
+    "apscheduler~=3.11",
+    "python-multipart~=0.0.32",
+]
+
+[project.optional-dependencies]
+dev = ["pytest~=9.1", "ruff~=0.16"]
+
+[project.scripts]
+hozur = "hozur.cli:main"
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["hozur*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.po", "*.mo", "*.ttf", "*.txt", "*.ini", "*.mako"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "I", "UP", "B", "RUF"]
+ignore = ["E501", "F403", "W191", "E101", "B017", "B023", "B904", "E741", "RUF001", "RUF002", "RUF003"]
+typing-modules = ["typing"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "tab"
+docstring-code-format = true
