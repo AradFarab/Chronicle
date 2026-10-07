@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-07 15:41+0000\n"
+"POT-Creation-Date: 2026-10-07 15:49+0000\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -15,9 +15,33 @@ msgstr ""
 msgid "A correction cannot be for a future day"
 msgstr "اصلاح تردد برای روزهای آینده ممکن نیست"
 
+#: backend/hozur/services/resources.py:289
+msgid "A department cannot be inside itself"
+msgstr "یک واحد نمی‌تواند زیرمجموعهٔ خودش باشد"
+
+#: backend/hozur/services/resources.py:324
+msgid "A flexible shift needs the required minutes"
+msgstr "شیفت شناور به دقایق کار لازم نیاز دارد"
+
+#: backend/hozur/services/resources.py:157
+msgid "A linked record does not exist"
+msgstr "رکورد مرتبط وجود ندارد"
+
 #: frontend/src/lib/warnings.ts:6
 msgid "A punch has no pair: correct the day"
 msgstr "یک تردد جفت ندارد؛ این روز را اصلاح کنید"
+
+#: backend/hozur/services/resources.py:350
+msgid "A rotating pattern needs the first day of the cycle"
+msgstr "الگوی چرخشی به روز اول چرخه نیاز دارد"
+
+#: backend/hozur/services/resources.py:253
+msgid "A standard record cannot be removed"
+msgstr "رکورد استاندارد قابل حذف نیست"
+
+#: backend/hozur/services/resources.py:162
+msgid "A value is not valid ({0})"
+msgstr "یکی از مقادیر معتبر نیست ({0})"
 
 #: backend/hozur/reports/catalog.py:60 frontend/src/pages/Month.vue:220
 msgid "Absence (Days)"
@@ -63,6 +87,10 @@ msgstr "ساعت‌هایی را که دستگاه ثبت نکرده وارد ک
 msgid "All branches"
 msgstr "همه شعبه‌ها"
 
+#: backend/hozur/services/resources.py:153
+msgid "Another record already has this value"
+msgstr "رکورد دیگری همین مقدار را دارد"
+
 #: frontend/src/components/AppShell.vue:100 frontend/src/pages/Today.vue:88
 msgid "Approvals"
 msgstr "تأییدها"
@@ -74,6 +102,10 @@ msgstr "تأیید"
 #: frontend/src/pages/Approvals.vue:107
 msgid "Approved"
 msgstr "تأییدشده"
+
+#: backend/hozur/services/users.py:167
+msgid "At least one active admin is needed"
+msgstr "دست‌کم یک مدیر سیستم فعال لازم است"
 
 #: frontend/src/pages/Today.vue:28
 msgid "At work"
@@ -94,6 +126,10 @@ msgstr "بازگشت به امروز"
 #: backend/hozur/reports/catalog.py:40 frontend/src/pages/DeviceForm.vue:20
 msgid "Branch"
 msgstr "شعبه"
+
+#: backend/hozur/services/periods.py:82
+msgid "Calculations are still running; try again in a minute"
+msgstr "محاسبات هنوز در جریان است؛ یک دقیقهٔ دیگر دوباره امتحان کنید"
 
 #: frontend/src/pages/NewRequest.vue:122
 msgid "Cancel"
@@ -118,6 +154,10 @@ msgstr "فایل تعطیلات را انتخاب کنید"
 #: frontend/src/pages/Month.vue:13 frontend/src/pages/NewRequest.vue:11 frontend/src/pages/Requests.vue:14
 msgid "Choose an employee"
 msgstr "انتخاب کارمند"
+
+#: backend/hozur/services/reports.py:133
+msgid "Choose at least one column"
+msgstr "دست‌کم یک ستون انتخاب کنید"
 
 #: backend/hozur/calendar/service.py:389
 msgid "Choose how the office closure is paid"
@@ -275,6 +315,10 @@ msgstr "غیرفعال"
 msgid "Each device user must point to an employee; users whose ID equals an employee code are mapped automatically."
 msgstr "هر کاربر دستگاه باید به یک کارمند وصل شود؛ کاربرانی که شناسه‌شان با کد پرسنلی یکی است خودکار وصل می‌شوند."
 
+#: backend/hozur/services/resources.py:357
+msgid "Each weekday can appear once"
+msgstr "هر روز هفته فقط یک بار می‌تواند بیاید"
+
 #: backend/hozur/reports/catalog.py:58 frontend/src/components/DayNumbers.vue:28
 msgid "Early Leave"
 msgstr "تعجیل"
@@ -299,7 +343,7 @@ msgstr "پرسنل"
 msgid "Employee Code"
 msgstr "کد پرسنلی"
 
-#: backend/hozur/services/requests.py:102
+#: backend/hozur/api/routes/admin.py:172 backend/hozur/api/routes/admin.py:249 backend/hozur/api/routes/attendance.py:143 backend/hozur/services/requests.py:102
 msgid "Employee not found"
 msgstr "کارمند پیدا نشد"
 
@@ -307,7 +351,7 @@ msgstr "کارمند پیدا نشد"
 msgid "Enabled"
 msgstr "فعال"
 
-#: backend/hozur/services/devices.py:126 backend/hozur/services/devices.py:585
+#: backend/hozur/api/routes/admin.py:69 backend/hozur/services/devices.py:126 backend/hozur/services/devices.py:585
 msgid "Enter a name"
 msgstr "نام را بنویسید"
 
@@ -318,6 +362,10 @@ msgstr "عنوان را بنویسید"
 #: backend/hozur/services/users.py:48
 msgid "Enter a username"
 msgstr "نام کاربری را بنویسید"
+
+#: backend/hozur/services/resources.py:328
+msgid "Enter both the start and the end of the break"
+msgstr "شروع و پایان استراحت را وارد کنید"
 
 #: backend/hozur/services/devices.py:133
 msgid "Enter the device IP address"
@@ -343,7 +391,11 @@ msgstr "دلیل اضافه‌کار استثنایی یا اضطراری را �
 msgid "Enter the reason for rejecting"
 msgstr "دلیل رد را بنویسید"
 
-#: backend/hozur/calendar/service.py:424 backend/hozur/calendar/service.py:447
+#: backend/hozur/services/periods.py:95
+msgid "Enter the reason for reopening"
+msgstr "دلیل بازکردن را وارد کنید"
+
+#: backend/hozur/calendar/service.py:424 backend/hozur/calendar/service.py:447 backend/hozur/services/resources.py:220
 msgid "Enter the reason for the change"
 msgstr "دلیل تغییر را بنویسید"
 
@@ -354,6 +406,10 @@ msgstr "دلیل اصلاح تردد را وارد کنید"
 #: backend/hozur/services/requests.py:225
 msgid "Enter the reason for the mission"
 msgstr "دلیل مأموریت را بنویسید"
+
+#: backend/hozur/services/resources.py:326
+msgid "Enter the start and end time"
+msgstr "ساعت شروع و پایان را وارد کنید"
 
 #: frontend/src/pages/NewRequest.vue:164
 msgid "Exceptional"
@@ -619,17 +675,25 @@ msgstr "عادی"
 msgid "Not enough leave: {0} days available, {1} requested"
 msgstr "مرخصی کافی نیست: {0} روز مانده، {1} روز درخواست شده"
 
-#: backend/hozur/services/devices.py:487 backend/hozur/services/devices.py:579
+#: backend/hozur/api/routes/admin.py:149 backend/hozur/api/routes/admin.py:98 backend/hozur/api/routes/devices.py:164 backend/hozur/services/devices.py:487 backend/hozur/services/devices.py:579 backend/hozur/services/reports.py:312 backend/hozur/services/resources.py:198 backend/hozur/services/resources.py:628
 msgid "Not found"
 msgstr "پیدا نشد"
 
-#: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/services/access.py:133 backend/hozur/services/requests.py:379
+#: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/api/routes/attendance.py:133 backend/hozur/api/routes/attendance.py:34 backend/hozur/services/access.py:133 backend/hozur/services/reports.py:262 backend/hozur/services/reports.py:314 backend/hozur/services/reports.py:333 backend/hozur/services/requests.py:379 backend/hozur/services/resources.py:138
 msgid "Not permitted"
 msgstr "دسترسی ندارید"
 
 #: frontend/src/pages/Approvals.vue:7
 msgid "Nothing is waiting for you"
 msgstr "چیزی منتظر تأیید شما نیست"
+
+#: backend/hozur/services/resources.py:353
+msgid "Number the days of the cycle 1, 2, 3, ..."
+msgstr "روزهای چرخه را ۱، ۲، ۳، ... شماره‌گذاری کنید"
+
+#: backend/hozur/services/resources.py:419
+msgid "Number the steps 1, 2, 3, ..."
+msgstr "مراحل را ۱، ۲، ۳، ... شماره‌گذاری کنید"
 
 #: backend/hozur/reports/catalog.py:77
 msgid "Nursing Breaks"
@@ -751,6 +815,10 @@ msgstr "ردشده"
 msgid "Remove"
 msgstr "حذف"
 
+#: backend/hozur/services/reports.py:123
+msgid "Report field not allowed: {0}"
+msgstr "این فیلد در گزارش مجاز نیست: {0}"
+
 #: frontend/src/pages/Today.vue:82
 msgid "Request leave"
 msgstr "درخواست مرخصی"
@@ -867,11 +935,19 @@ msgstr "نرم‌افزار فقط از دستگاه می‌خواند و هرگ
 msgid "The approver of step {0} has no user account"
 msgstr "تأییدکنندهٔ مرحلهٔ {0} حساب کاربری ندارد"
 
+#: backend/hozur/services/resources.py:336
+msgid "The break must be inside the shift"
+msgstr "استراحت باید داخل شیفت باشد"
+
+#: backend/hozur/services/users.py:189
+msgid "The current password is wrong"
+msgstr "رمز عبور فعلی اشتباه است"
+
 #: frontend/src/pages/Today.vue:48
 msgid "The day is not over; the numbers are final after your last punch."
 msgstr "روز هنوز تمام نشده است؛ اعداد پس از آخرین تردد شما قطعی می‌شوند."
 
-#: backend/hozur/services/devices.py:498 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220
+#: backend/hozur/api/routes/attendance.py:122 backend/hozur/api/routes/attendance.py:60 backend/hozur/services/devices.py:498 backend/hozur/services/reports.py:258 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220 backend/hozur/services/resources.py:294
 msgid "The end date is before the start date"
 msgstr "تاریخ پایان قبل از تاریخ شروع است"
 
@@ -899,11 +975,23 @@ msgstr "تعطیلات سال {0} هنوز قطعی نشده است؛ تقویم
 msgid "The legal baseline Labor Rule Set is missing; run hozur db install"
 msgstr "مجموعه قواعد پایهٔ قانونی وجود ندارد؛ دستور hozur db install را اجرا کنید"
 
+#: backend/hozur/services/resources.py:390
+msgid "The legal baseline is part of the app and cannot be changed"
+msgstr "مبنای قانونی بخشی از نرم‌افزار است و تغییر نمی‌کند"
+
+#: backend/hozur/services/periods.py:69
+msgid "The month {0} is not over yet"
+msgstr "ماه {0} هنوز تمام نشده است"
+
+#: backend/hozur/services/resources.py:296
+msgid "The national id must be 10 digits"
+msgstr "کد ملی باید ۱۰ رقم باشد"
+
 #: backend/hozur/services/users.py:26
 msgid "The password must be at least {0} characters"
 msgstr "رمز عبور باید دست‌کم {0} نویسه باشد"
 
-#: backend/hozur/services/periods.py:37
+#: backend/hozur/services/periods.py:38
 msgid "The period {0} is closed; reopen it first"
 msgstr "دورهٔ {0} بسته شده است؛ ابتدا آن را باز کنید"
 
@@ -950,6 +1038,10 @@ msgstr "ترددهای این دستگاه با ورود فایل می‌آید 
 #: backend/hozur/services/requests.py:368
 msgid "This person has no user account to accept the overtime"
 msgstr "این شخص حساب کاربری برای پذیرش اضافه‌کار ندارد"
+
+#: backend/hozur/services/resources.py:156
+msgid "This record is used elsewhere and cannot be removed"
+msgstr "این رکورد جای دیگری استفاده شده و قابل حذف نیست"
 
 #: backend/hozur/services/requests.py:427
 msgid "This request cannot be cancelled"
@@ -1015,6 +1107,14 @@ msgstr "نوع تأییدکننده نامعتبر: {0}"
 msgid "Unknown calendar source {0}"
 msgstr "منبع تقویم {0} ناشناخته است"
 
+#: backend/hozur/services/reports.py:352
+msgid "Unknown export format"
+msgstr "قالب خروجی نامعتبر"
+
+#: backend/hozur/services/reports.py:116
+msgid "Unknown grouping"
+msgstr "گروه‌بندی نامعتبر"
+
 #: backend/hozur/calendar/service.py:373
 msgid "Unknown holiday type"
 msgstr "نوع تعطیلی ناشناخته است"
@@ -1027,9 +1127,21 @@ msgstr "واحد مرخصی ناشناخته است"
 msgid "Unknown mission unit"
 msgstr "واحد مأموریت ناشناخته است"
 
+#: backend/hozur/services/periods.py:66
+msgid "Unknown month"
+msgstr "ماه نامعتبر است"
+
 #: backend/hozur/services/requests.py:233
 msgid "Unknown overtime kind"
 msgstr "نوع اضافه‌کار ناشناخته است"
+
+#: backend/hozur/services/resources.py:427
+msgid "Unknown report columns: {0}"
+msgstr "ستون‌های ناشناختهٔ گزارش: {0}"
+
+#: backend/hozur/services/reports.py:114
+msgid "Unknown report source"
+msgstr "منبع گزارش نامعتبر"
 
 #: backend/hozur/services/requests.py:312
 msgid "Unknown request type"
@@ -1038,6 +1150,10 @@ msgstr "نوع درخواست نامعتبر است"
 #: backend/hozur/services/users.py:53 backend/hozur/services/users.py:66
 msgid "Unknown role {0}"
 msgstr "نقش {0} ناشناخته است"
+
+#: backend/hozur/api/routes/admin.py:115
+msgid "Unknown settings: {0}"
+msgstr "تنظیمات ناشناخته: {0}"
 
 #: frontend/src/pages/Devices.vue:62
 msgid "Unmapped users"
@@ -1135,13 +1251,21 @@ msgstr "{0} حداکثر {1} روز است"
 msgid "{0} is not a valid Jalali date"
 msgstr "{0} تاریخ شمسی معتبری نیست"
 
-#: backend/hozur/services/rule_sets.py:38
+#: backend/hozur/services/resources.py:159
+msgid "{0} is required"
+msgstr "{0} لازم است"
+
+#: backend/hozur/api/routes/admin.py:125 backend/hozur/services/rule_sets.py:38
 msgid "{0} must be a number"
 msgstr "{0} باید عدد باشد"
 
 #: frontend/src/pages/DeviceForm.vue:310 frontend/src/pages/Devices.vue:151
 msgid "{0} new punches"
 msgstr "{0} تردد جدید"
+
+#: backend/hozur/services/periods.py:76
+msgid "{0} requests in this month are still waiting for approval"
+msgstr "{0} درخواست در این ماه هنوز منتظر تأیید است"
 
 #: frontend/src/pages/DeviceForm.vue:340
 msgid "{0} rows: {1} new, {2} already stored, {3} duplicates, {4} errors"
@@ -1162,6 +1286,10 @@ msgstr "{0} کاربر بدون کارمند"
 #: backend/hozur/services/requests.py:74
 msgid "{0}: enter the time as HH:MM"
 msgstr "{0}: زمان را به شکل HH:MM بنویسید"
+
+#: backend/hozur/services/resources.py:117
+msgid "{0}: the value {1} is not valid"
+msgstr "{0}: مقدار {1} معتبر نیست"
 
 #: backend/hozur/services/requests.py:66
 msgid "{0}: {1} is not a valid Jalali date"
@@ -1510,9 +1638,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Changed Fields"
 #~ msgstr "فیلدهای تغییرکرده"
 
-#~ msgid "Choose at least one column"
-#~ msgstr "دست‌کم یک ستون انتخاب کنید"
-
 #~ msgid "Choose the {0}"
 #~ msgstr "{0} را انتخاب کنید"
 
@@ -1849,9 +1974,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Ends After Midnight"
 #~ msgstr "پس از نیمه‌شب تمام می‌شود"
 
-#~ msgid "Enter both the start and the end of the break"
-#~ msgstr "شروع و پایان استراحت را وارد کنید"
-
 #~ msgid "Enter either the date-time column or both the date and time columns"
 #~ msgstr "یا ستون تاریخ و ساعت، یا هر دو ستون تاریخ و ساعت را وارد کنید"
 
@@ -1863,9 +1985,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Enter the period as a Jalali month, e.g. 1405/07"
 #~ msgstr "دوره را به‌صورت ماه شمسی وارد کنید، مثلاً 1405/07"
-
-#~ msgid "Enter the reason for reopening"
-#~ msgstr "دلیل بازکردن را وارد کنید"
 
 #~ msgid "Enter the reason for the adjustment"
 #~ msgstr "دلیل اصلاح را وارد کنید"
@@ -2614,9 +2733,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Report Template Role"
 #~ msgstr "نقش قالب گزارش"
 
-#~ msgid "Report field not allowed: {0}"
-#~ msgstr "این فیلد در گزارش مجاز نیست: {0}"
-
 #~ msgid "Request Approval"
 #~ msgstr "مرحله تأیید درخواست"
 
@@ -2800,9 +2916,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Text"
 #~ msgstr "متن"
 
-#~ msgid "The break must be inside the shift"
-#~ msgstr "استراحت باید داخل شیفت باشد"
-
 #~ msgid "The deputy must be someone other than the manager"
 #~ msgstr "جانشین باید غیر از مدیر باشد"
 
@@ -2877,15 +2990,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Unknown device type {0}"
 #~ msgstr "نوع دستگاه نامعتبر: {0}"
-
-#~ msgid "Unknown export format"
-#~ msgstr "قالب خروجی نامعتبر"
-
-#~ msgid "Unknown grouping"
-#~ msgstr "گروه‌بندی نامعتبر"
-
-#~ msgid "Unknown report source"
-#~ msgstr "منبع گزارش نامعتبر"
 
 #~ msgid "Unpaid"
 #~ msgstr "بدون حقوق"
@@ -3090,9 +3194,6 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "{0} is not a valid IP address or host name"
 #~ msgstr "{0} نشانی IP یا نام میزبان معتبر نیست"
-
-#~ msgid "{0} is required"
-#~ msgstr "{0} لازم است"
 
 #~ msgid "{0} new punches, {1} already stored, {2} duplicates."
 #~ msgstr "{0} تردد جدید، {1} از قبل ثبت‌شده، {2} تکراری."

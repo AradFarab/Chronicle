@@ -11,7 +11,7 @@ def _(text: str) -> str:
 	return text
 
 
-DAILY, SUMMARY = "Daily", "Summary"
+DAILY, SUMMARY = "daily", "summary"
 BOTH = (DAILY, SUMMARY)
 
 # kinds decide formatting: minutes follow the report's time unit; days and counts are numbers

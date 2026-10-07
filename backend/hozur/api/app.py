@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 from hozur import __version__
 from hozur.api.deps import csrf_guard
-from hozur.api.routes import auth, calendar, me, requests
+from hozur.api.routes import admin, attendance, auth, calendar, devices, me, reports, requests
 from hozur.config import get_settings
 from hozur.i18n import DEFAULT_LANGUAGE, translate
 from hozur.services.errors import HozurError
@@ -45,7 +45,7 @@ def create_app() -> FastAPI:
 	def health() -> dict:
 		return {"ok": True, "version": __version__}
 
-	for module in (auth, me, requests, calendar):
+	for module in (auth, me, requests, calendar, attendance, devices, reports, admin):
 		app.include_router(module.router)
 
 	dist = get_settings().frontend_dist

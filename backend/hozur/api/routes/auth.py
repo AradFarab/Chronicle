@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Request, Response
 from pydantic import BaseModel
 
-from hozur.api.deps import COOKIE, DB
+from hozur.api.deps import COOKIE, DB, current_user
 from hozur.config import get_settings
 from hozur.i18n import _
 from hozur.services import users
@@ -31,6 +31,11 @@ def login(body: Login, request: Request, response: Response, db: DB) -> dict:
 	token = users.start_session(
 		db, user, request.headers.get("user-agent"), request.client.host if request.client else None
 	)
+	login_cookie(response, token)
+	return {"ok": True}
+
+
+def login_cookie(response: Response, token: str) -> None:
 	settings = get_settings()
 	response.set_cookie(
 		COOKIE,
@@ -41,11 +46,24 @@ def login(body: Login, request: Request, response: Response, db: DB) -> dict:
 		samesite="lax",
 		path="/",
 	)
-	return {"ok": True}
 
 
 @router.post("/logout")
 def logout(request: Request, response: Response, db: DB) -> dict:
 	users.end_session(db, request.cookies.get(COOKIE))
 	response.delete_cookie(COOKIE, path="/")
+	return {"ok": True}
+
+
+class PasswordChange(BaseModel):
+	current_password: str
+	new_password: str
+
+
+@router.post("/password")
+def change_password(body: PasswordChange, request: Request, response: Response, db: DB) -> dict:
+	"""Change your own password; other devices are logged out, this one gets a new session."""
+	user = current_user(request, db)
+	users.change_own_password(db, user, body.current_password, body.new_password)
+	login_cookie(response, users.start_session(db, user, request.headers.get("user-agent")))
 	return {"ok": True}

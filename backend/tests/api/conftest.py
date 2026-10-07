@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
+from orgfactory import PASSWORD
 from sqlalchemy.orm import sessionmaker
 
 from hozur.api.app import create_app
 from hozur.services import users
-
-PASSWORD = "secret-pass-1405"
 
 
 @pytest.fixture

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-07 15:41+0000\n"
+"POT-Creation-Date: 2026-10-07 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,8 +14,32 @@ msgstr ""
 msgid "A correction cannot be for a future day"
 msgstr ""
 
+#: backend/hozur/services/resources.py:289
+msgid "A department cannot be inside itself"
+msgstr ""
+
+#: backend/hozur/services/resources.py:324
+msgid "A flexible shift needs the required minutes"
+msgstr ""
+
+#: backend/hozur/services/resources.py:157
+msgid "A linked record does not exist"
+msgstr ""
+
 #: frontend/src/lib/warnings.ts:6
 msgid "A punch has no pair: correct the day"
+msgstr ""
+
+#: backend/hozur/services/resources.py:350
+msgid "A rotating pattern needs the first day of the cycle"
+msgstr ""
+
+#: backend/hozur/services/resources.py:253
+msgid "A standard record cannot be removed"
+msgstr ""
+
+#: backend/hozur/services/resources.py:162
+msgid "A value is not valid ({0})"
 msgstr ""
 
 #: backend/hozur/reports/catalog.py:60 frontend/src/pages/Month.vue:220
@@ -62,6 +86,10 @@ msgstr ""
 msgid "All branches"
 msgstr ""
 
+#: backend/hozur/services/resources.py:153
+msgid "Another record already has this value"
+msgstr ""
+
 #: frontend/src/components/AppShell.vue:100 frontend/src/pages/Today.vue:88
 msgid "Approvals"
 msgstr ""
@@ -72,6 +100,10 @@ msgstr ""
 
 #: frontend/src/pages/Approvals.vue:107
 msgid "Approved"
+msgstr ""
+
+#: backend/hozur/services/users.py:167
+msgid "At least one active admin is needed"
 msgstr ""
 
 #: frontend/src/pages/Today.vue:28
@@ -92,6 +124,10 @@ msgstr ""
 
 #: backend/hozur/reports/catalog.py:40 frontend/src/pages/DeviceForm.vue:20
 msgid "Branch"
+msgstr ""
+
+#: backend/hozur/services/periods.py:82
+msgid "Calculations are still running; try again in a minute"
 msgstr ""
 
 #: frontend/src/pages/NewRequest.vue:122
@@ -116,6 +152,10 @@ msgstr ""
 
 #: frontend/src/pages/Month.vue:13 frontend/src/pages/NewRequest.vue:11 frontend/src/pages/Requests.vue:14
 msgid "Choose an employee"
+msgstr ""
+
+#: backend/hozur/services/reports.py:133
+msgid "Choose at least one column"
 msgstr ""
 
 #: backend/hozur/calendar/service.py:389
@@ -274,6 +314,10 @@ msgstr ""
 msgid "Each device user must point to an employee; users whose ID equals an employee code are mapped automatically."
 msgstr ""
 
+#: backend/hozur/services/resources.py:357
+msgid "Each weekday can appear once"
+msgstr ""
+
 #: backend/hozur/reports/catalog.py:58 frontend/src/components/DayNumbers.vue:28
 msgid "Early Leave"
 msgstr ""
@@ -298,7 +342,7 @@ msgstr ""
 msgid "Employee Code"
 msgstr ""
 
-#: backend/hozur/services/requests.py:102
+#: backend/hozur/api/routes/admin.py:172 backend/hozur/api/routes/admin.py:249 backend/hozur/api/routes/attendance.py:143 backend/hozur/services/requests.py:102
 msgid "Employee not found"
 msgstr ""
 
@@ -306,7 +350,7 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
-#: backend/hozur/services/devices.py:126 backend/hozur/services/devices.py:585
+#: backend/hozur/api/routes/admin.py:69 backend/hozur/services/devices.py:126 backend/hozur/services/devices.py:585
 msgid "Enter a name"
 msgstr ""
 
@@ -316,6 +360,10 @@ msgstr ""
 
 #: backend/hozur/services/users.py:48
 msgid "Enter a username"
+msgstr ""
+
+#: backend/hozur/services/resources.py:328
+msgid "Enter both the start and the end of the break"
 msgstr ""
 
 #: backend/hozur/services/devices.py:133
@@ -342,7 +390,11 @@ msgstr ""
 msgid "Enter the reason for rejecting"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:424 backend/hozur/calendar/service.py:447
+#: backend/hozur/services/periods.py:95
+msgid "Enter the reason for reopening"
+msgstr ""
+
+#: backend/hozur/calendar/service.py:424 backend/hozur/calendar/service.py:447 backend/hozur/services/resources.py:220
 msgid "Enter the reason for the change"
 msgstr ""
 
@@ -352,6 +404,10 @@ msgstr ""
 
 #: backend/hozur/services/requests.py:225
 msgid "Enter the reason for the mission"
+msgstr ""
+
+#: backend/hozur/services/resources.py:326
+msgid "Enter the start and end time"
 msgstr ""
 
 #: frontend/src/pages/NewRequest.vue:164
@@ -618,16 +674,24 @@ msgstr ""
 msgid "Not enough leave: {0} days available, {1} requested"
 msgstr ""
 
-#: backend/hozur/services/devices.py:487 backend/hozur/services/devices.py:579
+#: backend/hozur/api/routes/admin.py:149 backend/hozur/api/routes/admin.py:98 backend/hozur/api/routes/devices.py:164 backend/hozur/services/devices.py:487 backend/hozur/services/devices.py:579 backend/hozur/services/reports.py:312 backend/hozur/services/resources.py:198 backend/hozur/services/resources.py:628
 msgid "Not found"
 msgstr ""
 
-#: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/services/access.py:133 backend/hozur/services/requests.py:379
+#: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/api/routes/attendance.py:133 backend/hozur/api/routes/attendance.py:34 backend/hozur/services/access.py:133 backend/hozur/services/reports.py:262 backend/hozur/services/reports.py:314 backend/hozur/services/reports.py:333 backend/hozur/services/requests.py:379 backend/hozur/services/resources.py:138
 msgid "Not permitted"
 msgstr ""
 
 #: frontend/src/pages/Approvals.vue:7
 msgid "Nothing is waiting for you"
+msgstr ""
+
+#: backend/hozur/services/resources.py:353
+msgid "Number the days of the cycle 1, 2, 3, ..."
+msgstr ""
+
+#: backend/hozur/services/resources.py:419
+msgid "Number the steps 1, 2, 3, ..."
 msgstr ""
 
 #: backend/hozur/reports/catalog.py:77
@@ -750,6 +814,10 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
+#: backend/hozur/services/reports.py:123
+msgid "Report field not allowed: {0}"
+msgstr ""
+
 #: frontend/src/pages/Today.vue:82
 msgid "Request leave"
 msgstr ""
@@ -866,11 +934,19 @@ msgstr ""
 msgid "The approver of step {0} has no user account"
 msgstr ""
 
+#: backend/hozur/services/resources.py:336
+msgid "The break must be inside the shift"
+msgstr ""
+
+#: backend/hozur/services/users.py:189
+msgid "The current password is wrong"
+msgstr ""
+
 #: frontend/src/pages/Today.vue:48
 msgid "The day is not over; the numbers are final after your last punch."
 msgstr ""
 
-#: backend/hozur/services/devices.py:498 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220
+#: backend/hozur/api/routes/attendance.py:122 backend/hozur/api/routes/attendance.py:60 backend/hozur/services/devices.py:498 backend/hozur/services/reports.py:258 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220 backend/hozur/services/resources.py:294
 msgid "The end date is before the start date"
 msgstr ""
 
@@ -898,11 +974,23 @@ msgstr ""
 msgid "The legal baseline Labor Rule Set is missing; run hozur db install"
 msgstr ""
 
+#: backend/hozur/services/resources.py:390
+msgid "The legal baseline is part of the app and cannot be changed"
+msgstr ""
+
+#: backend/hozur/services/periods.py:69
+msgid "The month {0} is not over yet"
+msgstr ""
+
+#: backend/hozur/services/resources.py:296
+msgid "The national id must be 10 digits"
+msgstr ""
+
 #: backend/hozur/services/users.py:26
 msgid "The password must be at least {0} characters"
 msgstr ""
 
-#: backend/hozur/services/periods.py:37
+#: backend/hozur/services/periods.py:38
 msgid "The period {0} is closed; reopen it first"
 msgstr ""
 
@@ -948,6 +1036,10 @@ msgstr ""
 
 #: backend/hozur/services/requests.py:368
 msgid "This person has no user account to accept the overtime"
+msgstr ""
+
+#: backend/hozur/services/resources.py:156
+msgid "This record is used elsewhere and cannot be removed"
 msgstr ""
 
 #: backend/hozur/services/requests.py:427
@@ -1014,6 +1106,14 @@ msgstr ""
 msgid "Unknown calendar source {0}"
 msgstr ""
 
+#: backend/hozur/services/reports.py:352
+msgid "Unknown export format"
+msgstr ""
+
+#: backend/hozur/services/reports.py:116
+msgid "Unknown grouping"
+msgstr ""
+
 #: backend/hozur/calendar/service.py:373
 msgid "Unknown holiday type"
 msgstr ""
@@ -1026,8 +1126,20 @@ msgstr ""
 msgid "Unknown mission unit"
 msgstr ""
 
+#: backend/hozur/services/periods.py:66
+msgid "Unknown month"
+msgstr ""
+
 #: backend/hozur/services/requests.py:233
 msgid "Unknown overtime kind"
+msgstr ""
+
+#: backend/hozur/services/resources.py:427
+msgid "Unknown report columns: {0}"
+msgstr ""
+
+#: backend/hozur/services/reports.py:114
+msgid "Unknown report source"
 msgstr ""
 
 #: backend/hozur/services/requests.py:312
@@ -1036,6 +1148,10 @@ msgstr ""
 
 #: backend/hozur/services/users.py:53 backend/hozur/services/users.py:66
 msgid "Unknown role {0}"
+msgstr ""
+
+#: backend/hozur/api/routes/admin.py:115
+msgid "Unknown settings: {0}"
 msgstr ""
 
 #: frontend/src/pages/Devices.vue:62
@@ -1134,12 +1250,20 @@ msgstr ""
 msgid "{0} is not a valid Jalali date"
 msgstr ""
 
-#: backend/hozur/services/rule_sets.py:38
+#: backend/hozur/services/resources.py:159
+msgid "{0} is required"
+msgstr ""
+
+#: backend/hozur/api/routes/admin.py:125 backend/hozur/services/rule_sets.py:38
 msgid "{0} must be a number"
 msgstr ""
 
 #: frontend/src/pages/DeviceForm.vue:310 frontend/src/pages/Devices.vue:151
 msgid "{0} new punches"
+msgstr ""
+
+#: backend/hozur/services/periods.py:76
+msgid "{0} requests in this month are still waiting for approval"
 msgstr ""
 
 #: frontend/src/pages/DeviceForm.vue:340
@@ -1160,6 +1284,10 @@ msgstr ""
 
 #: backend/hozur/services/requests.py:74
 msgid "{0}: enter the time as HH:MM"
+msgstr ""
+
+#: backend/hozur/services/resources.py:117
+msgid "{0}: the value {1} is not valid"
 msgstr ""
 
 #: backend/hozur/services/requests.py:66

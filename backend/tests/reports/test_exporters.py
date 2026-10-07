@@ -65,10 +65,10 @@ def test_excel_is_rtl_numeric_and_totalled():
 
 
 def test_text_delimiters_and_ascii_digits():
-	text = to_text(COLUMNS, ROWS, DECIMAL_HOURS, 440, "Tab").decode("utf-8")
+	text = to_text(COLUMNS, ROWS, DECIMAL_HOURS, 440, "tab").decode("utf-8")
 	lines = text.splitlines()
 	assert lines[1].split("\t") == ["101", "آراد فراب", "176.33", "1.25", "0"]
-	pipe = to_text(COLUMNS, ROWS, HOURS_MINUTES, 440, "Pipe", header=False).decode("utf-8")
+	pipe = to_text(COLUMNS, ROWS, HOURS_MINUTES, 440, "pipe", header=False).decode("utf-8")
 	assert pipe.splitlines()[0] == "101|آراد فراب|176:20|1.25|0"
 
 
@@ -80,14 +80,14 @@ def test_fixed_width_text():
 
 
 def test_windows_1256_uses_arabic_yeh_for_old_payroll_software():
-	content = to_text(COLUMNS, ROWS, HOURS_MINUTES, 440, "Comma", "Windows-1256")
+	content = to_text(COLUMNS, ROWS, HOURS_MINUTES, 440, "comma", "windows-1256")
 	decoded = content.decode("cp1256")
 	assert "سارا يکتا" in decoded  # Persian yeh became Arabic yeh, keheh stays
 	assert "?" not in decoded
 
 
 def test_utf8_with_bom():
-	assert to_text(COLUMNS, ROWS, HOURS_MINUTES, 440, "Comma", "UTF-8 with BOM").startswith(b"\xef\xbb\xbf")
+	assert to_text(COLUMNS, ROWS, HOURS_MINUTES, 440, "comma", "utf-8-sig").startswith(b"\xef\xbb\xbf")
 
 
 def test_hash_detects_changes():

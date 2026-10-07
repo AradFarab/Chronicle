@@ -15,9 +15,9 @@ from collections.abc import Sequence
 from hozur.jalali.dates import to_ascii_digits, to_persian_digits
 from hozur.reports.catalog import COUNT, DATE, DAYS, MINUTES
 
-HOURS_MINUTES, DECIMAL_HOURS, DAYS_UNIT = "Hours:Minutes", "Decimal Hours", "Days"
-DELIMITERS = {"Comma": ",", "Tab": "\t", "Pipe": "|", "Semicolon": ";"}
-FIXED_WIDTH = "Fixed Width"
+HOURS_MINUTES, DECIMAL_HOURS, DAYS_UNIT = "hours_minutes", "decimal_hours", "days"
+DELIMITERS = {"comma": ",", "tab": "\t", "pipe": "|", "semicolon": ";"}
+FIXED_WIDTH = "fixed_width"
 # Windows-1256 has no Persian yeh: older payroll software expects the Arabic one.
 _CP1256 = str.maketrans({"ی": "ي", "ى": "ي", "ۀ": "ه"})
 
@@ -137,8 +137,8 @@ def to_text(
 	rows: Sequence[dict],
 	unit: str,
 	day_minutes: int,
-	delimiter: str = "Comma",
-	encoding: str = "UTF-8",
+	delimiter: str = "comma",
+	encoding: str = "utf-8",
 	header: bool = True,
 ) -> bytes:
 	"""Delimited or fixed-width text with ASCII digits, for payroll software."""
@@ -161,9 +161,9 @@ def to_text(
 		buf = io.StringIO()
 		csv.writer(buf, delimiter=DELIMITERS.get(delimiter, ","), lineterminator="\r\n").writerows(lines)
 		text = buf.getvalue()
-	if encoding == "Windows-1256":
+	if encoding == "windows-1256":
 		return text.translate(_CP1256).encode("cp1256", errors="replace")
-	if encoding == "UTF-8 with BOM":
+	if encoding == "utf-8-sig":
 		return text.encode("utf-8-sig")
 	return text.encode("utf-8")
 

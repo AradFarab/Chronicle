@@ -8,12 +8,12 @@ from datetime import UTC, datetime, timedelta
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from hozur.config import get_settings
 from hozur.db.models import AppUser, UserRole, UserSession
-from hozur.db.models.access import ROLES
+from hozur.db.models.access import ADMIN, ROLES
 from hozur.i18n import _
 from hozur.services.errors import ValidationError
 
@@ -124,3 +124,67 @@ def end_session(session: Session, token: str | None) -> None:
 
 def end_all_sessions(session: Session, user_id: int) -> None:
 	session.execute(delete(UserSession).where(UserSession.user_id == user_id))
+
+
+# administration (admins) -------------------------------------------------------------------------
+
+
+def user_view(user: AppUser) -> dict:
+	return {
+		"id": user.id,
+		"username": user.username,
+		"full_name": user.full_name,
+		"language": user.language,
+		"is_active": user.is_active,
+		"roles": sorted(user.role_names),
+		"last_login_at": user.last_login_at,
+	}
+
+
+def update_user(session: Session, user: AppUser, values: dict, admin_id: int | None) -> AppUser:
+	"""Name, language, active flag and roles. Deactivating ends the user's sessions; the last
+	active admin cannot be removed."""
+	from hozur.services import audit
+
+	before = user_view(user)
+	if "full_name" in values:
+		user.full_name = (values["full_name"] or "").strip() or user.username
+	if "language" in values:
+		user.language = values["language"] or "fa"
+	if "is_active" in values:
+		user.is_active = bool(values["is_active"])
+	if "roles" in values:
+		set_roles(session, user, list(values["roles"] or []))
+	session.flush()
+	if ADMIN in before["roles"] and (not user.is_active or ADMIN not in user.role_names):
+		admins = session.scalar(
+			select(func.count())
+			.select_from(AppUser)
+			.join(UserRole, UserRole.user_id == AppUser.id)
+			.where(UserRole.role == ADMIN, AppUser.is_active)
+		)
+		if not admins:
+			raise ValidationError(_("At least one active admin is needed"))
+	if not user.is_active:
+		end_all_sessions(session, user.id)
+	after = user_view(user)
+	before.pop("last_login_at"), after.pop("last_login_at")
+	audit.log(session, "app_user", user.id, "update", admin_id, values.get("reason"), before, after)
+	return user
+
+
+def set_password(session: Session, user: AppUser, password: str, by_user_id: int | None) -> None:
+	"""A new password ends every other session of the user."""
+	from hozur.services import audit
+
+	user.password_hash = hash_password(password)
+	end_all_sessions(session, user.id)
+	audit.log(
+		session, "app_user", user.id, "update", by_user_id, "password changed", after={"password": "***"}
+	)
+
+
+def change_own_password(session: Session, user: AppUser, current: str, new: str) -> None:
+	if not verify_password(user, current):
+		raise ValidationError(_("The current password is wrong"))
+	set_password(session, user, new, user.id)
