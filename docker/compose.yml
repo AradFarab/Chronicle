@@ -1,0 +1,54 @@
+# Production on the company's own server:
+#   cp docker/.env.example docker/.env   # then set HOZUR_SECRET_KEY and POSTGRES_PASSWORD
+#   docker compose -f docker/compose.yml --env-file docker/.env up -d --build
+#   docker compose -f docker/compose.yml exec app hozur create-user admin --role admin
+# The app listens on port 8000; put it behind the company's HTTPS reverse proxy for the PWA.
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hozur
+      POSTGRES_USER: hozur
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in docker/.env}
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hozur -d hozur"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: ..
+    image: hozur:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: &env
+      HOZUR_DATABASE_URL: postgresql+psycopg://hozur:${POSTGRES_PASSWORD}@db:5432/hozur
+      HOZUR_SECRET_KEY: ${HOZUR_SECRET_KEY:?set HOZUR_SECRET_KEY in docker/.env}
+      HOZUR_TIMEZONE: ${HOZUR_TIMEZONE:-Asia/Tehran}
+      HOZUR_COOKIE_SECURE: ${HOZUR_COOKIE_SECURE:-true}
+    volumes:
+      - files:/data
+    ports:
+      - "${HOZUR_PORT:-8000}:8000"
+
+  worker:
+    image: hozur:latest
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_started
+    environment: *env
+    volumes:
+      - files:/data
+    command: ["hozur", "worker"]
+    # The worker talks to attendance devices on the company network (TCP 4370).
+
+volumes:
+  db:
+  files:

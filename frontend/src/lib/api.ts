@@ -1,80 +1,81 @@
-/** One small client for Frappe's /api/method endpoints, with Frappe's error messages. */
+/**
+ * The client for the Hozur JSON API (/api). Every unsafe request carries the X-Hozur header
+ * (the server's CSRF guard); errors come back as {message} already translated to Persian.
+ */
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public excType?: string) {
+  constructor(
+    message: string,
+    public status: number,
+    public detail?: unknown
+  ) {
     super(message)
   }
 }
 
-function stripHtml(text: string): string {
-  const el = document.createElement("div")
-  el.innerHTML = text
-  return el.textContent?.trim() || text
-}
+type Query = Record<string, string | number | boolean | null | undefined>
 
-function serverMessages(data: Record<string, unknown>): string[] {
-  try {
-    const raw = data._server_messages
-    if (typeof raw !== "string") return []
-    return (JSON.parse(raw) as string[]).map((m) => {
-      try {
-        const parsed = JSON.parse(m)
-        return stripHtml(parsed.message ?? m)
-      } catch {
-        return stripHtml(m)
-      }
-    })
-  } catch {
-    return []
+function url(path: string, query?: Query): string {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (value !== undefined && value !== null && value !== "") params.set(key, String(value))
   }
+  const qs = params.toString()
+  return `/api${path}${qs ? `?${qs}` : ""}`
 }
 
-export async function call<T = unknown>(method: string, args: Record<string, unknown> = {}): Promise<T> {
-  const response = await fetch(`/api/method/${method}`, {
+let onUnauthorized: () => void = () => {}
+
+/** Called when the session has expired (the app shows the login page). */
+export function setUnauthorizedHandler(handler: () => void): void {
+  onUnauthorized = handler
+}
+
+async function request<T>(method: string, path: string, body?: unknown, query?: Query): Promise<T> {
+  const headers: Record<string, string> = { Accept: "application/json", "X-Hozur": "1" }
+  let payload: BodyInit | undefined
+  if (body instanceof FormData) payload = body
+  else if (body !== undefined) {
+    headers["Content-Type"] = "application/json; charset=utf-8"
+    payload = JSON.stringify(body)
+  }
+  const response = await fetch(url(path, query), { method, headers, body: payload, credentials: "same-origin" })
+  if (response.status === 401 && !path.startsWith("/auth/")) onUnauthorized()
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}))
+    throw new ApiError(data.message || response.statusText || "Error", response.status, data.detail)
+  }
+  const type = response.headers.get("content-type") ?? ""
+  return (type.includes("application/json") ? response.json() : response.blob()) as Promise<T>
+}
+
+export const api = {
+  get: <T = unknown>(path: string, query?: Query) => request<T>("GET", path, undefined, query),
+  post: <T = unknown>(path: string, body: unknown = {}) => request<T>("POST", path, body),
+  put: <T = unknown>(path: string, body: unknown = {}) => request<T>("PUT", path, body),
+  patch: <T = unknown>(path: string, body: unknown = {}) => request<T>("PATCH", path, body),
+  del: <T = unknown>(path: string, body?: unknown) => request<T>("DELETE", path, body),
+  upload: <T = unknown>(path: string, form: FormData) => request<T>("POST", path, form),
+}
+
+/** POST that returns a file (report export): saves it under the server's filename. */
+export async function download(path: string, body: unknown): Promise<void> {
+  const response = await fetch(url(path), {
     method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json; charset=utf-8",
-      "X-Frappe-CSRF-Token": window.csrf_token ?? "",
-    },
+    headers: { "Content-Type": "application/json; charset=utf-8", "X-Hozur": "1" },
+    body: JSON.stringify(body),
     credentials: "same-origin",
-    body: JSON.stringify(args),
   })
-  let data: Record<string, unknown> = {}
-  try {
-    data = await response.json()
-  } catch {
-    // non-JSON error page
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}))
+    throw new ApiError(data.message || response.statusText, response.status)
   }
-  if (!response.ok || data.exc || data.exc_type) {
-    if (response.status === 403 && data.exc_type === "SessionExpired") {
-      window.location.href = "/login?redirect-to=" + encodeURIComponent(location.pathname)
-    }
-    const messages = serverMessages(data)
-    const message =
-      messages.join("\n") ||
-      (data.exception as string | undefined)?.split(":").slice(1).join(":").trim() ||
-      response.statusText
-    throw new ApiError(message || "Error", response.status, data.exc_type as string | undefined)
-  }
-  return data.message as T
-}
-
-/** Upload a private file through Frappe's standard endpoint; returns its file_url. */
-export async function uploadFile(file: File): Promise<string> {
-  const form = new FormData()
-  form.append("file", file, file.name)
-  form.append("is_private", "1")
-  form.append("folder", "Home")
-  const response = await fetch("/api/method/upload_file", {
-    method: "POST",
-    headers: { Accept: "application/json", "X-Frappe-CSRF-Token": window.csrf_token ?? "" },
-    credentials: "same-origin",
-    body: form,
-  })
-  const data = await response.json().catch(() => ({}))
-  if (!response.ok || data.exc) {
-    throw new ApiError(serverMessages(data).join("\n") || response.statusText, response.status)
-  }
-  return data.message.file_url as string
+  const disposition = response.headers.get("content-disposition") ?? ""
+  const match = /filename\*=UTF-8''([^;]+)/.exec(disposition)
+  const name = match ? decodeURIComponent(match[1]) : "report"
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(await response.blob())
+  link.download = name
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(link.href), 10_000)
 }

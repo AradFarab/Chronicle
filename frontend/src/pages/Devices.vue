@@ -17,11 +17,11 @@
 		</div>
 
 		<ul class="space-y-3">
-			<li v-for="d in devices" :key="d.name" class="hz-card space-y-3">
-				<RouterLink :to="{ name: 'device', params: { name: d.name } }" class="flex items-start gap-3">
+			<li v-for="d in devices" :key="d.id" class="hz-card space-y-3">
+				<RouterLink :to="{ name: 'device', params: { id: d.id } }" class="flex items-start gap-3">
 					<span class="flex size-10 shrink-0 items-center justify-center rounded-4 bg-surface-gray-2">
 						<span
-							:class="d.adapter_type === 'File Import' ? 'lucide-file-up' : 'lucide-fingerprint'"
+							:class="isNetwork(d) ? 'lucide-fingerprint' : 'lucide-file-up'"
 							class="size-5"
 						/>
 					</span>
@@ -29,18 +29,14 @@
 						<span class="flex flex-wrap items-center gap-2">
 							<span class="font-semibold">{{ d.name }}</span>
 							<Badge v-if="!d.enabled" theme="gray" :label="__('Disabled')" />
-							<StatusBadge
-								v-if="d.last_sync_status"
-								:status="d.last_sync_status"
-								:label="__(d.last_sync_status)"
-							/>
+							<StatusBadge v-if="d.last_sync_status" :status="d.last_sync_status" />
 						</span>
 						<span class="mt-0.5 block text-sm text-ink-gray-5">
-							{{ __(d.adapter_type) }}
+							{{ adapterLabel(d.adapter_type) }}
 							<template v-if="d.host">
 								· <span dir="ltr" class="hz-num">{{ d.host }}:{{ d.port }}</span></template
 							>
-							<template v-if="d.branch"> · {{ d.branch }}</template>
+							<template v-if="d.branch_id && branches[d.branch_id]"> · {{ branches[d.branch_id] }}</template>
 						</span>
 					</span>
 					<span class="lucide-chevron-left size-4 text-ink-gray-4" />
@@ -48,7 +44,7 @@
 				<dl class="hz-num grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
 					<div>
 						<dt class="text-xs text-ink-gray-5">{{ __("Last Read") }}</dt>
-						<dd>{{ d.last_sync ? fa(d.last_sync) : "—" }}</dd>
+						<dd>{{ d.last_sync_at ? fa(d.last_sync_at) : "—" }}</dd>
 					</div>
 					<div>
 						<dt class="text-xs text-ink-gray-5">{{ __("Users on Device") }}</dt>
@@ -60,22 +56,22 @@
 					</div>
 					<div>
 						<dt class="text-xs text-ink-gray-5">{{ __("Unmapped users") }}</dt>
-						<dd :class="d.unmapped_users ? 'font-semibold text-ink-amber-7' : ''">
-							{{ fa(d.unmapped_users) }}
+						<dd :class="unmapped[d.id] ? 'font-semibold text-ink-amber-7' : ''">
+							{{ fa(unmapped[d.id] || 0) }}
 						</dd>
 					</div>
 				</dl>
 				<p
-					v-if="d.last_sync_status === 'Error' && d.last_error"
+					v-if="d.last_sync_status === 'error' && d.last_error"
 					class="rounded-4 bg-surface-red-1 p-2 text-sm text-ink-red-7"
 				>
 					{{ d.last_error }}
 				</p>
-				<div v-if="d.adapter_type !== 'File Import'" class="flex flex-wrap gap-2">
-					<Button icon-left="lucide-plug-zap" :loading="busy === d.name + 'test'" @click="test(d)">
+				<div v-if="isNetwork(d)" class="flex flex-wrap gap-2">
+					<Button icon-left="lucide-plug-zap" :loading="busy === d.id + 'test'" @click="test(d)">
 						{{ __("Test Connection") }}
 					</Button>
-					<Button icon-left="lucide-refresh-cw" :loading="busy === d.name + 'sync'" @click="sync(d)">
+					<Button icon-left="lucide-refresh-cw" :loading="busy === d.id + 'sync'" @click="sync(d)">
 						{{ __("Read punches now") }}
 					</Button>
 				</div>
@@ -88,35 +84,73 @@
 import { Badge, Button, ErrorMessage, toast } from "frappe-ui"
 import { onMounted, ref } from "vue"
 import StatusBadge from "@/components/StatusBadge.vue"
-import { call } from "@/lib/api"
+import { api } from "@/lib/api"
+import { refreshCounts } from "@/lib/counts"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
 
 interface Device {
+	id: number
 	name: string
 	adapter_type: string
-	branch: string | null
-	enabled: number
+	branch_id: number | null
+	enabled: boolean
 	host: string | null
 	port: number | null
-	last_sync: string | null
-	last_sync_status: string | null
+	last_sync_at: string | null
+	last_sync_status: string | null // ok | error
 	last_error: string | null
 	user_count: number | null
 	record_count: number | null
-	unmapped_users: number
+}
+
+interface Adapter {
+	code: string
+	label: string
+	network: boolean
+}
+
+interface SyncResult {
+	ok: boolean
+	created: number
+	existing: number
+	duplicates: number
+	message: string | null
 }
 
 const devices = ref<Device[]>([])
+const adapters = ref<Record<string, Adapter>>({})
+const branches = ref<Record<number, string>>({})
+const unmapped = ref<Record<number, number>>({}) // device id -> device users with punches but no employee
 const loading = ref(false)
 const error = ref("")
 const busy = ref("")
 
+function isNetwork(d: Device) {
+	return adapters.value[d.adapter_type]?.network ?? d.adapter_type !== "file_import"
+}
+
+function adapterLabel(code: string) {
+	const adapter = adapters.value[code]
+	return adapter ? __(adapter.label) : code
+}
+
 async function load() {
-	loading.value = true
+	loading.value = !devices.value.length
 	error.value = ""
 	try {
-		devices.value = await call<Device[]>("hozur.api.pwa.devices")
+		const [rows, types, branchRows, unmappedRows] = await Promise.all([
+			api.get<Device[]>("/devices"),
+			api.get<Adapter[]>("/devices/adapters"),
+			api.get<{ id: number; name: string }[]>("/admin/branches"),
+			api.get<{ device_id: number }[]>("/devices/users/unmapped"),
+		])
+		devices.value = rows
+		adapters.value = Object.fromEntries(types.map((a) => [a.code, a]))
+		branches.value = Object.fromEntries(branchRows.map((b) => [b.id, b.name]))
+		const perDevice: Record<number, number> = {}
+		for (const u of unmappedRows) perDevice[u.device_id] = (perDevice[u.device_id] || 0) + 1
+		unmapped.value = perDevice
 	} catch (e) {
 		error.value = (e as Error).message
 	} finally {
@@ -125,14 +159,13 @@ async function load() {
 }
 
 async function test(d: Device) {
-	busy.value = d.name + "test"
+	busy.value = d.id + "test"
 	try {
-		const r = await call<{ model: string; user_count: number; record_count: number }>(
-			"hozur.devices.service.test_connection",
-			{ device: d.name }
+		const r = await api.post<{ model: string | null; user_count: number; record_count: number }>(
+			`/devices/${d.id}/test`
 		)
 		toast.success(__("Connected: {0}", [r.model || d.name]), {
-			description: fa(__("{0} users, {1} records", [r.user_count, r.record_count])),
+			description: fa(__("{0} users, {1} records", [r.user_count ?? 0, r.record_count ?? 0])),
 		})
 		await load()
 	} catch (e) {
@@ -143,13 +176,13 @@ async function test(d: Device) {
 }
 
 async function sync(d: Device) {
-	busy.value = d.name + "sync"
+	busy.value = d.id + "sync"
 	try {
-		const r = await call<{ created: number; existing: number }>("hozur.devices.service.sync_now", {
-			device: d.name,
-		})
-		toast.success(fa(__("{0} new punches", [r.created])))
+		const r = await api.post<SyncResult>(`/devices/${d.id}/sync`)
+		if (r.ok) toast.success(fa(__("{0} new punches", [r.created])))
+		else toast.error(r.message || __("Error"), { duration: 10000 })
 		await load()
+		refreshCounts(true)
 	} catch (e) {
 		toast.error((e as Error).message)
 		await load()

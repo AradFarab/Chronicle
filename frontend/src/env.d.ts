@@ -14,9 +14,3 @@ declare module "jalaali-js" {
   export function isLeapJalaaliYear(jy: number): boolean
   export function jalaaliMonthLength(jy: number, jm: number): number
 }
-
-interface Window {
-  csrf_token?: string
-  hozur_boot?: import("./lib/session").Boot
-  hozur_messages?: Record<string, string>
-}

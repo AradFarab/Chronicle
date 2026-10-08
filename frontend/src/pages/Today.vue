@@ -2,7 +2,7 @@
 	<div class="space-y-4">
 		<section class="hz-brand rounded-7 p-5">
 			<p class="text-sm opacity-80">{{ __("Today") }}</p>
-			<p class="mt-1 text-xl font-bold">{{ displayLong(data?.jdate || session.today) }}</p>
+			<p class="mt-1 text-xl font-bold">{{ displayLong(jdate) }}</p>
 			<p v-if="session.employee" class="mt-2 text-sm opacity-90">{{ session.employee.full_name }}</p>
 		</section>
 
@@ -26,10 +26,8 @@
 				<section class="hz-card space-y-4">
 					<div class="flex flex-wrap items-center gap-2">
 						<Badge v-if="inProgress" theme="blue" :label="__('At work')" />
-						<StatusBadge v-else :status="data.attendance?.status || 'Absent'" />
-						<span v-if="data.attendance?.shift" class="text-sm text-ink-gray-5">{{
-							data.attendance.shift
-						}}</span>
+						<StatusBadge v-else :status="data.attendance?.status || 'absent'" />
+						<span v-if="data.schedule.shift" class="text-sm text-ink-gray-5">{{ data.schedule.shift }}</span>
 						<span v-if="data.attendance?.holiday_title" class="text-sm text-ink-red-6">{{
 							data.attendance.holiday_title
 						}}</span>
@@ -63,13 +61,13 @@
 							:route="{
 								name: 'new-request',
 								params: { kind: 'correction' },
-								query: { date: data.jdate },
+								query: { date: jdate },
 							}"
 						>
 							{{ __("Manual entry") }}
 						</Button>
 					</div>
-					<PunchList :punches="data.punches" />
+					<PunchList :punches="punches" />
 				</section>
 
 				<section class="grid grid-cols-2 gap-4">
@@ -84,7 +82,7 @@
 					</div>
 					<RouterLink :to="{ name: 'approvals' }" class="hz-card block">
 						<p class="text-xs text-ink-gray-5">{{ __("Waiting for my approval") }}</p>
-						<p class="hz-num mt-1 text-2xl font-bold">{{ fa(data.pending_approvals) }}</p>
+						<p class="hz-num mt-1 text-2xl font-bold">{{ fa(counts.approvals) }}</p>
 						<span class="mt-2 inline-block text-sm text-ink-blue-link">{{ __("Approvals") }}</span>
 					</RouterLink>
 				</section>
@@ -99,47 +97,45 @@ import { computed, onMounted, ref } from "vue"
 import DayNumbers from "@/components/DayNumbers.vue"
 import PunchList from "@/components/PunchList.vue"
 import StatusBadge from "@/components/StatusBadge.vue"
-import { call } from "@/lib/api"
+import { api } from "@/lib/api"
+import { counts, refreshCounts } from "@/lib/counts"
+import { countedPunches, dayPunches } from "@/lib/format"
 import { __ } from "@/lib/i18n"
 import { displayLong, fa } from "@/lib/jalali"
 import { session } from "@/lib/session"
-import type { Attendance, Punch } from "@/lib/types"
+import type { DayDetails } from "@/lib/types"
 import { warningMessages } from "@/lib/warnings"
 
-interface TodayData {
-	jdate: string
-	time: string
-	attendance: Attendance | null
-	punches: Punch[]
-	leave_balance: number | null
-	pending_approvals: number
-}
-
-const data = ref<TodayData | null>(null)
+const jdate = computed(() => session.today)
+const data = ref<DayDetails | null>(null)
+const leaveBalance = ref<number | null>(null)
 const loading = ref(false)
 const error = ref("")
 
+const punches = computed(() => dayPunches(data.value))
 const warnings = computed(() => warningMessages(data.value?.attendance?.warnings))
 // Before the last punch of today the engine sees an unpaired punch; show the day as running.
-const inProgress = computed(
-	() => !!data.value && data.value.jdate === session.today && data.value.punches.length % 2 === 1
-)
+const inProgress = computed(() => !!data.value && countedPunches(data.value).length % 2 === 1)
 // while the day runs, the first punch is the arrival even before it has a pair
 const attendance = computed(() => {
 	const a = data.value?.attendance
 	if (!a || !inProgress.value || a.first_in) return a
-	return { ...a, first_in: data.value!.punches[0]?.time?.slice(0, 5) ?? null }
+	return { ...a, first_in: countedPunches(data.value)[0]?.time?.slice(0, 5) ?? null }
 })
-const balance = computed(() =>
-	data.value?.leave_balance == null ? "—" : fa(Number(data.value.leave_balance.toFixed(2)))
-)
+const balance = computed(() => (leaveBalance.value == null ? "—" : fa(Number(leaveBalance.value.toFixed(2)))))
 
 async function load() {
 	if (!session.employee) return
 	loading.value = true
 	error.value = ""
 	try {
-		data.value = await call<TodayData>("hozur.api.pwa.today")
+		const [day, earned] = await Promise.all([
+			api.get<DayDetails>("/attendance/day", { employee_id: session.employee.id, jdate: jdate.value }),
+			api.get<{ balance: number | null }>("/leave/balance", { employee_id: session.employee.id }),
+			refreshCounts(true),
+		])
+		data.value = day
+		leaveBalance.value = earned.balance
 	} catch (e) {
 		error.value = (e as Error).message
 	} finally {

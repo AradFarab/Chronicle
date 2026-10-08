@@ -72,7 +72,7 @@
 					<ul v-if="dayWarnings.length" class="space-y-1 text-sm text-ink-amber-7">
 						<li v-for="w in dayWarnings" :key="w">{{ w }}</li>
 					</ul>
-					<PunchList :punches="dayData.punches" />
+					<PunchList :punches="dayPunches(dayData)" />
 				</template>
 			</div>
 			<template #actions>
@@ -114,29 +114,49 @@ import DayNumbers from "@/components/DayNumbers.vue"
 import EmployeePicker from "@/components/EmployeePicker.vue"
 import PunchList from "@/components/PunchList.vue"
 import StatusBadge from "@/components/StatusBadge.vue"
-import { call } from "@/lib/api"
-import { duration } from "@/lib/format"
+import { api } from "@/lib/api"
+import { dayPunches, duration } from "@/lib/format"
 import { __ } from "@/lib/i18n"
-import { MONTHS, WEEKDAYS_SHORT, addMonths, displayLong, fa, parse, today, weekday } from "@/lib/jalali"
+import {
+	MONTHS,
+	WEEKDAYS_SHORT,
+	addMonths,
+	displayLong,
+	fa,
+	format,
+	monthLength,
+	parse,
+	today,
+	weekday,
+} from "@/lib/jalali"
 import { session } from "@/lib/session"
-import type { Attendance, Punch } from "@/lib/types"
+import type { Attendance, DayDetails } from "@/lib/types"
 import { warningMessages } from "@/lib/warnings"
 
 interface Day {
 	jdate: string
-	weekday: string
 	day_type: string
 	holiday: string
 	predicted: boolean
-	attendance: (Attendance & { worked_minutes: number }) | null
+	attendance: Attendance | null
+}
+
+interface Holiday {
+	jdate: string
+	title: string
+	holiday_type: string
+	status: string
+	scope: string
+	branch_id: number | null
+	closure_pay_mode: string | null
 }
 
 const route = useRoute()
 const router = useRouter()
-const now = today()
+const now = parse(session.today) ?? today()
 const jy = computed(() => Number(route.params.year) || now.jy)
 const jm = computed(() => Number(route.params.month) || now.jm)
-const employee = ref<string | null>(String(route.query.employee || "") || session.employee?.name || null)
+const employee = ref<number | null>(Number(route.query.employee) || session.employee?.id || null)
 
 const days = ref<Day[]>([])
 const error = ref("")
@@ -146,17 +166,66 @@ const offset = computed(() => {
 	return first ? weekday(first) : 0
 })
 
+// holidays of a year, for the days the engine has not calculated yet
+const holidayCache = new Map<number, Promise<Holiday[]>>()
+function holidaysOf(year: number): Promise<Holiday[]> {
+	if (!holidayCache.has(year)) {
+		const request = api.get<Holiday[]>("/calendar/holidays", { year })
+		request.catch(() => holidayCache.delete(year))
+		holidayCache.set(year, request)
+	}
+	return holidayCache.get(year)!
+}
+
+/** Same rule as the server (hozur.jalali.holidays.day_off_kind); null = not a day off. */
+function dayOffKind(h: Holiday): string | null {
+	if (h.holiday_type === "office_closure")
+		return { paid_holiday: "official_holiday", employer_paid: "company_holiday" }[h.closure_pay_mode ?? ""] ?? null
+	return h.holiday_type === "company_internal" ? "company_holiday" : "official_holiday"
+}
+
+function holidayApplies(h: Holiday): boolean {
+	if (h.scope === "country" || h.scope === "company") return true
+	// a branch holiday is known here only for your own branch; calculated days carry the truth
+	return h.scope === "branch" && employee.value === session.employee?.id && h.branch_id === session.employee?.branch_id
+}
+
 async function load() {
 	error.value = ""
 	days.value = []
 	if (!employee.value) return
+	const year = jy.value
+	const month = jm.value
+	const first = format({ jy: year, jm: month, jd: 1 })
+	const last = format({ jy: year, jm: month, jd: monthLength(year, month) })
 	try {
-		const result = await call<{ days: Day[] }>("hozur.api.pwa.month", {
-			year: jy.value,
-			month: jm.value,
-			employee: employee.value,
-		})
-		days.value = result.days
+		const [rows, holidays] = await Promise.all([
+			api.get<Attendance[]>("/attendance", { from_date: first, to_date: last, employee_id: employee.value }),
+			holidaysOf(year).catch(() => [] as Holiday[]),
+		])
+		const byDate = new Map(rows.map((r) => [r.jdate, r]))
+		const list: Day[] = []
+		for (let jd = 1; jd <= monthLength(year, month); jd++) {
+			const date = { jy: year, jm: month, jd }
+			const jdate = format(date)
+			const offs = holidays.filter((h) => h.jdate === jdate && dayOffKind(h) && holidayApplies(h))
+			const kind = offs.some((h) => dayOffKind(h) === "official_holiday")
+				? "official_holiday"
+				: offs.length
+				? "company_holiday"
+				: weekday(date) === 6
+				? "friday"
+				: "workday"
+			const attendance = byDate.get(jdate) ?? null
+			list.push({
+				jdate,
+				day_type: attendance?.day_type || kind,
+				holiday: attendance?.holiday_title || [...new Set(offs.map((h) => h.title))].join(" / "),
+				predicted: offs.some((h) => h.status === "predicted"),
+				attendance,
+			})
+		}
+		days.value = list
 	} catch (e) {
 		error.value = (e as Error).message
 	}
@@ -171,22 +240,22 @@ watch([jy, jm, employee], load, { immediate: true })
 watch(employee, (value) => router.replace({ query: { ...route.query, employee: value || undefined } }))
 
 const STATUS_DOT: Record<string, string> = {
-	Present: "bg-surface-green-5",
-	Incomplete: "bg-surface-amber-5",
-	Absent: "bg-surface-red-5",
-	Leave: "bg-surface-violet-5",
-	Mission: "bg-surface-blue-5",
+	present: "bg-surface-green-5",
+	incomplete: "bg-surface-amber-5",
+	absent: "bg-surface-red-5",
+	leave: "bg-surface-violet-5",
+	mission: "bg-surface-blue-5",
 }
 
 function dotClass(d: Day) {
 	return STATUS_DOT[d.attendance?.status || ""] || ""
 }
 
-const HOLIDAYS = ["Official Holiday", "Company Holiday"]
+const HOLIDAYS = ["official_holiday", "company_holiday"]
 
 function dayStatus(d: Day) {
-	if (HOLIDAYS.includes(d.day_type)) return "Holiday"
-	if (d.day_type === "Friday") return "Rest Day"
+	if (HOLIDAYS.includes(d.day_type)) return "holiday"
+	if (d.day_type === "friday") return "rest_day"
 	return ""
 }
 
@@ -197,27 +266,27 @@ function cellClass(d: Day) {
 		isToday ? "border-outline-gray-5" : "border-transparent",
 		holiday
 			? "bg-surface-red-1 text-ink-red-6"
-			: d.day_type === "Friday"
+			: d.day_type === "friday"
 			? "bg-surface-gray-2 text-ink-red-5"
 			: "bg-surface-gray-1 hover:bg-surface-gray-2",
 	].join(" ")
 }
 
 const legend = computed(() => [
-	{ label: __("Present"), class: STATUS_DOT.Present },
-	{ label: __("Incomplete"), class: STATUS_DOT.Incomplete },
-	{ label: __("Absent"), class: STATUS_DOT.Absent },
-	{ label: __("Leave"), class: STATUS_DOT.Leave },
-	{ label: __("Mission"), class: STATUS_DOT.Mission },
+	{ label: __("Present"), class: STATUS_DOT.present },
+	{ label: __("Incomplete"), class: STATUS_DOT.incomplete },
+	{ label: __("Absent"), class: STATUS_DOT.absent },
+	{ label: __("Leave"), class: STATUS_DOT.leave },
+	{ label: __("Mission"), class: STATUS_DOT.mission },
 ])
 
 const summary = computed(() => {
-	const rows = days.value.map((d) => d.attendance).filter((a): a is NonNullable<Day["attendance"]> => !!a)
+	const rows = days.value.map((d) => d.attendance).filter((a): a is Attendance => !!a)
 	const sum = (key: keyof Attendance) => rows.reduce((t, r) => t + (Number(r[key]) || 0), 0)
 	const count = (...statuses: string[]) => rows.filter((r) => statuses.includes(r.status)).length
 	return [
-		{ label: __("Days Present"), value: fa(count("Present", "Incomplete")), class: "" },
-		{ label: __("Absence (Days)"), value: fa(count("Absent")), class: count("Absent") ? "text-ink-red-6" : "" },
+		{ label: __("Days Present"), value: fa(count("present", "incomplete")), class: "" },
+		{ label: __("Absence (Days)"), value: fa(count("absent")), class: count("absent") ? "text-ink-red-6" : "" },
 		{ label: __("Worked"), value: duration(sum("worked_minutes"), true), class: "" },
 		{
 			label: __("Late"),
@@ -230,20 +299,24 @@ const summary = computed(() => {
 // day dialog
 const dialogOpen = ref(false)
 const selected = ref<Day | null>(null)
-const dayData = ref<{ attendance: Attendance | null; punches: Punch[] } | null>(null)
+const dayData = ref<DayDetails | null>(null)
 const loadingDay = ref(false)
 const dayWarnings = computed(() => warningMessages(dayData.value?.attendance?.warnings))
 const canCorrect = computed(
-	() => !!selected.value && (session.is_operator || employee.value === session.employee?.name)
+	() =>
+		!!selected.value &&
+		!dayData.value?.period_closed &&
+		(session.is_operator || (!!employee.value && employee.value === session.employee?.id))
 )
 
 async function open(d: Day) {
+	if (!employee.value) return
 	selected.value = d
 	dialogOpen.value = true
 	dayData.value = null
 	loadingDay.value = true
 	try {
-		dayData.value = await call("hozur.api.pwa.day", { jdate: d.jdate, employee: employee.value })
+		dayData.value = await api.get<DayDetails>("/attendance/day", { jdate: d.jdate, employee_id: employee.value })
 	} catch (e) {
 		error.value = (e as Error).message
 		dialogOpen.value = false

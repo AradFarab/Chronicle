@@ -13,9 +13,9 @@
 
 			<!-- leave -->
 			<template v-if="kind === 'leave'">
-				<Select v-model="leave.leave_type" :label="__('Leave Type')" :options="leaveTypeOptions" />
-				<Segmented v-if="allowHourly" v-model="leave.leave_unit" :options="units" />
-				<template v-if="leave.leave_unit === 'Daily'">
+				<Select v-model="leave.leave_type_id" :label="__('Leave Type')" :options="leaveTypeOptions" />
+				<Segmented v-if="allowHourly" v-model="leave.unit" :options="units" />
+				<template v-if="leave.unit === 'daily'">
 					<div class="grid gap-4 sm:grid-cols-2">
 						<JalaliDatePicker v-model="leave.from_date" :label="__('From Date')" />
 						<JalaliDatePicker v-model="leave.to_date" :label="__('To Date')" :min="leave.from_date" />
@@ -33,9 +33,9 @@
 
 			<!-- mission -->
 			<template v-else-if="kind === 'mission'">
-				<Segmented v-model="mission.mission_unit" :options="units" />
+				<Segmented v-model="mission.unit" :options="units" />
 				<TextInput v-model="mission.destination" :label="__('Destination')" />
-				<template v-if="mission.mission_unit === 'Daily'">
+				<template v-if="mission.unit === 'daily'">
 					<div class="grid gap-4 sm:grid-cols-2">
 						<JalaliDatePicker v-model="mission.from_date" :label="__('From Date')" />
 						<JalaliDatePicker v-model="mission.to_date" :label="__('To Date')" :min="mission.from_date" />
@@ -78,21 +78,21 @@
 				<div v-if="existing.length" class="space-y-1">
 					<p class="text-xs text-ink-gray-5">{{ __("Punches of this day") }}</p>
 					<label
-						v-for="p in existing"
-						:key="p.ref"
+						v-for="(p, i) in existing"
+						:key="(p.id ?? 'm') + '-' + i"
 						class="flex items-center gap-3 rounded-4 px-2 py-1.5 hover:bg-surface-gray-1"
 					>
 						<span
 							class="hz-num font-semibold"
-							:class="ignored.includes(p.ref) ? 'line-through opacity-50' : ''"
+							:class="p.is_duplicate || p.ignored || (p.id && ignored.includes(p.id)) ? 'line-through opacity-50' : ''"
 							>{{ clock(p.time) }}</span
 						>
 						<span class="text-sm text-ink-gray-5"
-							>{{ __(p.direction || "Unknown") }} · {{ sourceLabel(p.source) }}</span
+							>{{ directionLabel(p.direction) }} · {{ sourceLabel(p.source) }}</span
 						>
 						<span class="flex-1" />
-						<template v-if="p.source !== 'Manual'">
-							<input v-model="ignored" type="checkbox" :value="p.ref" class="rounded-2" />
+						<template v-if="canIgnore(p)">
+							<input v-model="ignored" type="checkbox" :value="p.id" class="rounded-2" />
 							<span class="text-xs text-ink-gray-5">{{ __("Ignore") }}</span>
 						</template>
 					</label>
@@ -132,11 +132,12 @@ import EmployeePicker from "@/components/EmployeePicker.vue"
 import JalaliDatePicker from "@/components/JalaliDatePicker.vue"
 import Segmented from "@/components/Segmented.vue"
 import TimeInput from "@/components/TimeInput.vue"
-import { call } from "@/lib/api"
-import { clock, sourceLabel } from "@/lib/format"
+import { api } from "@/lib/api"
+import { refreshCounts } from "@/lib/counts"
+import { clock, dayPunches, directionLabel, sourceLabel, statusLabel } from "@/lib/format"
 import { __ } from "@/lib/i18n"
 import { session } from "@/lib/session"
-import type { Punch } from "@/lib/types"
+import type { DayDetails, LeaveType, Punch, RequestView } from "@/lib/types"
 
 const route = useRoute()
 const router = useRouter()
@@ -151,28 +152,32 @@ const kinds = computed(() => [
 	{ value: "correction", label: __("Manual entry") },
 ])
 const units = computed(() => [
-	{ value: "Daily", label: __("Daily") },
-	{ value: "Hourly", label: __("Hourly") },
+	{ value: "daily", label: __("Daily") },
+	{ value: "hourly", label: __("Hourly") },
 ])
 const directions = computed(() => [
-	{ value: "In", label: __("In") },
-	{ value: "Out", label: __("Out") },
-	{ value: "Unknown", label: __("Unknown") },
+	{ value: "in", label: __("In") },
+	{ value: "out", label: __("Out") },
+	{ value: "unknown", label: __("Unknown") },
 ])
 const overtimeKinds = computed(() => [
-	{ value: "Normal", label: __("Normal") },
-	{ value: "Exceptional", label: __("Exceptional") },
-	{ value: "Emergency", label: __("Emergency") },
+	{ value: "normal", label: __("Normal") },
+	{ value: "exceptional", label: __("Exceptional") },
+	{ value: "emergency", label: __("Emergency") },
 ])
 
 const date = String(route.query.date || "") || session.today
-const employee = ref<string | null>(String(route.query.employee || "") || session.employee?.name || null)
+const employee = ref<number | null>(Number(route.query.employee) || session.employee?.id || null)
 const canChooseEmployee = computed(() => session.is_operator || (kind.value === "overtime" && session.is_manager))
-const assigning = computed(() => kind.value === "overtime" && employee.value !== session.employee?.name)
+// the request is for someone else only when the picker is shown and another person is chosen
+const forSomeoneElse = computed(
+	() => canChooseEmployee.value && !!employee.value && employee.value !== session.employee?.id
+)
+const assigning = computed(() => kind.value === "overtime" && forSomeoneElse.value)
 
 const leave = reactive({
-	leave_type: null as string | null,
-	leave_unit: "Daily",
+	leave_type_id: null as number | null,
+	unit: "daily",
 	from_date: date as string | null,
 	to_date: date as string | null,
 	jdate: date as string | null,
@@ -181,7 +186,7 @@ const leave = reactive({
 	reason: "",
 })
 const mission = reactive({
-	mission_unit: "Daily",
+	unit: "daily",
 	destination: "",
 	from_date: date as string | null,
 	to_date: date as string | null,
@@ -192,48 +197,50 @@ const mission = reactive({
 })
 const overtime = reactive({
 	jdate: date as string | null,
-	overtime_kind: "Normal",
+	overtime_kind: "normal",
 	from_time: null as string | null,
 	to_time: null as string | null,
 	reason: "",
 })
 const correction = reactive({
 	jdate: date as string | null,
-	items: [{ time: null as string | null, direction: "In" }],
+	items: [{ time: null as string | null, direction: "in" }],
 	reason: "",
 })
 
-interface LeaveType {
-	name: string
-	allow_hourly: number
-}
+const saving = ref(false)
+const error = ref("")
+
 const leaveTypes = ref<LeaveType[]>([])
-const leaveTypeOptions = computed(() => leaveTypes.value.map((t) => ({ value: t.name, label: t.name })))
-const allowHourly = computed(() => !!leaveTypes.value.find((t) => t.name === leave.leave_type)?.allow_hourly)
+const leaveTypeOptions = computed(() => leaveTypes.value.map((t) => ({ value: t.id, label: t.name })))
+const allowHourly = computed(() => !!leaveTypes.value.find((t) => t.id === leave.leave_type_id)?.allow_hourly)
 watch(allowHourly, (allowed) => {
-	if (!allowed) leave.leave_unit = "Daily"
+	if (!allowed) leave.unit = "daily"
 })
 
 onMounted(async () => {
-	leaveTypes.value = await call<LeaveType[]>("hozur.api.pwa.leave_types")
-	leave.leave_type = leaveTypes.value[0]?.name ?? null
+	try {
+		leaveTypes.value = await api.get<LeaveType[]>("/leave-types")
+		leave.leave_type_id = leaveTypes.value[0]?.id ?? null
+	} catch (e) {
+		error.value = (e as Error).message
+	}
 })
 
 // existing punches of the correction day, so a wrong device punch can be ignored
 const existing = ref<Punch[]>([])
-const ignored = ref<string[]>([])
+const ignored = ref<number[]>([])
 watch(
 	() => [kind.value, correction.jdate, employee.value],
 	async () => {
 		existing.value = []
 		ignored.value = []
-		if (kind.value !== "correction" || !correction.jdate || !employee.value) return
+		const person = forSomeoneElse.value ? employee.value : session.employee?.id
+		if (kind.value !== "correction" || !correction.jdate || !person) return
 		try {
-			const day = await call<{ punches: Punch[] }>("hozur.api.pwa.day", {
-				jdate: correction.jdate,
-				employee: employee.value,
-			})
-			existing.value = day.punches
+			existing.value = dayPunches(
+				await api.get<DayDetails>("/attendance/day", { jdate: correction.jdate, employee_id: person })
+			)
 		} catch {
 			// the form still works without the list
 		}
@@ -241,22 +248,27 @@ watch(
 	{ immediate: true }
 )
 
+// only raw punches that still count can be set aside
+function canIgnore(p: Punch) {
+	return !!p.id && p.source !== "manual" && !p.is_duplicate && !p.ignored
+}
+
 function addTime() {
 	const last = correction.items[correction.items.length - 1]
-	correction.items.push({ time: null, direction: last?.direction === "In" ? "Out" : "In" })
+	correction.items.push({ time: null, direction: last?.direction === "in" ? "out" : "in" })
 }
 
 function values(): Record<string, unknown> {
-	const base = { employee: employee.value }
+	const base = forSomeoneElse.value ? { employee_id: employee.value } : {}
 	if (kind.value === "leave") {
 		const v = { ...leave }
-		return v.leave_unit === "Daily"
+		return v.unit === "daily"
 			? { ...base, ...v, jdate: null, from_time: null, to_time: null }
 			: { ...base, ...v, from_date: null, to_date: null }
 	}
 	if (kind.value === "mission") {
 		const v = { ...mission }
-		return v.mission_unit === "Daily"
+		return v.unit === "daily"
 			? { ...base, ...v, jdate: null, from_time: null, to_time: null }
 			: { ...base, ...v, from_date: null, to_date: null }
 	}
@@ -268,24 +280,19 @@ function values(): Record<string, unknown> {
 		items: [
 			...correction.items
 				.filter((i) => i.time)
-				.map((i) => ({ action: "Add Punch", time: i.time, direction: i.direction })),
-			...ignored.value.map((ref) => ({ action: "Ignore Punch", raw_punch: ref })),
+				.map((i) => ({ action: "add_punch", time: i.time, direction: i.direction })),
+			...ignored.value.map((id) => ({ action: "ignore_punch", raw_punch_id: id })),
 		],
 	}
 }
-
-const saving = ref(false)
-const error = ref("")
 
 async function submit() {
 	saving.value = true
 	error.value = ""
 	try {
-		const result = await call<{ status_label: string }>("hozur.api.pwa.submit_request", {
-			kind: kind.value,
-			values: values(),
-		})
-		toast.success(__("Request submitted: {0}", [result.status_label]))
+		const result = await api.post<RequestView>(`/requests/${kind.value}`, values())
+		toast.success(__("Request submitted: {0}", [statusLabel(result.status)]))
+		refreshCounts(true)
 		router.push({ name: "requests" })
 	} catch (e) {
 		error.value = (e as Error).message

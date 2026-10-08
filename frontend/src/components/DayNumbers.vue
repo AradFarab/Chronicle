@@ -29,7 +29,14 @@ const items = computed(() => {
 		{ label: __("Absence (Hours)"), value: a.absence_minutes, class: "text-ink-red-6" },
 		{ label: __("Leave (Hours)"), value: a.leave_minutes, class: "" },
 		{ label: __("Mission (Hours)"), value: a.mission_minutes, class: "" },
-		{ label: __("Overtime"), value: a.overtime_normal_minutes, class: "text-ink-green-6" },
+		{
+			label: __("Overtime"),
+			value:
+				(a.overtime_normal_minutes || 0) +
+				(a.overtime_exceptional_minutes || 0) +
+				(a.overtime_emergency_minutes || 0),
+			class: "text-ink-green-6",
+		},
 		{ label: __("Unapproved Extra Work"), value: a.unapproved_extra_minutes, class: "" },
 	]
 	return [

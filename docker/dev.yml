@@ -1,0 +1,20 @@
+# Development database only: the server and the PWA run from the checkout.
+#   docker compose -f docker/dev.yml up -d
+# Creates the databases hozur (app) and hozur_test (pytest), user/password hozur/hozur.
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: hozur
+      POSTGRES_USER: hozur
+      POSTGRES_PASSWORD: hozur
+    command: ["postgres", "-c", "fsync=off"]
+    ports:
+      - "5432:5432"
+    volumes:
+      - devdb:/var/lib/postgresql/data
+      - ./dev-init.sql:/docker-entrypoint-initdb.d/dev-init.sql:ro
+
+volumes:
+  devdb:

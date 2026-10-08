@@ -1,7 +1,7 @@
 import { __ } from "./i18n"
 
-/** Daily Attendance.warnings holds comma-separated codes from the engine (same list as the desk form). */
-export function warningMessages(codes: string | null | undefined): string[] {
+/** Daily attendance warnings: codes from the engine (backend/hozur/engine/daily.py). */
+export function warningMessages(codes: string[] | string | null | undefined): string[] {
   const messages: Record<string, string> = {
     MISSING_PUNCH: __("A punch has no pair: correct the day"),
     ARTICLE_54_SPAN_EXCEEDED: __("More than 15 hours from first to last punch (Article 54)"),
@@ -16,8 +16,8 @@ export function warningMessages(codes: string | null | undefined): string[] {
     ARTICLE_84_NO_NIGHT_WORK_JUVENILE: __("No night work for young workers (Article 84)"),
     UNAPPROVED_EXTRA_WORK: __("Extra work without an approved overtime request"),
   }
-  return (codes || "")
-    .split(/[,\n]/)
+  const list = Array.isArray(codes) ? codes : (codes || "").split(/[,\n]/)
+  return list
     .map((c) => c.trim())
     .filter(Boolean)
     .map((c) => messages[c] || c)
