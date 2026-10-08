@@ -41,6 +41,7 @@ include = ["hozur*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]  # tests import shared helpers as `tests.*`
 
 [tool.ruff]
 line-length = 110
