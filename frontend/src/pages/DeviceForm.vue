@@ -16,7 +16,7 @@
 			/>
 			<div class="grid gap-4 sm:grid-cols-2">
 				<Select v-model="form.adapter_type" :label="__('Device Type')" :options="adapterOptions" />
-				<Select v-model="form.branch_id" :label="__('Branch')" :options="branchOptions" />
+				<Select v-model="form.work_location_id" :label="__('Work location')" :options="locationOptions" />
 			</div>
 			<div>
 				<Select
@@ -156,6 +156,7 @@
 					<span v-if="unmappedCount" class="text-sm text-ink-amber-7">
 						{{ fa(__("{0} without an employee", [unmappedCount])) }}
 					</span>
+					<ExcelImport v-if="hasImport('device-users')" name="device-users" @done="onUsersImported" />
 				</div>
 				<p class="text-sm text-ink-gray-5">
 					{{
@@ -198,11 +199,13 @@
 import { Button, ErrorMessage, Select, Switch, TextInput, toast } from "frappe-ui"
 import { computed, onMounted, reactive, ref, watch } from "vue"
 import { useRouter } from "vue-router"
+import ExcelImport from "@/components/ExcelImport.vue"
 import JalaliDatePicker from "@/components/JalaliDatePicker.vue"
 import { api } from "@/lib/api"
 import { refreshCounts } from "@/lib/counts"
 import { directionModeLabel } from "@/lib/format"
 import { __ } from "@/lib/i18n"
+import { hasImport } from "@/lib/imports"
 import { fa } from "@/lib/jalali"
 import type { Employee } from "@/lib/types"
 
@@ -214,7 +217,7 @@ interface Device {
 	id: number
 	name: string
 	adapter_type: string
-	branch_id: number | null
+	work_location_id: number | null
 	enabled: boolean
 	direction_mode: string
 	host: string | null
@@ -242,7 +245,7 @@ interface SyncResult {
 const form = reactive({
 	name: "",
 	adapter_type: "zkteco",
-	branch_id: "" as number | "",
+	work_location_id: "" as number | "",
 	enabled: true,
 	direction_mode: "from_device",
 	host: "",
@@ -258,7 +261,7 @@ const enabled = computed({ get: () => form.enabled, set: (v: boolean) => (form.e
 const useUdp = computed({ get: () => form.use_udp, set: (v: boolean) => (form.use_udp = v) })
 
 const adapters = ref<Adapter[]>([])
-const branches = ref<{ id: number; name: string }[]>([])
+const locations = ref<{ id: number; name: string }[]>([])
 const templates = ref<{ id: number; name: string }[]>([])
 const isNetwork = computed(
 	() => adapters.value.find((a) => a.code === form.adapter_type)?.network ?? form.adapter_type !== "file_import"
@@ -267,9 +270,9 @@ const adapterOptions = computed(() => adapters.value.map((a) => ({ value: a.code
 const directionModes = computed(() =>
 	["from_device", "always_in", "always_out", "pair_by_order"].map((m) => ({ value: m, label: directionModeLabel(m) }))
 )
-const branchOptions = computed(() => [
-	{ value: "", label: __("All branches") },
-	...branches.value.map((b) => ({ value: b.id, label: b.name })),
+const locationOptions = computed(() => [
+	{ value: "", label: __("All work locations") },
+	...locations.value.map((b) => ({ value: b.id, label: b.name })),
 ])
 const templateOptions = computed(() => templates.value.map((t) => ({ value: t.id, label: t.name })))
 
@@ -281,7 +284,7 @@ function fill(d: Device) {
 	Object.assign(form, {
 		name: d.name,
 		adapter_type: d.adapter_type,
-		branch_id: d.branch_id ?? "",
+		work_location_id: d.work_location_id ?? "",
 		enabled: d.enabled,
 		direction_mode: d.direction_mode,
 		host: d.host ?? "",
@@ -308,7 +311,7 @@ async function save() {
 	error.value = ""
 	try {
 		const { comm_key, ...values } = form
-		const body = { ...values, branch_id: form.branch_id || null, ...(comm_key ? { comm_key } : {}) }
+		const body = { ...values, work_location_id: form.work_location_id || null, ...(comm_key ? { comm_key } : {}) }
 		const device = props.id
 			? await api.patch<Device>(`/devices/${props.id}`, body)
 			: await api.post<Device>("/devices", body)
@@ -458,6 +461,11 @@ async function loadUsers() {
 	users.value = [...mapped, ...waiting]
 }
 
+function onUsersImported() {
+	loadUsers().catch((e) => (error.value = (e as Error).message))
+	refreshCounts(true)
+}
+
 async function mapUser(u: DeviceUser, employee: string) {
 	const employee_id = employee ? Number(employee) : null
 	try {
@@ -499,12 +507,12 @@ watch(
 
 onMounted(async () => {
 	try {
-		const [adapterRows, branchRows] = await Promise.all([
+		const [adapterRows, locationRows] = await Promise.all([
 			api.get<Adapter[]>("/devices/adapters"),
-			api.get<{ id: number; name: string }[]>("/admin/branches"),
+			api.get<{ id: number; name: string }[]>("/admin/work-locations"),
 		])
 		adapters.value = adapterRows
-		branches.value = branchRows
+		locations.value = locationRows
 		await loadExisting()
 	} catch (e) {
 		error.value = (e as Error).message

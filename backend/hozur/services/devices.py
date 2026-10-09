@@ -1,4 +1,4 @@
-"""Attendance devices: ingestion into raw_punch, polling, file imports, operator actions.
+"""Attendance devices: ingestion into raw_punch, polling, file imports, admin actions.
 
 Raw punches are append-only evidence (CLAUDE.md rule 4): the same punch is never stored
 twice (dedup key = device + device user + Jalali day + time, so a USB export of a device
@@ -41,7 +41,7 @@ FORCED_DIRECTION = {"always_in": IN, "always_out": OUT, "pair_by_order": UNKNOWN
 DEVICE_FIELDS = (
 	"name",
 	"adapter_type",
-	"branch_id",
+	"work_location_id",
 	"enabled",
 	"direction_mode",
 	"host",
@@ -71,7 +71,7 @@ TEMPLATE_FIELDS = (
 
 
 class DeviceFailure(ValidationError):
-	"""A device could not be reached or answered wrongly; the message is for the operator."""
+	"""A device could not be reached or answered wrongly; the message is for the system admin."""
 
 	status_code = 502
 
@@ -90,7 +90,7 @@ def get_device(session: Session, device_id: int) -> AttendanceDevice:
 	return device
 
 
-def _operator_text(error: base.DeviceError) -> str:
+def _admin_text(error: base.DeviceError) -> str:
 	"""Stored messages (last_error, error_log) are in the company language."""
 	return error.translated(lambda text: translate(text, DEFAULT_LANGUAGE))
 
@@ -361,7 +361,7 @@ def sync_device(
 		_record_health(device, adapter.health())
 		punches = adapter.fetch_since(since)
 	except base.DeviceError as e:
-		device.last_sync_status, device.last_error = "error", _operator_text(e)
+		device.last_sync_status, device.last_error = "error", _admin_text(e)
 		return SyncResult(False, error=e)
 	stats = ingest(session, device, punch_items(punches), SOURCE_DEVICE)
 	device.last_sync_status, device.last_error = "ok", None
@@ -461,7 +461,7 @@ def resync_from(session: Session, device: AttendanceDevice, jdate: str) -> SyncR
 
 
 def set_device_clock(session: Session, device: AttendanceDevice, user_id: int | None) -> list[str]:
-	"""Set the device clock to the server time (only on an explicit operator action)."""
+	"""Set the device clock to the server time (only on an explicit admin action)."""
 	moment = now().replace(tzinfo=None)
 	_call(lambda: adapter_for(device).sync_time(moment))
 	audit.log(
@@ -626,7 +626,7 @@ def import_file(
 		rows = file_import.read_table(content, template.file_format, template.delimiter, template.encoding)
 		parsed = file_import.parse_rows(rows, _template_dict(template))
 	except base.DeviceError as e:
-		record.status, record.error_log = "failed", _operator_text(e)
+		record.status, record.error_log = "failed", _admin_text(e)
 		return record
 	except Exception as e:  # a corrupt or wrong-format file
 		record.status = "failed"

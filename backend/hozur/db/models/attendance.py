@@ -61,7 +61,7 @@ class DailyAttendance(IdMixin, Base):
 	holiday_title: Mapped[str | None] = mapped_column(Text)
 	# what the calculation used (a snapshot: later org changes do not rewrite history)
 	department_id: Mapped[int | None] = mapped_column(ForeignKey("department.id"))
-	branch_id: Mapped[int | None] = mapped_column(ForeignKey("branch.id"))
+	work_location_id: Mapped[int | None] = mapped_column(ForeignKey("work_location.id"))
 	designation_id: Mapped[int | None] = mapped_column(ForeignKey("designation.id"))
 	work_pattern_id: Mapped[int | None] = mapped_column(ForeignKey("work_pattern.id"))
 	shift_id: Mapped[int | None] = mapped_column(ForeignKey("shift.id"))

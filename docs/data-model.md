@@ -27,26 +27,30 @@ in `backend/hozur/db/migrations/` and is reflected here. Constraints live in the
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
 | `app_user` | people who log in | `username` unique (lower-case); `password_hash` Argon2; `language` default `fa` |
-| `user_role` | roles of a user | PK (`user_id`, `role`); role ∈ `admin, operator, ceo, manager, employee` |
+| `user_role` | roles of a user | PK (`user_id`, `role`); role ∈ `admin` (system admin, مدیر سیستم), `employee`. Who is the CEO or a manager is not a role: it follows from the designation tree |
 | `user_session` | server-side sessions | PK is the SHA-256 of the cookie token; `expires_at` |
 
 ### Organization
 
+The organization is the tree of designations (سمت). A person's **parent** is whoever holds the nearest filled designation above theirs; their **subordinates** are everyone holding a designation below one they hold. Departments are only tags for reports.
+
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
-| `organization` | the company (one row) | `id = 1` CHECK; CEO is an employee |
+| `organization` | the company (one row) | `id = 1` CHECK. The CEO is not stored here: it is the holder of the designation flagged `is_ceo` |
 | `province` | 31 provinces (seeded) | name unique |
-| `branch` | branches; province for provincial holidays | name unique |
-| `department` | department tree (adjacency list, read with recursive CTEs) | name unique; `parent_id` self-FK; manager, default approver, deputy with Jalali validity |
-| `designation` | job titles; hard-and-harmful flag | name unique |
-| `employee` | personnel | `code` unique; `national_id` unique when set; `user_id` unique when set; `full_name` generated; `status ∈ active, suspended, left`; `contract_type ∈ full_time, part_time, hourly` |
+| `work_location` | the physical place people work (محل کار); its province decides which provincial holidays apply | name unique |
+| `department` | a flat tag put on people (one per employee) so reports can be grouped | name unique; no parent, no manager |
+| `designation` | a position in the organization chart; a tree (`parent_id`) | name unique; `parent_id <> id`; at most one `is_ceo` (partial unique index) and it must be a root (CHECK); `hard_and_harmful` flag with the committee ruling |
+| `designation_assignment` | a person holds a designation from one Jalali day to another; giving adds a row, taking away sets `valid_to` (history stays). Several people may hold one designation, one person several | `valid_to ≥ valid_from` |
+| `employee` | personnel | `code` unique; `detail_code` (کد تفصیلی, accounting detail code) unique when set; `national_id` unique when set; **`user_id` NOT NULL unique: every employee is also a user**; `full_name` generated; `status ∈ active, suspended, left` (a person who left or is suspended cannot log in); `contract_type ∈ full_time, part_time, hourly` |
+| `approval_delegation` | a manager hands their approval authority to another person for a period | `delegator_id <> delegate_id`; `valid_to ≥ valid_from` |
 
 ### Calendar
 
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
-| `holiday` | every day off: official solar/lunar/occasional, office closure, company internal | `status ∈ confirmed, predicted`; `scope ∈ country, province, branch, company` with the matching FK set (CHECK); `source ∈ bundled, time_ir, file, manual`; `closure_pay_mode` only for office closures |
-| `calendar_year` | one row per Jalali year: where its holidays came from and when the operator refreshed it | PK `jyear`; `status ∈ predicted, confirmed` |
+| `holiday` | every day off: official solar/lunar/occasional, office closure, company internal | `status ∈ confirmed, predicted`; `scope ∈ country, province, work_location, company` with the matching FK set (CHECK); `source ∈ bundled, time_ir, file, manual`; `closure_pay_mode` only for office closures |
+| `calendar_year` | one row per Jalali year: where its holidays came from and when the system admin refreshed it | PK `jyear`; `status ∈ predicted, confirmed` |
 
 Weekdays and month lengths are computed with jdatetime; there is no per-day table.
 
@@ -66,16 +70,16 @@ Parameters are JSONB so that a new legal parameter does not need a schema change
 | `shift` | one working day's hours | name unique; `shift_type ∈ fixed, flexible`; break inside the shift (checked in Python) |
 | `work_pattern` | weekly or rotating pattern | name unique; `pattern_type ∈ weekly, rotating`; rotating needs `cycle_start_date` |
 | `work_pattern_day` | a day of the pattern | weekly: `weekday` 0–6 (0 = Saturday) unique per pattern; rotating: `cycle_day` 1..n unique per pattern; `shift_id` NULL = rest day |
-| `work_pattern_assignment` | who follows which pattern, from–to | `target_type ∈ employee, designation, department, company` and exactly the matching FK (CHECK); `valid_to ≥ valid_from` |
+| `work_pattern_assignment` | who follows which pattern, from–to | `target_type ∈ employee, designation, department, company` and exactly the matching FK (CHECK); `valid_to ≥ valid_from`; `cycle_offset_days ≥ 0` moves a group along a rotating pattern's cycle, so two groups of guards can follow one pattern half a cycle apart |
 | `shift_override` | one-day change for one person | unique (`employee_id`, `jdate`); `shift_id` NULL = day off |
 
-Resolution order for a person and day: override → employee → designation → department (walking up) → company.
+Resolution order for a person and day: override → employee → a designation they hold that day → department → company.
 
 ### Devices and punches
 
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
-| `attendance_device` | a configured device (rule 5) | name unique; `adapter_type` registered in code; `comm_key` encrypted with the app secret; health and sync status columns |
+| `attendance_device` | a configured device (rule 5); `work_location_id` says where it hangs | name unique; `adapter_type` registered in code; `comm_key` encrypted with the app secret; health and sync status columns |
 | `device_user_map` | device user id → employee, with Jalali validity | unique (`device_id`, `device_user_id`, `valid_from`) |
 | `raw_punch` | every punch as received (append-only) | `dedup_key` unique; `jdate` + `time` set once at ingestion; `device_timestamp` raw device clock; `source ∈ device, file_import` |
 | `punch_import_template` | how to read a USB/Excel/CSV file | name unique |
@@ -91,15 +95,16 @@ The request number (`LV-00012`, `MS-…`, `OT-…`, `COR-…`) is a generated co
 
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
-| `request` | the common part of every request | `kind ∈ leave, mission, overtime, correction`; `request_type ∈ daily_leave, hourly_leave, mission, overtime, attendance_correction` (selects the approval process); `status ∈ pending, approved, rejected, cancelled`; `start_jdate ≤ end_jdate`; `pending_*` columns mirror the current step for a fast inbox |
+| `request` | the common part of every request | `kind ∈ leave, mission, overtime, correction`; `request_type ∈ daily_leave, hourly_leave, mission, overtime, attendance_correction` (selects the approval process); `status ∈ pending, approved, rejected, cancelled`; `start_jdate ≤ end_jdate`; `entered_by_admin` when the system admin filed it for someone |
 | `leave_request` | 1:1 detail | daily: from/to dates; hourly: one date and from/to time (CHECK per unit) |
 | `mission_request` | 1:1 detail | same shape as leave |
 | `overtime_request` | 1:1 detail | `overtime_kind ∈ normal, exceptional, emergency`; `minutes > 0`; `assigned_by_manager` |
 | `correction_item` | lines of a correction | `action ∈ add_punch, ignore_punch`; add needs `time`, ignore needs `raw_punch_id` (CHECK) |
-| `request_approval` | the approval chain of one request | unique (`request_id`, `step`); `status ∈ pending, approved, rejected, skipped` |
+| `request_approval` | one step of the approval chain of a request | unique (`request_id`, `step`); `status ∈ pending, approved, rejected, skipped`; `approver_type ∈ parent, ceo, specific_person, employee_acceptance`; `acted_by_id` is who really decided |
+| `request_approval_approver` | who may decide a step: the holders of the designation it resolved to (any one of them, or someone they delegated to) | PK (`approval_id`, `employee_id`); the inbox is a join on this table |
 | `approval_process` | named process | name unique |
-| `approval_process_step` | ordered steps | unique (`process_id`, `position`); `approver_type ∈ direct_manager, parent_department_manager, ceo, specific_person` (person needs the FK) |
-| `approval_default` | default process per request type (and for operator entries) | PK `request_type` |
+| `approval_process_step` | ordered steps | unique (`process_id`, `position`); `approver_type ∈ parent, ceo, specific_person` (a person needs the FK) |
+| `approval_default` | default process per request type (and for requests the system admin files for someone: `admin_entry`) | PK `request_type` |
 | `approval_override` | per-employee exception | unique (`employee_id`, `request_type`) |
 
 ### Leave
@@ -113,7 +118,7 @@ The request number (`LV-00012`, `MS-…`, `OT-…`, `COR-…`) is a generated co
 
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
-| `daily_attendance` | engine output, one row per person and Jalali day | unique (`employee_id`, `jdate`); snapshot of department/branch/designation/pattern/shift/rule set used; `warnings text[]` of engine codes |
+| `daily_attendance` | engine output, one row per person and Jalali day | unique (`employee_id`, `jdate`); snapshot of department/work location/designation/pattern/shift/rule set used; `warnings text[]` of engine codes |
 | `daily_attendance_leave` | leave minutes/days per type in that day | PK (`attendance_id`, `leave_type_id`) |
 | `attendance_period` | Jalali month open/closed (rule 9) | unique (`jyear`, `jmonth`) |
 

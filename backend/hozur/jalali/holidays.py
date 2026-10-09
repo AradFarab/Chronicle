@@ -14,14 +14,14 @@ SEED_FILE = Path(__file__).parent / "data" / "holidays.json"
 OFFICIAL_SOLAR = "official_solar"
 OFFICIAL_LUNAR = "official_lunar"
 OFFICIAL_OCCASIONAL = "official_occasional"  # declared by government, nationwide or per province (Article 63)
-OFFICE_CLOSURE = "office_closure"  # e.g. air pollution; pay handling chosen by the operator
+OFFICE_CLOSURE = "office_closure"  # e.g. air pollution; pay handling chosen by the system admin
 COMPANY_INTERNAL = "company_internal"  # paid, this company only
 HOLIDAY_TYPES = (OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL, OFFICE_CLOSURE, COMPANY_INTERNAL)
 OFFICIAL_TYPES = (OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL)
 
 CONFIRMED, PREDICTED = "confirmed", "predicted"
-COUNTRY, PROVINCE, BRANCH, COMPANY = "country", "province", "branch", "company"
-SCOPES = (COUNTRY, PROVINCE, BRANCH, COMPANY)
+COUNTRY, PROVINCE, WORK_LOCATION, COMPANY = "country", "province", "work_location", "company"
+SCOPES = (COUNTRY, PROVINCE, WORK_LOCATION, COMPANY)
 
 # Hijri month names as they appear in official calendars (time.ir writes the lunar date of
 # an event in brackets, e.g. "عید غدیر [ ۱۸ ذوالحجه ]").

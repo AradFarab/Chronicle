@@ -2,6 +2,7 @@
 	<div class="space-y-4">
 		<div class="flex items-center gap-2">
 			<h1 class="flex-1 text-lg font-bold">{{ __("Attendance devices") }}</h1>
+			<ExcelImport v-if="hasImport('devices')" name="devices" @done="load" />
 			<Button variant="solid" icon-left="lucide-plus" :route="{ name: 'new-device' }">{{
 				__("Add a device")
 			}}</Button>
@@ -36,7 +37,7 @@
 							<template v-if="d.host">
 								· <span dir="ltr" class="hz-num">{{ d.host }}:{{ d.port }}</span></template
 							>
-							<template v-if="d.branch_id && branches[d.branch_id]"> · {{ branches[d.branch_id] }}</template>
+							<template v-if="d.work_location_id && locations[d.work_location_id]"> · {{ locations[d.work_location_id] }}</template>
 						</span>
 					</span>
 					<span class="lucide-chevron-left size-4 text-ink-gray-4" />
@@ -83,17 +84,19 @@
 <script setup lang="ts">
 import { Badge, Button, ErrorMessage, toast } from "frappe-ui"
 import { onMounted, ref } from "vue"
+import ExcelImport from "@/components/ExcelImport.vue"
 import StatusBadge from "@/components/StatusBadge.vue"
 import { api } from "@/lib/api"
 import { refreshCounts } from "@/lib/counts"
 import { __ } from "@/lib/i18n"
+import { hasImport } from "@/lib/imports"
 import { fa } from "@/lib/jalali"
 
 interface Device {
 	id: number
 	name: string
 	adapter_type: string
-	branch_id: number | null
+	work_location_id: number | null
 	enabled: boolean
 	host: string | null
 	port: number | null
@@ -120,7 +123,7 @@ interface SyncResult {
 
 const devices = ref<Device[]>([])
 const adapters = ref<Record<string, Adapter>>({})
-const branches = ref<Record<number, string>>({})
+const locations = ref<Record<number, string>>({})
 const unmapped = ref<Record<number, number>>({}) // device id -> device users with punches but no employee
 const loading = ref(false)
 const error = ref("")
@@ -139,15 +142,15 @@ async function load() {
 	loading.value = !devices.value.length
 	error.value = ""
 	try {
-		const [rows, types, branchRows, unmappedRows] = await Promise.all([
+		const [rows, types, locationRows, unmappedRows] = await Promise.all([
 			api.get<Device[]>("/devices"),
 			api.get<Adapter[]>("/devices/adapters"),
-			api.get<{ id: number; name: string }[]>("/admin/branches"),
+			api.get<{ id: number; name: string }[]>("/admin/work-locations"),
 			api.get<{ device_id: number }[]>("/devices/users/unmapped"),
 		])
 		devices.value = rows
 		adapters.value = Object.fromEntries(types.map((a) => [a.code, a]))
-		branches.value = Object.fromEntries(branchRows.map((b) => [b.id, b.name]))
+		locations.value = Object.fromEntries(locationRows.map((b) => [b.id, b.name]))
 		const perDevice: Record<number, number> = {}
 		for (const u of unmappedRows) perDevice[u.device_id] = (perDevice[u.device_id] || 0) + 1
 		unmapped.value = perDevice

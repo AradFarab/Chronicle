@@ -9,7 +9,7 @@
 		<div v-if="!session.employee" class="hz-card space-y-3">
 			<p class="text-ink-gray-7">{{ __("Your user is not linked to an employee") }}</p>
 			<Button
-				v-if="session.is_operator"
+				v-if="session.is_admin"
 				variant="solid"
 				:route="{ name: 'devices' }"
 				icon-left="lucide-fingerprint"

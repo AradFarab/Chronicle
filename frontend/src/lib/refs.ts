@@ -2,7 +2,7 @@ import { reactive } from "vue"
 import { api } from "./api"
 import { rowLabel, type Option } from "./resources"
 
-/** Rows of admin resources used as options (branches, employees, shifts...), loaded once. */
+/** Rows of admin resources used as options (work locations, employees, shifts...), loaded once. */
 const cache = reactive<Record<string, Record<string, unknown>[]>>({})
 const loading: Record<string, Promise<void> | undefined> = {}
 

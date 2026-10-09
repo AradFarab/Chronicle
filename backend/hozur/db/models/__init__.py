@@ -11,9 +11,18 @@ from hozur.db.models.devices import (
 	RawPunch,
 )
 from hozur.db.models.leave import LeaveLedgerEntry, LeaveType
-from hozur.db.models.org import Branch, Department, Designation, Employee, Organization, Province
+from hozur.db.models.org import (
+	Department,
+	Designation,
+	DesignationAssignment,
+	Employee,
+	Organization,
+	Province,
+	WorkLocation,
+)
 from hozur.db.models.requests import (
 	ApprovalDefault,
+	ApprovalDelegation,
 	ApprovalOverride,
 	ApprovalProcess,
 	ApprovalProcessStep,
@@ -23,6 +32,7 @@ from hozur.db.models.requests import (
 	OvertimeRequest,
 	Request,
 	RequestApproval,
+	RequestApprovalApprover,
 )
 from hozur.db.models.rules import LaborRuleSet
 from hozur.db.models.schedules import Shift, ShiftOverride, WorkPattern, WorkPatternAssignment, WorkPatternDay
@@ -32,19 +42,20 @@ __all__ = [
 	"AppSetting",
 	"AppUser",
 	"ApprovalDefault",
+	"ApprovalDelegation",
 	"ApprovalOverride",
 	"ApprovalProcess",
 	"ApprovalProcessStep",
 	"AttendanceDevice",
 	"AttendancePeriod",
 	"AuditEntry",
-	"Branch",
 	"CalendarYear",
 	"CorrectionItem",
 	"DailyAttendance",
 	"DailyAttendanceLeave",
 	"Department",
 	"Designation",
+	"DesignationAssignment",
 	"DeviceUserMap",
 	"Employee",
 	"Holiday",
@@ -63,11 +74,13 @@ __all__ = [
 	"ReportTemplate",
 	"Request",
 	"RequestApproval",
+	"RequestApprovalApprover",
 	"Shift",
 	"ShiftOverride",
 	"StoredFile",
 	"UserRole",
 	"UserSession",
+	"WorkLocation",
 	"WorkPattern",
 	"WorkPatternAssignment",
 	"WorkPatternDay",

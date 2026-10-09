@@ -48,7 +48,7 @@ class AttendanceDevice(IdMixin, TimestampMixin, Base):
 
 	name: Mapped[str] = mapped_column(String(150), unique=True)
 	adapter_type: Mapped[str] = mapped_column(String(50))  # a code registered in hozur.devices
-	branch_id: Mapped[int | None] = mapped_column(ForeignKey("branch.id"))
+	work_location_id: Mapped[int | None] = mapped_column(ForeignKey("work_location.id"))
 	enabled: Mapped[bool] = mapped_column(Boolean, server_default=true())
 	direction_mode: Mapped[str] = mapped_column(String(20), server_default="from_device")
 	host: Mapped[str | None] = mapped_column(String(255))

@@ -20,7 +20,7 @@ from hozur.db.models import (
 	LeaveType,
 	RawPunch,
 )
-from hozur.services import leave, requests
+from hozur.services import approvals, leave, requests
 from hozur.services.errors import Conflict, PermissionDenied, ValidationError
 from hozur.services.punches import effective_punches
 from hozur.setup import data
@@ -34,6 +34,11 @@ def leave_type(db, name=EARNED):
 
 def give_leave(org, days):
 	leave.add_entry(org.db, org.employee.id, leave_type(org.db).id, leave.ALLOCATION, "1405/01/01", days)
+
+
+def chain(request):
+	"""The approvers of each step, as employee ids."""
+	return [[p.employee_id for p in a.approvers] for a in request.approvals]
 
 
 def daily_leave(org, start, end, actor=None, **kw):
@@ -51,13 +56,14 @@ def test_daily_leave_goes_manager_then_ceo_and_uses_the_ledger(org):
 	give_leave(org, 10)
 	r = daily_leave(org, "1405/07/12", "1405/07/18")  # Sun..Sat: Thu, Fri are rest days
 	assert (r.status, r.leave.total_days, r.number) == ("pending", Decimal(5), f"LV-{r.id:05d}")
-	assert [a.approver_id for a in r.approvals] == [org.manager.id, org.ceo.id]
-	assert r.pending_approver_user_id == org.users.mgr.id
-	assert [x.id for x in requests.inbox(org.db, org.mgr)] == [r.id]
+	assert chain(r) == [[org.manager.id], [org.ceo.id]]
+	assert approvals.waiting_for(r) == [org.manager.id]
+	assert [x.id for x in requests.inbox(org.db, org.mgr, TODAY)] == [r.id]
+	assert requests.inbox(org.db, org.boss, TODAY) == []  # not the CEO's turn yet
 	with pytest.raises(PermissionDenied):
 		requests.act(org.db, org.boss, r.id, "approve", None, TODAY)  # not their step yet
 	requests.act(org.db, org.mgr, r.id, "approve", "ok", TODAY)
-	assert r.pending_approver_user_id == org.users.ceo.id
+	assert approvals.waiting_for(r) == [org.ceo.id]
 	requests.act(org.db, org.boss, r.id, "approve", None, TODAY)
 	assert r.status == "approved" and r.decided_at
 	assert leave.balance(org.db, org.employee.id, leave_type(org.db).id) == Decimal(5)
@@ -112,7 +118,7 @@ def test_hourly_leave_is_minutes_over_the_legal_day(org):
 		120,
 		Decimal("0.2727"),
 	)
-	assert [a.approver_id for a in r.approvals] == [org.manager.id]  # hourly: direct manager only
+	assert chain(r) == [[org.manager.id]]  # hourly: the parent only
 	with pytest.raises(ValidationError, match="cannot be taken by the hour"):
 		requests.submit(
 			org.db, org.emp, "leave",
@@ -133,16 +139,16 @@ def test_leave_limits_come_from_the_rule_set(org):
 		)
 
 
-def test_employees_file_only_for_themselves_operators_for_anyone(org):
+def test_employees_file_only_for_themselves_the_admin_for_anyone(org):
 	give_leave(org, 5)
 	with pytest.raises(PermissionDenied):
 		daily_leave(org, "1405/07/12", "1405/07/12", actor=org.mgr, employee_id=org.employee.id)
 	no_approval = org.db.scalar(select(ApprovalProcess).where(ApprovalProcess.name == data.NO_APPROVAL))
 	from hozur.db.models import ApprovalDefault
 
-	org.db.get(ApprovalDefault, "operator_entry").process_id = no_approval.id
+	org.db.get(ApprovalDefault, "admin_entry").process_id = no_approval.id
 	r = daily_leave(org, "1405/07/12", "1405/07/12", actor=org.op, employee_id=org.employee.id)
-	assert (r.entered_by_operator, r.status) == (True, "approved")
+	assert (r.entered_by_admin, r.status) == (True, "approved")
 
 
 def test_per_employee_override(org):
@@ -156,7 +162,7 @@ def test_per_employee_override(org):
 		{"unit": "daily", "from_date": TODAY, "to_date": TODAY, "reason": "x"},
 		TODAY,
 	)
-	assert [a.approver_id for a in r.approvals] == [org.ceo.id]
+	assert chain(r) == [[org.ceo.id]]
 
 
 def test_mission_needs_a_reason(org):
@@ -176,9 +182,12 @@ def test_madde_59_assigned_overtime_needs_the_employees_acceptance(org):
 	)
 	assert (r.overtime.assigned_by_manager, r.overtime.minutes) == (True, 120)
 	first, manager_step = r.approvals
-	assert (first.approver_type, first.approver_id) == ("employee_acceptance", org.employee.id)
+	assert (first.approver_type, [p.employee_id for p in first.approvers]) == (
+		"employee_acceptance",
+		[org.employee.id],
+	)
 	assert manager_step.status == "approved"  # the assigning manager's own step
-	assert r.pending_approver_user_id == org.users.emp.id
+	assert approvals.waiting_for(r) == [org.employee.id]
 	requests.act(org.db, org.emp, r.id, "approve", None, TODAY)
 	assert r.status == "approved"
 
@@ -302,11 +311,63 @@ def test_visibility_of_requests(org):
 	r = requests.submit(org.db, org.emp, "overtime", {"jdate": TODAY, "minutes": 60}, TODAY)
 	assert requests.get(org.db, org.mgr, r.id, TODAY).id == r.id
 	assert [x.id for x in requests.list_requests(org.db, org.mgr, TODAY)] == [r.id]
-	org.root.manager_id = org.ceo.id  # the root department's manager approves for org.other
-	org.db.flush()
 	other = requests.submit(
 		org.db, org.op, "overtime", {"employee_id": org.other.id, "jdate": TODAY, "minutes": 30}, TODAY
 	)
 	with pytest.raises(PermissionDenied):
 		requests.get(org.db, org.emp, other.id, TODAY)
 	assert other.id not in [x.id for x in requests.list_requests(org.db, org.mgr, TODAY)]
+
+
+# the three processes and who they ask ---------------------------------------------------------------
+
+
+def mission(org, actor, **kw):
+	values = {"unit": "daily", "from_date": TODAY, "to_date": TODAY, "reason": "x", **kw}
+	return requests.submit(org.db, actor, "mission", values, TODAY)
+
+
+def test_parent_then_ceo_is_only_the_ceo_when_the_parent_is_the_ceo(org):
+	"""Process 2: the manager's own parent is the CEO, so one approval is enough."""
+	r = mission(org, org.mgr)
+	assert [(a.approver_type, a.status) for a in r.approvals] == [("parent", "pending"), ("ceo", "skipped")]
+	assert chain(r) == [[org.ceo.id], [org.ceo.id]]
+	requests.act(org.db, org.boss, r.id, "approve", None, TODAY)
+	assert r.status == "approved"
+
+
+def test_the_ceos_own_requests_need_no_approval(org):
+	r = mission(org, org.boss)
+	assert r.status == "approved" and {a.status for a in r.approvals} == {"skipped"}
+
+
+def test_any_holder_of_the_parent_designation_can_approve(org):
+	from orgfactory import make_employee
+
+	second, _user = make_employee(org.db, "T-MGR2", org.manager_designation)
+	r = requests.submit(org.db, org.emp, "overtime", {"jdate": TODAY, "minutes": 60}, TODAY)
+	assert chain(r) == [sorted([org.manager.id, second.id])]
+	requests.act(org.db, org.mgr, r.id, "approve", None, TODAY)
+	assert r.status == "approved"
+
+
+def test_a_delegate_approves_in_the_managers_place_and_the_manager_still_can(org):
+	from orgfactory import make_employee
+
+	from hozur.services import access, delegations
+
+	peer, peer_user = make_employee(org.db, "T-PEER", org.accountant_designation)
+	delegations.create(org.db, org.mgr, {"delegate_id": peer.id}, TODAY)
+	r = requests.submit(org.db, org.emp, "overtime", {"jdate": TODAY, "minutes": 60}, TODAY)
+	delegate = access.actor_for(org.db, peer_user, TODAY)
+	assert [x.id for x in requests.inbox(org.db, delegate, TODAY)] == [r.id]
+	assert [x.id for x in requests.inbox(org.db, org.mgr, TODAY)] == [r.id]
+	requests.act(org.db, delegate, r.id, "approve", "ok", TODAY)
+	assert r.status == "approved"
+	assert r.approvals[0].acted_by_id == peer_user.id  # the history says who really approved
+
+
+def test_someone_who_is_not_the_parent_or_a_delegate_cannot_approve(org):
+	r = requests.submit(org.db, org.emp, "overtime", {"jdate": TODAY, "minutes": 60}, TODAY)
+	with pytest.raises(PermissionDenied):
+		requests.act(org.db, org.anyone, r.id, "approve", None, TODAY)

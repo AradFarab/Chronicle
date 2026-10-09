@@ -35,39 +35,43 @@ def list_requests(
 	limit: int = Query(50, le=500),
 ) -> list[dict]:
 	return [
-		request_view(db, r, actor)
+		request_view(db, r, actor, today)
 		for r in requests.list_requests(db, actor, today, employee_id, status, limit)
 	]
 
 
 @router.post("/requests/{kind}")
 def submit(kind: Kind, values: dict[str, Any], actor: Actor, db: DB, today: Today) -> dict:
-	return request_view(db, requests.submit(db, actor, kind, values, today), actor)
+	return request_view(db, requests.submit(db, actor, kind, values, today), actor, today)
 
 
 @router.get("/requests/{request_id}")
 def get_request(request_id: int, actor: Actor, db: DB, today: Today) -> dict:
-	return request_view(db, requests.get(db, actor, request_id, today), actor)
+	return request_view(db, requests.get(db, actor, request_id, today), actor, today)
 
 
 @router.post("/requests/{request_id}/approve")
 def approve(request_id: int, body: Decision, actor: Actor, db: DB, today: Today) -> dict:
-	return request_view(db, requests.act(db, actor, request_id, requests.APPROVE, body.comment, today), actor)
+	return request_view(
+		db, requests.act(db, actor, request_id, requests.APPROVE, body.comment, today), actor, today
+	)
 
 
 @router.post("/requests/{request_id}/reject")
 def reject(request_id: int, body: Decision, actor: Actor, db: DB, today: Today) -> dict:
-	return request_view(db, requests.act(db, actor, request_id, requests.REJECT, body.comment, today), actor)
+	return request_view(
+		db, requests.act(db, actor, request_id, requests.REJECT, body.comment, today), actor, today
+	)
 
 
 @router.post("/requests/{request_id}/cancel")
 def cancel(request_id: int, body: Cancellation, actor: Actor, db: DB, today: Today) -> dict:
-	return request_view(db, requests.cancel(db, actor, request_id, body.reason, today), actor)
+	return request_view(db, requests.cancel(db, actor, request_id, body.reason, today), actor, today)
 
 
 @router.get("/inbox")
-def inbox(actor: Actor, db: DB) -> list[dict]:
-	return [request_view(db, r, actor) for r in requests.inbox(db, actor)]
+def inbox(actor: Actor, db: DB, today: Today) -> list[dict]:
+	return [request_view(db, r, actor, today) for r in requests.inbox(db, actor, today)]
 
 
 @router.get("/leave-types")

@@ -3,7 +3,7 @@
 One declarative `Resource` per table says which columns may be written, who may read and
 write, how to validate, and which recalculation a change needs. The generic code below does
 type coercion from JSON (Jalali dates, times, numbers), audit entries (CLAUDE.md rule 4)
-and turns database constraint errors into messages for the operator. Tables with their own
+and turns database constraint errors into messages for the system admin. Tables with their own
 workflow (requests, holidays, devices, users, periods) have their own services.
 """
 
@@ -24,9 +24,9 @@ from hozur.db.models import (
 	ApprovalOverride,
 	ApprovalProcess,
 	ApprovalProcessStep,
-	Branch,
 	Department,
 	Designation,
+	DesignationAssignment,
 	Employee,
 	LaborRuleSet,
 	LeaveType,
@@ -34,6 +34,7 @@ from hozur.db.models import (
 	ReportTemplate,
 	Shift,
 	ShiftOverride,
+	WorkLocation,
 	WorkPattern,
 	WorkPatternAssignment,
 	WorkPatternDay,
@@ -47,7 +48,7 @@ from hozur.services.errors import Conflict, NotFound, PermissionDenied, Validati
 from hozur.services.rule_sets import check_parameters
 from hozur.services.schedules import employees_following
 
-OPERATOR, ADMIN, EVERYONE = "operator", "admin", "everyone"
+ADMIN, EVERYONE, NOBODY = "admin", "everyone", "nobody"  # NOBODY: written through its own service
 RECALC_LOOKBACK_DAYS = 366  # a configuration change never recalculates further back than this
 
 
@@ -67,8 +68,8 @@ class Resource:
 	name: str  # URL segment
 	model: type
 	fields: tuple[str, ...]  # writable columns
-	read: str = OPERATOR
-	write: str = OPERATOR
+	read: str = ADMIN
+	write: str = ADMIN
 	order_by: tuple[str, ...] = ("id",)
 	children: dict[str, tuple[type, tuple[str, ...]]] = field(default_factory=dict)  # name -> (model, fields)
 	validate: Hook | None = None  # (ctx, obj, before) after values are set, before flush
@@ -128,9 +129,7 @@ def _apply(model: type, obj: Any, values: dict[str, Any], allowed: tuple[str, ..
 
 
 def _allowed(actor: access.Actor, level: str) -> bool:
-	return (
-		level == EVERYONE or (level == OPERATOR and actor.is_operator) or (level == ADMIN and actor.is_admin)
-	)
+	return level == EVERYONE or (level == ADMIN and actor.is_admin)
 
 
 def check(actor: access.Actor, level: str) -> None:
@@ -142,7 +141,7 @@ def check(actor: access.Actor, level: str) -> None:
 
 
 def flush(session: Session, deleting: bool = False) -> None:
-	"""Flush inside a savepoint; constraint violations become messages for the operator."""
+	"""Flush inside a savepoint; constraint violations become messages for the system admin."""
 	try:
 		with session.begin_nested():
 			session.flush()
@@ -284,11 +283,6 @@ def _month_start(ctx: Context) -> str:
 # validation and side effects per table ------------------------------------------------------------
 
 
-def _department(ctx: Context, d: Department, before) -> None:
-	if d.parent_id and d.id and d.parent_id in access.subtree(ctx.session, {d.id}):
-		raise ValidationError(_("A department cannot be inside itself"))
-
-
 def _employee(ctx: Context, e: Employee, before) -> None:
 	if e.end_date and e.start_date and e.end_date < e.start_date:
 		raise ValidationError(_("The end date is before the start date"))
@@ -298,9 +292,8 @@ def _employee(ctx: Context, e: Employee, before) -> None:
 
 EMPLOYMENT_FIELDS = ("start_date", "end_date", "status")
 CALCULATION_FIELDS = (
-	"branch_id",
+	"work_location_id",
 	"department_id",
-	"designation_id",
 	"birth_date",
 	"nursing_until",
 	"overtime_consent_on_file",
@@ -396,16 +389,45 @@ def _rule_set_changed(ctx: Context, r: LaborRuleSet, before) -> None:
 	recalculate(ctx, start, None, "labor rule set changed")
 
 
+def _designation(ctx: Context, d: Designation, before) -> None:
+	if d.is_ceo and d.parent_id:
+		raise ValidationError(_("The CEO designation must be at the top of the chart"))
+	if d.id and d.parent_id:
+		with ctx.session.no_autoflush:  # the edited row is not valid until these checks pass
+			below = access.descendants(ctx.session, {d.id})
+		if d.parent_id in below:
+			raise ValidationError(_("A designation cannot be below itself"))
+
+
+def _holders_of(ctx: Context, designation_id: int) -> set[int]:
+	return set(
+		ctx.session.scalars(
+			select(DesignationAssignment.employee_id).where(
+				DesignationAssignment.designation_id == designation_id
+			)
+		)
+	)
+
+
 def _designation_changed(ctx: Context, d: Designation, before) -> None:
 	if before and before.get("hard_and_harmful") != d.hard_and_harmful and not inspect(d).deleted:
-		ids = set(ctx.session.scalars(select(Employee.id).where(Employee.designation_id == d.id)))
-		recalculate(ctx, _month_start(ctx), ids, "designation changed")
+		recalculate(ctx, _month_start(ctx), _holders_of(ctx, d.id), "designation changed")
 
 
-def _branch_changed(ctx: Context, b: Branch, before) -> None:
+def _designation_assignment(ctx: Context, a: DesignationAssignment, before) -> None:
+	if a.valid_to and a.valid_from and a.valid_to < a.valid_from:
+		raise ValidationError(_("The end date is before the start date"))
+
+
+def _designation_assignment_changed(ctx: Context, a: DesignationAssignment, before) -> None:
+	starts = [d for d in (a.valid_from, (before or {}).get("valid_from")) if d]
+	recalculate(ctx, min(starts), {a.employee_id}, "designation given or taken")
+
+
+def _work_location_changed(ctx: Context, b: WorkLocation, before) -> None:
 	if before and before.get("province_id") != b.province_id and not inspect(b).deleted:
-		ids = set(ctx.session.scalars(select(Employee.id).where(Employee.branch_id == b.id)))
-		recalculate(ctx, _month_start(ctx), ids, "branch province changed")
+		ids = set(ctx.session.scalars(select(Employee.id).where(Employee.work_location_id == b.id)))
+		recalculate(ctx, _month_start(ctx), ids, "work location province changed")
 
 
 def _leave_type_changed(ctx: Context, t: LeaveType, before) -> None:
@@ -432,69 +454,49 @@ RESOURCES: dict[str, Resource] = {
 	for r in (
 		Resource("provinces", Province, (), read=EVERYONE, write=ADMIN, order_by=("name",)),
 		Resource(
-			"branches",
-			Branch,
+			"work-locations",
+			WorkLocation,
 			("name", "province_id", "city", "address", "is_active"),
 			read=EVERYONE,
 			order_by=("name",),
-			changed=_branch_changed,
+			changed=_work_location_changed,
 		),
-		Resource(
-			"departments",
-			Department,
-			(
-				"name",
-				"parent_id",
-				"is_group",
-				"manager_id",
-				"default_approver_id",
-				"deputy_id",
-				"deputy_from",
-				"deputy_to",
-			),
-			read=EVERYONE,
-			order_by=("name",),
-			validate=_department,
-		),
+		Resource("departments", Department, ("name",), read=EVERYONE, order_by=("name",)),
 		Resource(
 			"designations",
 			Designation,
-			("name", "description", "hard_and_harmful", "committee_ruling_no", "committee_ruling_date"),
+			(
+				"name",
+				"parent_id",
+				"is_ceo",
+				"description",
+				"hard_and_harmful",
+				"committee_ruling_no",
+				"committee_ruling_date",
+			),
 			read=EVERYONE,
 			order_by=("name",),
+			validate=_designation,
 			changed=_designation_changed,
 		),
 		Resource(
+			"designation-assignments",
+			DesignationAssignment,
+			("employee_id", "designation_id", "valid_from", "valid_to", "note"),
+			order_by=("valid_from", "id"),
+			validate=_designation_assignment,
+			changed=_designation_assignment_changed,
+			deletable=lambda a: True,
+		),
+		# Employees are users too, so they are written by services/employees.py (password,
+		# username); the generic layer only reads them.
+		Resource(
 			"employees",
 			Employee,
-			(
-				"code",
-				"first_name",
-				"last_name",
-				"national_id",
-				"gender",
-				"mobile",
-				"email",
-				"user_id",
-				"status",
-				"contract_type",
-				"start_date",
-				"end_date",
-				"branch_id",
-				"department_id",
-				"designation_id",
-				"reports_to_id",
-				"overtime_consent_on_file",
-				"overtime_consent_date",
-				"birth_date",
-				"biometric_consent_date",
-				"uses_card_instead_of_biometrics",
-				"nursing_until",
-			),
-			read=EVERYONE,  # narrowed to the actor's department subtree in list_employees
+			(),
+			read=EVERYONE,  # narrowed to what the actor may see in the route
+			write=NOBODY,
 			order_by=("code",),
-			validate=_employee,
-			changed=_employee_changed,
 			deletable=lambda e: False,  # people leave (status / end date); their history stays
 		),
 		Resource(
@@ -538,6 +540,7 @@ RESOURCES: dict[str, Resource] = {
 				"designation_id",
 				"department_id",
 				"work_pattern_id",
+				"cycle_offset_days",
 				"valid_from",
 				"valid_to",
 				"note",

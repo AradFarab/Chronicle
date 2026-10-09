@@ -8,7 +8,7 @@ from fastapi import APIRouter, File, Form, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from hozur.api.deps import DB, Operator
+from hozur.api.deps import DB, Admin
 from hozur.api.views import jalali_moment
 from hozur.db.models import AttendanceDevice, DeviceUserMap, PunchImport, PunchImportTemplate
 from hozur.i18n import _, translate
@@ -40,58 +40,58 @@ def _sync_view(result: devices.SyncResult, language: str) -> dict:
 
 
 @router.get("/adapters")
-def adapters(actor: Operator) -> list[dict]:
+def adapters(actor: Admin) -> list[dict]:
 	return devices.adapter_types()
 
 
 @router.get("")
-def list_devices(actor: Operator, db: DB) -> list[dict]:
+def list_devices(actor: Admin, db: DB) -> list[dict]:
 	return [device_view(d) for d in db.scalars(select(AttendanceDevice).order_by(AttendanceDevice.name))]
 
 
 @router.post("")
-def create_device(values: dict[str, Any], actor: Operator, db: DB) -> dict:
+def create_device(values: dict[str, Any], actor: Admin, db: DB) -> dict:
 	return device_view(devices.save_device(db, values, actor.user_id))
 
 
 @router.get("/{device_id:int}")
-def get_device(device_id: int, actor: Operator, db: DB) -> dict:
+def get_device(device_id: int, actor: Admin, db: DB) -> dict:
 	return device_view(devices.get_device(db, device_id))
 
 
 @router.patch("/{device_id}")
-def update_device(device_id: int, values: dict[str, Any], actor: Operator, db: DB) -> dict:
+def update_device(device_id: int, values: dict[str, Any], actor: Admin, db: DB) -> dict:
 	return device_view(devices.save_device(db, values, actor.user_id, device_id))
 
 
 @router.delete("/{device_id}")
-def delete_device(device_id: int, actor: Operator, db: DB) -> dict:
+def delete_device(device_id: int, actor: Admin, db: DB) -> dict:
 	devices.delete_device(db, devices.get_device(db, device_id), actor.user_id)
 	return {"ok": True}
 
 
 @router.post("/{device_id}/test")
-def test_connection(device_id: int, actor: Operator, db: DB) -> dict:
+def test_connection(device_id: int, actor: Admin, db: DB) -> dict:
 	return devices.test_connection(db, devices.get_device(db, device_id))
 
 
 @router.post("/{device_id}/sync")
-def sync_now(device_id: int, actor: Operator, db: DB) -> dict:
+def sync_now(device_id: int, actor: Admin, db: DB) -> dict:
 	return _sync_view(devices.sync_device(db, devices.get_device(db, device_id)), actor.language)
 
 
 @router.post("/{device_id}/resync")
-def resync(device_id: int, body: Since, actor: Operator, db: DB) -> dict:
+def resync(device_id: int, body: Since, actor: Admin, db: DB) -> dict:
 	return _sync_view(devices.resync_from(db, devices.get_device(db, device_id), body.jdate), actor.language)
 
 
 @router.post("/{device_id}/read-users")
-def read_users(device_id: int, actor: Operator, db: DB) -> dict:
+def read_users(device_id: int, actor: Admin, db: DB) -> dict:
 	return devices.read_device_users(db, devices.get_device(db, device_id), actor.user_id)
 
 
 @router.post("/{device_id}/set-clock")
-def set_clock(device_id: int, actor: Operator, db: DB) -> dict:
+def set_clock(device_id: int, actor: Admin, db: DB) -> dict:
 	return {"set_to": devices.set_device_clock(db, devices.get_device(db, device_id), actor.user_id)}
 
 
@@ -99,12 +99,12 @@ def set_clock(device_id: int, actor: Operator, db: DB) -> dict:
 
 
 @router.get("/users/unmapped")
-def unmapped(actor: Operator, db: DB) -> list[dict]:
+def unmapped(actor: Admin, db: DB) -> list[dict]:
 	return devices.unmapped_device_users(db)
 
 
 @router.get("/{device_id}/users")
-def device_users(device_id: int, actor: Operator, db: DB) -> list[dict]:
+def device_users(device_id: int, actor: Admin, db: DB) -> list[dict]:
 	rows = db.scalars(
 		select(DeviceUserMap)
 		.where(DeviceUserMap.device_id == device_id)
@@ -114,12 +114,12 @@ def device_users(device_id: int, actor: Operator, db: DB) -> list[dict]:
 
 
 @router.post("/users")
-def create_mapping(values: dict[str, Any], actor: Operator, db: DB) -> dict:
+def create_mapping(values: dict[str, Any], actor: Admin, db: DB) -> dict:
 	return audit.snapshot(devices.save_mapping(db, values, actor.user_id))
 
 
 @router.patch("/users/{map_id}")
-def update_mapping(map_id: int, values: dict[str, Any], actor: Operator, db: DB) -> dict:
+def update_mapping(map_id: int, values: dict[str, Any], actor: Admin, db: DB) -> dict:
 	return audit.snapshot(devices.save_mapping(db, values, actor.user_id, map_id))
 
 
@@ -127,19 +127,19 @@ def update_mapping(map_id: int, values: dict[str, Any], actor: Operator, db: DB)
 
 
 @router.get("/import-templates")
-def templates(actor: Operator, db: DB) -> list[dict]:
+def templates(actor: Admin, db: DB) -> list[dict]:
 	return [
 		audit.snapshot(t) for t in db.scalars(select(PunchImportTemplate).order_by(PunchImportTemplate.name))
 	]
 
 
 @router.post("/import-templates")
-def create_template(values: dict[str, Any], actor: Operator, db: DB) -> dict:
+def create_template(values: dict[str, Any], actor: Admin, db: DB) -> dict:
 	return audit.snapshot(devices.save_template(db, values, actor.user_id))
 
 
 @router.patch("/import-templates/{template_id}")
-def update_template(template_id: int, values: dict[str, Any], actor: Operator, db: DB) -> dict:
+def update_template(template_id: int, values: dict[str, Any], actor: Admin, db: DB) -> dict:
 	return audit.snapshot(devices.save_template(db, values, actor.user_id, template_id))
 
 
@@ -150,7 +150,7 @@ def import_view(r: PunchImport) -> dict:
 
 
 @router.get("/imports")
-def imports(actor: Operator, db: DB) -> list[dict]:
+def imports(actor: Admin, db: DB) -> list[dict]:
 	return [
 		import_view(r) for r in db.scalars(select(PunchImport).order_by(PunchImport.id.desc()).limit(200))
 	]
@@ -161,7 +161,7 @@ def import_file(
 	device_id: int,
 	template_id: Annotated[int, Form()],
 	file: Annotated[UploadFile, File()],
-	actor: Operator,
+	actor: Admin,
 	db: DB,
 ) -> dict:
 	template = db.get(PunchImportTemplate, template_id)

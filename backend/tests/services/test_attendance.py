@@ -44,7 +44,12 @@ def test_a_full_day_is_present(org):
 	row = day(org, SUNDAY)
 	assert (row.status, row.worked_minutes, row.credited_minutes) == ("present", 477, 470)
 	assert (row.first_in, row.last_out, row.punch_count) == (time(7, 58), time(16, 35), 2)
-	assert (row.shift_id, row.work_pattern_id, row.department_id) == (org.office.id, org.week.id, org.team.id)
+	assert (row.shift_id, row.work_pattern_id, row.department_id, row.designation_id) == (
+		org.office.id,
+		org.week.id,
+		org.sales.id,
+		org.expert_designation.id,
+	)
 	assert row.rule_set_id is not None and row.weekday == 1
 
 
@@ -87,7 +92,7 @@ def test_approved_daily_leave_is_stored_per_leave_type(org):
 		},
 		TODAY,
 	)
-	requests.act(org.db, org.mgr, r.id, "approve", None, TODAY)  # operator entries: direct manager
+	requests.act(org.db, org.mgr, r.id, "approve", None, TODAY)  # admin entries: the parent approves
 	assert r.status == "approved"
 	calc(org, SUNDAY)
 	row = day(org, SUNDAY)

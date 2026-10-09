@@ -34,8 +34,8 @@ OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL, OFFICE_CLOSURE, COMPANY_INT
 HOLIDAY_TYPES = (OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL, OFFICE_CLOSURE, COMPANY_INTERNAL)
 CONFIRMED, PREDICTED = "confirmed", "predicted"
 HOLIDAY_STATUSES = (CONFIRMED, PREDICTED)
-COUNTRY, PROVINCE, BRANCH, COMPANY = "country", "province", "branch", "company"
-HOLIDAY_SCOPES = (COUNTRY, PROVINCE, BRANCH, COMPANY)
+COUNTRY, PROVINCE, WORK_LOCATION, COMPANY = "country", "province", "work_location", "company"
+HOLIDAY_SCOPES = (COUNTRY, PROVINCE, WORK_LOCATION, COMPANY)
 BUNDLED, TIME_IR, FILE, MANUAL = "bundled", "time_ir", "file", "manual"
 HOLIDAY_SOURCES = (BUNDLED, TIME_IR, FILE, MANUAL)
 # How an office closure is paid (only for office_closure).
@@ -58,7 +58,9 @@ class Holiday(IdMixin, TimestampMixin, Base):
 		enum_check("scope", HOLIDAY_SCOPES),
 		enum_check("source", HOLIDAY_SOURCES),
 		CheckConstraint("(scope = 'province') = (province_id IS NOT NULL)", name="province_scope"),
-		CheckConstraint("(scope = 'branch') = (branch_id IS NOT NULL)", name="branch_scope"),
+		CheckConstraint(
+			"(scope = 'work_location') = (work_location_id IS NOT NULL)", name="work_location_scope"
+		),
 		CheckConstraint(
 			"closure_pay_mode IS NULL OR (holiday_type = 'office_closure' AND closure_pay_mode IN "
 			"('paid_holiday', 'employer_paid', 'workday'))",
@@ -73,7 +75,7 @@ class Holiday(IdMixin, TimestampMixin, Base):
 			"title",
 			"scope",
 			text("coalesce(province_id, 0)"),
-			text("coalesce(branch_id, 0)"),
+			text("coalesce(work_location_id, 0)"),
 			unique=True,
 		),
 	)
@@ -86,7 +88,7 @@ class Holiday(IdMixin, TimestampMixin, Base):
 	status: Mapped[str] = mapped_column(String(20), server_default=CONFIRMED)
 	scope: Mapped[str] = mapped_column(String(20), server_default=COUNTRY)
 	province_id: Mapped[int | None] = mapped_column(ForeignKey("province.id"))
-	branch_id: Mapped[int | None] = mapped_column(ForeignKey("branch.id"))
+	work_location_id: Mapped[int | None] = mapped_column(ForeignKey("work_location.id"))
 	closure_pay_mode: Mapped[str | None] = mapped_column(String(20))
 	source: Mapped[str] = mapped_column(String(20), server_default=MANUAL)
 	# Stable key from the source (seed key, time.ir event) so a refresh can match rows.
@@ -94,7 +96,7 @@ class Holiday(IdMixin, TimestampMixin, Base):
 	note: Mapped[str | None] = mapped_column(Text)
 	change_reason: Mapped[str | None] = mapped_column(Text)
 	# The operator changed a row that came from a source; a refresh will not overwrite it.
-	edited_by_operator: Mapped[bool] = mapped_column(Boolean, server_default=false())
+	edited_by_admin: Mapped[bool] = mapped_column(Boolean, server_default=false())
 
 
 class CalendarYear(Base):

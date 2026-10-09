@@ -64,7 +64,7 @@ export interface Employee {
   code: string
   full_name: string
   department_id: number | null
-  branch_id: number | null
+  work_location_id: number | null
   status: string // active | suspended | left
 }
 
@@ -79,7 +79,7 @@ export interface LeaveType {
 export interface ApprovalStep {
   step: number
   approver_type: string
-  approver_name: string | null
+  approver_names: string[]
   status: string
   acted_at: string | null
   comment: string | null
@@ -97,9 +97,9 @@ export interface RequestView {
   start_jdate: string
   end_jdate: string
   reason: string | null
-  entered_by_operator: boolean
+  entered_by_admin: boolean
   created_at: string | null
-  waiting_for: string | null
+  waiting_for: string[]
   approvals: ApprovalStep[]
   can_act?: boolean
   is_acceptance?: boolean

@@ -1,7 +1,9 @@
 """Which shift an employee works on a Jalali day.
 
-Priority (design doc): one-day shift override, then an assignment to the employee, to their
-designation, to their department (or the nearest parent department), then the company.
+Priority: one-day shift override, then an assignment to the employee, to a designation they
+hold on that day, to their department, then to the company. A rotating pattern starts its
+cycle on the pattern's first day plus the assignment's offset, so two groups can follow the
+same pattern half a cycle apart.
 """
 
 from __future__ import annotations
@@ -23,7 +25,7 @@ from hozur.db.models.schedules import (
 )
 from hozur.engine import model as engine
 from hozur.jalali.dates import days_between, weekday
-from hozur.services.access import ancestors
+from hozur.services.access import designations_on
 
 OVERRIDE, NONE = "override", "none"
 
@@ -79,7 +81,7 @@ class ScheduleResolver:
 		self._patterns: dict[int, WorkPattern] = {}
 		self._assignments: list[WorkPatternAssignment] | None = None
 		self._employees: dict[int, Employee] = {}
-		self._ancestors: dict[int | None, list[int]] = {}
+		self._held: dict[tuple[int, str], list[int]] = {}
 
 	def shift(self, shift_id: int) -> engine.Shift:
 		if shift_id not in self._shifts:
@@ -105,14 +107,13 @@ class ScheduleResolver:
 			self._employees[employee_id] = self.session.get(Employee, employee_id)
 		return self._employees[employee_id]
 
-	def _department_chain(self, department_id: int | None) -> list[int]:
-		if department_id not in self._ancestors:
-			self._ancestors[department_id] = ancestors(self.session, department_id)
-		return self._ancestors[department_id]
+	def _designations(self, employee_id: int, jdate: str) -> list[int]:
+		key = (employee_id, jdate)
+		if key not in self._held:
+			self._held[key] = designations_on(self.session, employee_id, jdate)
+		return self._held[key]
 
-	def _assignment(self, target: str, value: int | None, jdate: str) -> int | None:
-		if target != TARGET_COMPANY and not value:
-			return None
+	def _assignment(self, target: str, values: set[int | None], jdate: str) -> WorkPatternAssignment | None:
 		field = {
 			TARGET_EMPLOYEE: "employee_id",
 			TARGET_DESIGNATION: "designation_id",
@@ -121,30 +122,33 @@ class ScheduleResolver:
 		for a in self._all_assignments():  # newest valid_from first
 			if a.target_type != target or a.valid_from > jdate or (a.valid_to and jdate > a.valid_to):
 				continue
-			if target == TARGET_COMPANY or getattr(a, field[target]) == value:
-				return a.work_pattern_id
+			if target == TARGET_COMPANY or getattr(a, field[target]) in values:
+				return a
 		return None
 
-	def pattern_for(self, employee_id: int, jdate: str) -> tuple[int | None, str]:
+	def pattern_for(self, employee_id: int, jdate: str) -> tuple[int | None, str, int]:
+		"""(pattern id, where it came from, cycle offset in days)."""
 		emp = self._employee(employee_id)
-		for target, value in ((TARGET_EMPLOYEE, employee_id), (TARGET_DESIGNATION, emp.designation_id)):
-			pattern = self._assignment(target, value, jdate)
-			if pattern:
-				return pattern, target
-		for department in self._department_chain(emp.department_id):
-			pattern = self._assignment(TARGET_DEPARTMENT, department, jdate)
-			if pattern:
-				return pattern, TARGET_DEPARTMENT
-		pattern = self._assignment(TARGET_COMPANY, None, jdate)
-		return (pattern, TARGET_COMPANY) if pattern else (None, NONE)
+		for target, values in (
+			(TARGET_EMPLOYEE, {employee_id}),
+			(TARGET_DESIGNATION, set(self._designations(employee_id, jdate))),
+			(TARGET_DEPARTMENT, {emp.department_id} - {None}),
+			(TARGET_COMPANY, {None}),
+		):
+			if target != TARGET_COMPANY and not values:
+				continue
+			found = self._assignment(target, values, jdate)
+			if found:
+				return found.work_pattern_id, target, found.cycle_offset_days
+		return None, NONE, 0
 
-	def _pattern_day(self, pattern: WorkPattern, jdate: str) -> tuple[int | None, bool, bool]:
+	def _pattern_day(self, pattern: WorkPattern, jdate: str, offset: int) -> tuple[int | None, bool, bool]:
 		"""(shift id or None, weekly rest day?, rotating?) for a day of a pattern."""
 		if pattern.pattern_type == ROTATING:
 			length = len(pattern.days)
 			if not length:
 				return None, True, True
-			index = days_between(pattern.cycle_start_date, jdate) % length + 1
+			index = (days_between(pattern.cycle_start_date, jdate) + offset) % length + 1
 			row = next((d for d in pattern.days if d.cycle_day == index), None)
 			shift_id = row.shift_id if row else None
 			return shift_id, shift_id is None, True
@@ -158,7 +162,7 @@ class ScheduleResolver:
 				ShiftOverride.employee_id == employee_id, ShiftOverride.jdate == jdate
 			)
 		)
-		pattern_id, source = self.pattern_for(employee_id, jdate)
+		pattern_id, source, offset = self.pattern_for(employee_id, jdate)
 		pattern = self.pattern(pattern_id) if pattern_id else None
 		rotating = bool(pattern) and pattern.pattern_type == ROTATING
 		if override:
@@ -166,7 +170,7 @@ class ScheduleResolver:
 			return Schedule(shift, override.shift_id, False, pattern_id, rotating, OVERRIDE)
 		if not pattern:
 			return Schedule(None, None, False, None, False, NONE)
-		shift_id, rest_day, rotating = self._pattern_day(pattern, jdate)
+		shift_id, rest_day, rotating = self._pattern_day(pattern, jdate, offset)
 		return Schedule(
 			self.shift(shift_id) if shift_id else None, shift_id, rest_day, pattern_id, rotating, source
 		)

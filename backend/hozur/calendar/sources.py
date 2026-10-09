@@ -42,7 +42,7 @@ class SourceHoliday:
 
 
 def lenient_jdate(value: str) -> str:
-	"""Operator files may write 1406/1/1 or 1406-01-01; store 1406/01/01 (raises if invalid)."""
+	"""Admin files may write 1406/1/1 or 1406-01-01; store 1406/01/01 (raises if invalid)."""
 	parts = re.split(r"[/-]", to_ascii_digits(value.strip()))
 	if len(parts) != 3 or not all(p.isdigit() for p in parts):
 		raise InvalidJalaliDate(value)

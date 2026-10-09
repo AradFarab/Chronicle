@@ -7,11 +7,12 @@
 			<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
 				<JalaliDatePicker v-model="fromDate" :label="__('From')" />
 				<JalaliDatePicker v-model="toDate" :label="__('Until')" />
+				<Combobox v-model="workLocationId" :label="__('Work location')" :options="refOptions('work-locations')" />
 				<Combobox v-model="departmentId" :label="__('Department')" :options="refOptions('departments')" />
 				<Combobox v-model="employeeId" :label="__('Employee')" :options="refOptions('employees')" />
 			</div>
 
-			<!-- ad-hoc report (operators) -->
+			<!-- ad-hoc report (system admin) -->
 			<div v-if="templateId === CUSTOM" class="flex flex-col gap-3 border-t border-outline-gray-1 pt-3">
 				<div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
 					<Select v-model="spec.source" :label="__('Rows')" :options="sourceOptions" />
@@ -140,6 +141,7 @@ const month = Number((session.today || "1405/01").slice(5, 7))
 const pad = (n: number) => String(n).padStart(2, "0")
 const fromDate = ref<string | null>(`${year}/${pad(month)}/01`)
 const toDate = ref<string | null>(`${year}/${pad(month)}/${pad(monthLength(year, month))}`)
+const workLocationId = ref<number | null>(null)
 const departmentId = ref<number | null>(null)
 const employeeId = ref<number | null>(null)
 const spec = reactive({ source: "summary", group_by: null as string | null, time_unit: "hours_minutes", columns: [] as string[] })
@@ -151,7 +153,7 @@ const busy = ref("")
 
 const templateOptions = computed(() => [
 	...templates.value.map((t) => ({ value: t.id, label: t.name })),
-	...(session.is_operator ? [{ value: CUSTOM, label: __("A new report…") }] : []),
+	...(session.is_admin ? [{ value: CUSTOM, label: __("A new report…") }] : []),
 ])
 const sourceOptions = [
 	{ value: "summary", label: __("One row per person") },
@@ -194,6 +196,7 @@ function body(exportFormat?: string) {
 		filters: {
 			from_date: fromDate.value,
 			to_date: toDate.value,
+			work_location_id: workLocationId.value,
 			department_id: departmentId.value,
 			employee_id: employeeId.value,
 		},

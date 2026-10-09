@@ -3,6 +3,7 @@
 		<div class="flex items-center gap-2">
 			<Button :aria-label="__('Back')" icon="lucide-arrow-right" :route="{ name: 'manage' }" />
 			<h1 class="flex-1 text-xl font-semibold">{{ def.title }}</h1>
+			<ExcelImport v-if="canWrite && hasImport(def.name)" :name="def.name" @done="load" />
 			<Button v-if="canWrite" variant="solid" icon-left="lucide-plus" @click="edit(null)">{{ __("New") }}</Button>
 		</div>
 		<TextInput v-model="search" :placeholder="__('Search')" />
@@ -37,9 +38,11 @@
 <script setup lang="ts">
 import { Button, ErrorMessage, TextInput } from "frappe-ui"
 import { computed, ref, watch } from "vue"
+import ExcelImport from "@/components/ExcelImport.vue"
 import ResourceForm from "@/components/ResourceForm.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
+import { hasImport } from "@/lib/imports"
 import { display, fa } from "@/lib/jalali"
 import { refLabel } from "@/lib/refs"
 import { resourceDef, type FieldDef } from "@/lib/resources"
@@ -55,7 +58,7 @@ const search = ref("")
 const formOpen = ref(false)
 const current = ref<Record<string, unknown> | null>(null)
 
-const canWrite = computed(() => (def.value?.admin ? session.is_admin : session.is_operator))
+const canWrite = computed(() => session.is_admin)
 const columns = computed(() => def.value?.fields.filter((f) => f.list) ?? [])
 
 const filtered = computed(() => {
@@ -67,7 +70,7 @@ const filtered = computed(() => {
 function cell(field: FieldDef, row: Record<string, unknown>): string {
 	const value = row[field.key]
 	if (value === null || value === undefined || value === "") return ""
-	if (field.type === "bool") return value ? "✓" : ""
+	if (field.type === "bool" || field.type === "badge") return value ? "✓" : ""
 	if (field.type === "jdate") return display(String(value))
 	if (field.type === "ref") return refLabel(field.ref!, value)
 	if (field.type === "select") {

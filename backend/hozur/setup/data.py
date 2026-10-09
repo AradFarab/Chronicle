@@ -1,4 +1,4 @@
-"""Reference data seeded on install. Everything here is ordinary data the operator may edit."""
+"""Reference data seeded on install. Everything here is ordinary data the system admin may edit."""
 
 # The 31 provinces of Iran (for provincial holidays).
 PROVINCES = (
@@ -35,27 +35,32 @@ PROVINCES = (
 	"یزد",
 )
 
-ROOT_DEPARTMENT = "همه واحدها"
+# The top of the designation tree: whoever holds it approves where the parent is the CEO.
+CEO_DESIGNATION = "مدیرعامل"
 
-# Standard approval processes (design doc, approval section). Names are data, editable.
+# Standard approval processes. Names are data, editable.
+#   1. the parent (whoever holds the designation just above) approves;
+#   2. the parent, then the CEO (only the CEO when the parent is the CEO);
+#   3. the CEO alone.
+# The CEO has no parent, so none of them asks anything of the CEO's own requests.
 NO_APPROVAL = "بدون تأیید"
-DIRECT_MANAGER = "مدیر مستقیم"
-MANAGER_THEN_CEO = "مدیر مستقیم، سپس مدیرعامل"
+PARENT_ONLY = "تأیید مافوق مستقیم"
+PARENT_THEN_CEO = "مافوق مستقیم، سپس مدیرعامل"
 CEO_ONLY = "فقط مدیرعامل"
 STANDARD_PROCESSES = {
 	NO_APPROVAL: [],
-	DIRECT_MANAGER: ["direct_manager"],
-	MANAGER_THEN_CEO: ["direct_manager", "ceo"],
+	PARENT_ONLY: ["parent"],
+	PARENT_THEN_CEO: ["parent", "ceo"],
 	CEO_ONLY: ["ceo"],
 }
-# Default process per request type (design doc examples); the operator changes them.
+# Default process per request type; the system admin changes them.
 DEFAULT_PROCESSES = {
-	"daily_leave": MANAGER_THEN_CEO,
-	"hourly_leave": DIRECT_MANAGER,
-	"overtime": DIRECT_MANAGER,
-	"mission": MANAGER_THEN_CEO,
-	"attendance_correction": DIRECT_MANAGER,
-	"operator_entry": DIRECT_MANAGER,
+	"daily_leave": PARENT_THEN_CEO,
+	"hourly_leave": PARENT_ONLY,
+	"overtime": PARENT_ONLY,
+	"mission": PARENT_THEN_CEO,
+	"attendance_correction": PARENT_ONLY,
+	"admin_entry": PARENT_ONLY,
 }
 
 # name, category, paid, deducts from balance, hourly allowed, rule-set limit, once in service

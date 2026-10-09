@@ -22,6 +22,7 @@ export type FieldType =
   | "ref"
   | "children"
   | "params"
+  | "badge" // a read-only flag shown as a badge (never sent back)
 
 export interface FieldDef {
   key: string
@@ -35,16 +36,15 @@ export interface FieldDef {
   children?: FieldDef[]
   show?: (values: Record<string, unknown>) => boolean
   dir?: "ltr"
+  helper?: "rotation" // a builder shown above the child rows (the quick rotation of a work pattern)
 }
 
 export interface ResourceDef {
   name: string // URL segment under /api/admin
   title: string
   singular: string
-  group: string
   icon: string
   fields: FieldDef[]
-  admin?: boolean // only admins may change it
   reasonOnChange?: boolean
   canDelete?: boolean
   defaults?: Record<string, unknown>
@@ -70,10 +70,9 @@ export const requestTypeOptions = opts([
 
 export const RESOURCES: ResourceDef[] = [
   {
-    name: "branches",
-    title: __("Branches"),
-    singular: __("Branch"),
-    group: __("Organization"),
+    name: "work-locations",
+    title: __("Work locations"),
+    singular: __("Work location"),
     icon: "lucide-building-2",
     canDelete: true,
     defaults: { is_active: true },
@@ -89,35 +88,28 @@ export const RESOURCES: ResourceDef[] = [
     name: "departments",
     title: __("Departments"),
     singular: __("Department"),
-    group: __("Organization"),
     icon: "lucide-network",
     canDelete: true,
-    fields: [
-      { key: "name", label: __("Name"), type: "text", required: true, list: true },
-      { key: "parent_id", label: __("Parent department"), type: "ref", ref: "departments", list: true },
-      { key: "is_group", label: __("Has sub-departments"), type: "bool" },
-      { key: "manager_id", label: __("Manager"), type: "ref", ref: "employees", list: true },
-      {
-        key: "default_approver_id",
-        label: __("Default approver"),
-        type: "ref",
-        ref: "employees",
-        help: __("When set, approves instead of the manager"),
-      },
-      { key: "deputy_id", label: __("Deputy"), type: "ref", ref: "employees" },
-      { key: "deputy_from", label: __("Deputy from"), type: "jdate" },
-      { key: "deputy_to", label: __("Deputy until"), type: "jdate" },
-    ],
+    fields: [{ key: "name", label: __("Name"), type: "text", required: true, list: true }],
   },
   {
     name: "designations",
     title: __("Designations"),
     singular: __("Designation"),
-    group: __("Organization"),
     icon: "lucide-briefcase",
     canDelete: true,
     fields: [
       { key: "name", label: __("Name"), type: "text", required: true, list: true },
+      { key: "is_ceo", label: __("CEO"), type: "badge", list: true },
+      {
+        key: "parent_id",
+        label: __("Designation above"),
+        type: "ref",
+        ref: "designations",
+        list: true,
+        help: __("Whoever holds the designation above approves the requests of the people below"),
+        show: (v) => !v.is_ceo,
+      },
       {
         key: "hard_and_harmful",
         label: __("Hard and harmful work"),
@@ -131,81 +123,23 @@ export const RESOURCES: ResourceDef[] = [
     ],
   },
   {
-    name: "employees",
-    title: __("Employees"),
-    singular: __("Employee"),
-    group: __("Organization"),
-    icon: "lucide-users",
-    defaults: { status: "active", contract_type: "full_time" },
+    name: "designation-assignments",
+    title: __("Designations held"),
+    singular: __("Designation held"),
+    icon: "lucide-user-check",
+    canDelete: true,
     fields: [
-      { key: "code", label: __("Personnel code"), type: "text", required: true, list: true, dir: "ltr" },
-      { key: "first_name", label: __("First name"), type: "text", required: true },
-      { key: "last_name", label: __("Last name"), type: "text", required: true },
-      { key: "full_name", label: __("Full name"), type: "text", list: true, show: () => false },
-      { key: "national_id", label: __("National code"), type: "text", dir: "ltr" },
-      {
-        key: "gender",
-        label: __("Gender"),
-        type: "select",
-        options: opts([
-          ["male", __("Male")],
-          ["female", __("Female")],
-        ]),
-      },
-      { key: "mobile", label: __("Mobile"), type: "text", dir: "ltr" },
-      { key: "email", label: __("Email"), type: "text", dir: "ltr" },
-      {
-        key: "status",
-        label: __("Status"),
-        type: "select",
-        required: true,
-        list: true,
-        options: opts([
-          ["active", __("Active")],
-          ["suspended", __("Suspended")],
-          ["left", __("Left")],
-        ]),
-      },
-      {
-        key: "contract_type",
-        label: __("Contract"),
-        type: "select",
-        required: true,
-        options: opts([
-          ["full_time", __("Full time")],
-          ["part_time", __("Part time")],
-          ["hourly", __("Hourly")],
-        ]),
-      },
-      { key: "start_date", label: __("Start date"), type: "jdate", required: true },
-      { key: "end_date", label: __("End date"), type: "jdate" },
-      { key: "branch_id", label: __("Branch"), type: "ref", ref: "branches" },
-      { key: "department_id", label: __("Department"), type: "ref", ref: "departments", list: true },
-      { key: "designation_id", label: __("Designation"), type: "ref", ref: "designations" },
-      { key: "reports_to_id", label: __("Reports to"), type: "ref", ref: "employees" },
-      {
-        key: "overtime_consent_on_file",
-        label: __("Written overtime consent on file"),
-        type: "bool",
-        help: __("Article 59"),
-      },
-      { key: "overtime_consent_date", label: __("Overtime consent date"), type: "jdate" },
-      { key: "birth_date", label: __("Birth date"), type: "jdate", help: __("Only for young-worker rules") },
-      {
-        key: "biometric_consent_date",
-        label: __("Biometric consent date"),
-        type: "jdate",
-        help: __("Written consent is needed before enrolling face or fingerprint"),
-      },
-      { key: "uses_card_instead_of_biometrics", label: __("Uses a card instead of biometrics"), type: "bool" },
-      { key: "nursing_until", label: __("Nursing breaks until"), type: "jdate", help: __("Article 78") },
+      { key: "employee_id", label: __("Employee"), type: "ref", ref: "employees", required: true, list: true },
+      { key: "designation_id", label: __("Designation"), type: "ref", ref: "designations", required: true, list: true },
+      { key: "valid_from", label: __("From"), type: "jdate", required: true, list: true },
+      { key: "valid_to", label: __("Until"), type: "jdate", list: true },
+      { key: "note", label: __("Note"), type: "textarea" },
     ],
   },
   {
     name: "shifts",
     title: __("Shifts"),
     singular: __("Shift"),
-    group: __("Work schedules"),
     icon: "lucide-clock",
     canDelete: true,
     defaults: { shift_type: "fixed", break_minutes: 0, grace_late_minutes: 0, grace_early_minutes: 0, overtime_after_minutes: 0 },
@@ -249,7 +183,6 @@ export const RESOURCES: ResourceDef[] = [
     name: "work-patterns",
     title: __("Work patterns"),
     singular: __("Work pattern"),
-    group: __("Work schedules"),
     icon: "lucide-calendar-range",
     canDelete: true,
     defaults: { pattern_type: "weekly", weekly_rest_day: 6, days: [] },
@@ -283,6 +216,7 @@ export const RESOURCES: ResourceDef[] = [
         key: "days",
         label: __("Days"),
         type: "children",
+        helper: "rotation",
         children: [
           {
             key: "weekday",
@@ -308,10 +242,9 @@ export const RESOURCES: ResourceDef[] = [
     name: "work-pattern-assignments",
     title: __("Pattern assignments"),
     singular: __("Pattern assignment"),
-    group: __("Work schedules"),
     icon: "lucide-calendar-check",
     canDelete: true,
-    defaults: { target_type: "employee" },
+    defaults: { target_type: "employee", cycle_offset_days: 0 },
     fields: [
       {
         key: "target_type",
@@ -322,7 +255,7 @@ export const RESOURCES: ResourceDef[] = [
         options: opts([
           ["employee", __("One employee")],
           ["designation", __("A designation")],
-          ["department", __("A department and its sub-departments")],
+          ["department", __("A department")],
           ["company", __("The whole company")],
         ]),
       },
@@ -351,6 +284,14 @@ export const RESOURCES: ResourceDef[] = [
         show: (v) => v.target_type === "department",
       },
       { key: "work_pattern_id", label: __("Work pattern"), type: "ref", ref: "work-patterns", required: true, list: true },
+      {
+        key: "cycle_offset_days",
+        label: __("Start the cycle later by (days)"),
+        type: "number",
+        help: __(
+          "For a rotating pattern: moves this group along the cycle by this many days, so two groups can follow one pattern half a cycle apart"
+        ),
+      },
       { key: "valid_from", label: __("From"), type: "jdate", required: true, list: true },
       { key: "valid_to", label: __("Until"), type: "jdate", list: true },
       { key: "note", label: __("Note"), type: "textarea" },
@@ -360,7 +301,6 @@ export const RESOURCES: ResourceDef[] = [
     name: "shift-overrides",
     title: __("One-day shift changes"),
     singular: __("Shift change"),
-    group: __("Work schedules"),
     icon: "lucide-calendar-x",
     canDelete: true,
     fields: [
@@ -374,9 +314,7 @@ export const RESOURCES: ResourceDef[] = [
     name: "rule-sets",
     title: __("Labor rule sets"),
     singular: __("Labor rule set"),
-    group: __("Rules"),
     icon: "lucide-scale",
-    admin: true,
     reasonOnChange: true,
     canDelete: true,
     fields: [
@@ -391,9 +329,7 @@ export const RESOURCES: ResourceDef[] = [
     name: "leave-types",
     title: __("Leave types"),
     singular: __("Leave type"),
-    group: __("Rules"),
     icon: "lucide-tree-palm",
-    admin: true,
     canDelete: true,
     defaults: { category: "other" },
     fields: [
@@ -428,9 +364,7 @@ export const RESOURCES: ResourceDef[] = [
     name: "approval-processes",
     title: __("Approval processes"),
     singular: __("Approval process"),
-    group: __("Approvals"),
     icon: "lucide-git-branch",
-    admin: true,
     canDelete: true,
     defaults: { steps: [] },
     fields: [
@@ -447,8 +381,7 @@ export const RESOURCES: ResourceDef[] = [
             label: __("Approver"),
             type: "select",
             options: opts([
-              ["direct_manager", __("Direct manager")],
-              ["parent_department_manager", __("Manager of the parent department")],
+              ["parent", __("Parent in the chart")],
               ["ceo", __("CEO")],
               ["specific_person", __("A specific person")],
             ]),
@@ -462,9 +395,7 @@ export const RESOURCES: ResourceDef[] = [
     name: "approval-overrides",
     title: __("Approval exceptions"),
     singular: __("Approval exception"),
-    group: __("Approvals"),
     icon: "lucide-user-cog",
-    admin: true,
     canDelete: true,
     fields: [
       { key: "employee_id", label: __("Employee"), type: "ref", ref: "employees", required: true, list: true },

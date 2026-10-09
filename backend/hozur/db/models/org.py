@@ -1,4 +1,4 @@
-"""The company, branches, the department tree, job titles and personnel."""
+"""The company, work locations, departments (tags), the designation tree and personnel."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from sqlalchemy import (
 	String,
 	Text,
 	false,
+	text,
 	true,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -38,7 +39,6 @@ class Organization(TimestampMixin, Base):
 	national_id: Mapped[str | None] = mapped_column(String(20))
 	economic_code: Mapped[str | None] = mapped_column(String(20))
 	insurance_workshop_code: Mapped[str | None] = mapped_column(String(20))
-	ceo_id: Mapped[int | None] = mapped_column(ForeignKey("employee.id", use_alter=True, ondelete="SET NULL"))
 	phone: Mapped[str | None] = mapped_column(String(30))
 	address: Mapped[str | None] = mapped_column(Text)
 	logo_file_id: Mapped[int | None] = mapped_column(ForeignKey("stored_file.id", ondelete="SET NULL"))
@@ -50,8 +50,10 @@ class Province(IdMixin, Base):
 	name: Mapped[str] = mapped_column(String(100), unique=True)
 
 
-class Branch(IdMixin, TimestampMixin, Base):
-	__tablename__ = "branch"
+class WorkLocation(IdMixin, TimestampMixin, Base):
+	"""The physical place people work. Its province decides which provincial holidays apply."""
+
+	__tablename__ = "work_location"
 
 	name: Mapped[str] = mapped_column(String(150), unique=True)
 	province_id: Mapped[int] = mapped_column(ForeignKey("province.id"))
@@ -61,36 +63,27 @@ class Branch(IdMixin, TimestampMixin, Base):
 
 
 class Department(IdMixin, TimestampMixin, Base):
-	"""Department tree (adjacency list). Managers approve requests of their subtree."""
+	"""A tag put on people to make reports easier. It has no hierarchy and no manager."""
 
 	__tablename__ = "department"
-	__table_args__ = (
-		CheckConstraint("parent_id <> id", name="not_own_parent"),
-		CheckConstraint(
-			"deputy_to IS NULL OR deputy_from IS NULL OR deputy_to >= deputy_from", name="deputy_range"
-		),
-	)
 
 	name: Mapped[str] = mapped_column(String(150), unique=True)
-	parent_id: Mapped[int | None] = mapped_column(ForeignKey("department.id"), index=True)
-	is_group: Mapped[bool] = mapped_column(Boolean, server_default=false())
-	manager_id: Mapped[int | None] = mapped_column(
-		ForeignKey("employee.id", use_alter=True, ondelete="SET NULL")
-	)
-	default_approver_id: Mapped[int | None] = mapped_column(
-		ForeignKey("employee.id", use_alter=True, ondelete="SET NULL")
-	)
-	deputy_id: Mapped[int | None] = mapped_column(
-		ForeignKey("employee.id", use_alter=True, ondelete="SET NULL")
-	)
-	deputy_from: Mapped[str | None] = mapped_column(JDate)
-	deputy_to: Mapped[str | None] = mapped_column(JDate)
 
 
 class Designation(IdMixin, TimestampMixin, Base):
+	"""A position in the organization chart (سمت). Positions form a tree: the holders of the
+	position above are the "parent" who approves requests. Exactly one root can be the CEO."""
+
 	__tablename__ = "designation"
+	__table_args__ = (
+		CheckConstraint("parent_id <> id", name="not_own_parent"),
+		CheckConstraint("NOT is_ceo OR parent_id IS NULL", name="ceo_is_root"),
+		Index("uq_designation_one_ceo", "is_ceo", unique=True, postgresql_where=text("is_ceo")),
+	)
 
 	name: Mapped[str] = mapped_column(String(150), unique=True)
+	parent_id: Mapped[int | None] = mapped_column(ForeignKey("designation.id"), index=True)
+	is_ceo: Mapped[bool] = mapped_column(Boolean, server_default=false())
 	description: Mapped[str | None] = mapped_column(Text)
 	# Only with a ruling of the hard-and-harmful jobs committee (Articles 52, 61).
 	hard_and_harmful: Mapped[bool] = mapped_column(Boolean, server_default=false())
@@ -106,11 +99,18 @@ class Employee(IdMixin, TimestampMixin, Base):
 		CheckConstraint("gender IS NULL OR gender IN ('male', 'female')", name="gender_valid"),
 		CheckConstraint("national_id ~ '^[0-9]{10}$'", name="national_id_digits"),
 		CheckConstraint("end_date IS NULL OR end_date >= start_date", name="employment_range"),
-		CheckConstraint("reports_to_id <> id", name="not_own_manager"),
 		Index("ix_employee_department_id_status", "department_id", "status"),
+		Index(
+			"uq_employee_detail_code",
+			"detail_code",
+			unique=True,
+			postgresql_where=text("detail_code IS NOT NULL"),
+		),
 	)
 
 	code: Mapped[str] = mapped_column(String(30), unique=True)
+	# Accounting "detail code" (کد تفصیلی): the person's account in the books.
+	detail_code: Mapped[str | None] = mapped_column(String(30))
 	first_name: Mapped[str] = mapped_column(String(100))
 	last_name: Mapped[str] = mapped_column(String(100))
 	full_name: Mapped[str] = mapped_column(
@@ -120,17 +120,14 @@ class Employee(IdMixin, TimestampMixin, Base):
 	gender: Mapped[str | None] = mapped_column(String(10))
 	mobile: Mapped[str | None] = mapped_column(String(20))
 	email: Mapped[str | None] = mapped_column(String(150))
-	user_id: Mapped[int | None] = mapped_column(
-		BigInteger, ForeignKey("app_user.id", ondelete="SET NULL"), unique=True
-	)
+	# Every employee is also a user: creating one creates the other.
+	user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("app_user.id"), unique=True)
 	status: Mapped[str] = mapped_column(String(20), server_default=ACTIVE)
 	contract_type: Mapped[str] = mapped_column(String(20), server_default="full_time")
 	start_date: Mapped[str] = mapped_column(JDate)
 	end_date: Mapped[str | None] = mapped_column(JDate)
-	branch_id: Mapped[int | None] = mapped_column(ForeignKey("branch.id"))
+	work_location_id: Mapped[int | None] = mapped_column(ForeignKey("work_location.id"))
 	department_id: Mapped[int | None] = mapped_column(ForeignKey("department.id"))
-	designation_id: Mapped[int | None] = mapped_column(ForeignKey("designation.id"))
-	reports_to_id: Mapped[int | None] = mapped_column(ForeignKey("employee.id", ondelete="SET NULL"))
 	# Written general consent to overtime (Article 59).
 	overtime_consent_on_file: Mapped[bool] = mapped_column(Boolean, server_default=false())
 	overtime_consent_date: Mapped[str | None] = mapped_column(JDate)
@@ -143,3 +140,21 @@ class Employee(IdMixin, TimestampMixin, Base):
 	uses_card_instead_of_biometrics: Mapped[bool] = mapped_column(Boolean, server_default=false())
 	# Nursing breaks until this day (Article 78).
 	nursing_until: Mapped[str | None] = mapped_column(JDate)
+
+
+class DesignationAssignment(IdMixin, TimestampMixin, Base):
+	"""A person holds a designation from one Jalali day to another. Giving a designation adds a
+	row; taking it away sets the end date, so the history stays."""
+
+	__tablename__ = "designation_assignment"
+	__table_args__ = (
+		CheckConstraint("valid_to IS NULL OR valid_to >= valid_from", name="valid_range"),
+		Index("ix_designation_assignment_employee_id", "employee_id"),
+		Index("ix_designation_assignment_designation_id", "designation_id"),
+	)
+
+	employee_id: Mapped[int] = mapped_column(ForeignKey("employee.id", ondelete="CASCADE"))
+	designation_id: Mapped[int] = mapped_column(ForeignKey("designation.id"))
+	valid_from: Mapped[str] = mapped_column(JDate)
+	valid_to: Mapped[str | None] = mapped_column(JDate)
+	note: Mapped[str | None] = mapped_column(Text)

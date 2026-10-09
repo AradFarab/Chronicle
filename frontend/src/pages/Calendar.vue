@@ -3,6 +3,7 @@
 		<div class="flex items-center gap-2">
 			<Button :aria-label="__('Back')" icon="lucide-arrow-right" :route="{ name: 'manage' }" />
 			<h1 class="flex-1 text-xl font-semibold">{{ __("Holidays") }}</h1>
+			<ExcelImport v-if="hasImport('holidays')" name="holidays" @done="load" />
 			<Button icon-left="lucide-refresh-cw" @click="refreshOpen = true">{{ __("Yearly refresh") }}</Button>
 			<Button variant="solid" icon-left="lucide-plus" @click="edit(null)">{{ __("New") }}</Button>
 		</div>
@@ -74,10 +75,10 @@
 					:options="refOptions('provinces')"
 				/>
 				<Combobox
-					v-if="form.scope === 'branch'"
-					v-model="form.branch_id"
-					:label="__('Branch')"
-					:options="refOptions('branches')"
+					v-if="form.scope === 'work_location'"
+					v-model="form.work_location_id"
+					:label="__('Work location')"
+					:options="refOptions('work-locations')"
 				/>
 				<Select v-model="form.status" :label="__('Status')" :options="holidayStatusOptions()" />
 				<Textarea :model-value="form.note ?? ''" @update:model-value="(v: string) => (form.note = v)" :label="__('Note')" :rows="2" />
@@ -144,9 +145,11 @@
 <script setup lang="ts">
 import { Badge, Button, Combobox, Dialog, ErrorMessage, Select, Textarea, TextInput, toast } from "frappe-ui"
 import { computed, onMounted, reactive, ref, watch } from "vue"
+import ExcelImport from "@/components/ExcelImport.vue"
 import JalaliDatePicker from "@/components/JalaliDatePicker.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
+import { hasImport } from "@/lib/imports"
 import { display, displayLong, fa } from "@/lib/jalali"
 import {
 	calendarSourceOptions,
@@ -167,7 +170,7 @@ interface Holiday {
 	status: string
 	scope: string
 	province_id: number | null
-	branch_id: number | null
+	work_location_id: number | null
 	closure_pay_mode: string | null
 	note: string | null
 }
@@ -213,7 +216,7 @@ interface HolidayForm {
 	status: string
 	closure_pay_mode?: string | null
 	province_id?: number | null
-	branch_id?: number | null
+	work_location_id?: number | null
 	note?: string | null
 	reason?: string
 }
@@ -226,7 +229,7 @@ const blank: HolidayForm = {
 	status: "confirmed",
 	closure_pay_mode: null,
 	province_id: null,
-	branch_id: null,
+	work_location_id: null,
 	note: "",
 	reason: "",
 }

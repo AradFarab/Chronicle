@@ -7,7 +7,7 @@
 		</div>
 
 		<EmployeePicker
-			v-if="session.is_manager || session.is_operator"
+			v-if="session.is_manager || session.is_admin"
 			v-model="employee"
 			:label="__('Employee')"
 			:placeholder="session.employee ? undefined : __('Choose an employee')"
@@ -147,7 +147,7 @@ interface Holiday {
 	holiday_type: string
 	status: string
 	scope: string
-	branch_id: number | null
+	work_location_id: number | null
 	closure_pay_mode: string | null
 }
 
@@ -186,8 +186,12 @@ function dayOffKind(h: Holiday): string | null {
 
 function holidayApplies(h: Holiday): boolean {
 	if (h.scope === "country" || h.scope === "company") return true
-	// a branch holiday is known here only for your own branch; calculated days carry the truth
-	return h.scope === "branch" && employee.value === session.employee?.id && h.branch_id === session.employee?.branch_id
+	// a work-location holiday is known here only for your own work location; calculated days carry the truth
+	return (
+		h.scope === "work_location" &&
+		employee.value === session.employee?.id &&
+		h.work_location_id === session.employee?.work_location_id
+	)
 }
 
 async function load() {
@@ -306,7 +310,7 @@ const canCorrect = computed(
 	() =>
 		!!selected.value &&
 		!dayData.value?.period_closed &&
-		(session.is_operator || (!!employee.value && employee.value === session.employee?.id))
+		(session.is_admin || (!!employee.value && employee.value === session.employee?.id))
 )
 
 async function open(d: Day) {

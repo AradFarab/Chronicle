@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import pytest
+from fastapi.testclient import TestClient
 from orgfactory import PASSWORD, TODAY
 from sqlalchemy import select
 
 from hozur.api import deps
-from hozur.db.models import AuditEntry, Job, LaborRuleSet
-from hozur.services import devices
+from hozur.db.models import AuditEntry, DesignationAssignment, Job, LaborRuleSet
+from hozur.services import devices, users
 
 
 @pytest.fixture(autouse=True)
@@ -18,26 +19,26 @@ def fixed_today(app):
 	app.dependency_overrides.clear()
 
 
-def test_operator_manages_branches_and_audit_is_written(client_for, org):
+def test_admin_manages_work_locations_and_audit_is_written(client_for, org):
 	op = client_for("op")
 	province = op.get("/api/admin/provinces").json()[0]["id"]
-	r = op.post("/api/admin/branches", json={"name": "شعبه شیراز", "province_id": province})
+	r = op.post("/api/admin/work-locations", json={"name": "دفتر شیراز", "province_id": province})
 	assert r.status_code == 200, r.text
 	branch = r.json()
-	r = op.patch(f"/api/admin/branches/{branch['id']}", json={"city": "شیراز"})
+	r = op.patch(f"/api/admin/work-locations/{branch['id']}", json={"city": "شیراز"})
 	assert r.json()["city"] == "شیراز"
 	assert (
-		op.post("/api/admin/branches", json={"name": "شعبه شیراز", "province_id": province}).status_code
+		op.post("/api/admin/work-locations", json={"name": "دفتر شیراز", "province_id": province}).status_code
 		== 409
 	)
-	entries = org.db.scalars(select(AuditEntry).where(AuditEntry.entity == "branch")).all()
+	entries = org.db.scalars(select(AuditEntry).where(AuditEntry.entity == "work_location")).all()
 	assert [e.action for e in entries] == ["insert", "update"]
 
 
 def test_employee_cannot_change_configuration(client_for):
 	emp = client_for("emp")
-	assert emp.get("/api/admin/branches").status_code == 200  # read for forms
-	assert emp.post("/api/admin/branches", json={"name": "x", "province_id": 1}).status_code == 403
+	assert emp.get("/api/admin/work-locations").status_code == 200  # read for forms
+	assert emp.post("/api/admin/work-locations", json={"name": "x", "province_id": 1}).status_code == 403
 	assert emp.get("/api/admin/work-patterns").status_code == 403
 
 
@@ -50,7 +51,13 @@ def test_manager_sees_only_their_subtree(client_for, org):
 def test_new_employee_queues_their_calculation(client_for, org):
 	r = client_for("op").post(
 		"/api/admin/employees",
-		json={"code": "T-NEW", "first_name": "علی", "last_name": "نو", "start_date": "۱۴۰۵/۰۷/۰۱"},
+		json={
+			"code": "T-NEW",
+			"first_name": "علی",
+			"last_name": "نو",
+			"start_date": "۱۴۰۵/۰۷/۰۱",
+			"password": "long-enough-1",
+		},
 	)
 	assert r.status_code == 200, r.text
 	assert r.json()["start_date"] == "1405/07/01" and r.json()["full_name"] == "علی نو"
@@ -96,7 +103,7 @@ def test_work_pattern_with_days(client_for, org):
 def test_rule_sets_are_admin_only_and_never_worse_than_the_law(client_for, org):
 	baseline = org.db.scalar(select(LaborRuleSet).where(LaborRuleSet.is_legal_baseline))
 	params = dict(baseline.parameters)
-	assert client_for("op").post("/api/admin/rule-sets", json={}).status_code == 403
+	assert client_for("emp").post("/api/admin/rule-sets", json={}).status_code == 403
 	admin = client_for("admin")
 	worse = {**params, "annual_leave_days": params["annual_leave_days"] - 1}
 	r = admin.post(
@@ -127,18 +134,16 @@ def test_settings_and_users(client_for, org):
 	assert admin.put("/api/admin/settings", json={"nope": 1}).status_code == 422
 	r = admin.post(
 		"/api/admin/users",
-		json={
-			"username": "New",
-			"password": "long-enough-1",
-			"roles": ["employee"],
-			"employee_id": org.other.id,
-		},
+		json={"username": "New", "password": "long-enough-1", "roles": ["admin"]},
 	)
-	assert r.status_code == 200, r.text
-	org.db.refresh(org.other)
-	assert org.other.user_id == r.json()["id"]
-	r = admin.patch(f"/api/admin/users/{org.users.admin.id}", json={"roles": ["operator"]})
+	assert r.status_code == 200, r.text  # a login without an employee record
+	assert admin.patch(f"/api/admin/users/{org.users.op.id}", json={"roles": ["employee"]}).status_code == 200
+	assert admin.patch(f"/api/admin/users/{r.json()['id']}", json={"roles": ["employee"]}).status_code == 200
+	r = admin.patch(f"/api/admin/users/{org.users.admin.id}", json={"roles": ["employee"]})
 	assert r.status_code == 422  # the last admin stays
+	assert (
+		admin.patch(f"/api/admin/users/{org.users.admin.id}", json={"roles": ["operator"]}).status_code == 422
+	)
 
 
 def test_device_crud_never_returns_the_comm_key(client_for):
@@ -247,9 +252,179 @@ def test_change_own_password_keeps_this_session(client_for):
 def test_device_errors_are_messages_not_crashes(client_for, org):
 	op = client_for("op")
 	r = op.post(
-		"/api/devices", json={"name": "X", "adapter_type": "zkteco", "host": "10.0.0.5", "branch_id": 999999}
+		"/api/devices",
+		json={"name": "X", "adapter_type": "zkteco", "host": "10.0.0.5", "work_location_id": 999999},
 	)
 	assert r.status_code == 422
 	assert op.get(f"/api/devices/{org.device.id}").json()["name"] == "T-Device"
 	assert op.get("/api/devices/imports").status_code == 200
 	assert op.get("/api/attendance/day", params={"employee_id": 999999, "jdate": TODAY}).status_code == 404
+
+
+def test_creating_an_employee_creates_the_login_and_the_first_designation(client_for, org):
+	admin = client_for("admin")
+	r = admin.post(
+		"/api/admin/employees",
+		json={
+			"code": "T-NEW",
+			"detail_code": "10020030",
+			"first_name": "نگین",
+			"last_name": "نوری",
+			"start_date": "1405/07/01",
+			"password": "long-enough-1",
+			"designation_id": org.expert_designation.id,
+			"department_id": org.sales.id,
+		},
+	)
+	assert r.status_code == 200, r.text
+	body = r.json()
+	assert body["username"] == "t-new" and body["detail_code"] == "10020030" and body["is_active_user"]
+	assert [d["designation_id"] for d in body["designations"] if d["current"]] == [org.expert_designation.id]
+	# the new person can log in with the password given on creation
+	other = TestClient(admin.app, headers={"X-Hozur": "1"})
+	assert (
+		other.post("/api/auth/login", json={"username": "t-new", "password": "long-enough-1"}).status_code
+		== 200
+	)
+	assert other.get("/api/me").json()["employee"]["code"] == "T-NEW"
+	# the same accounting detail code cannot be given twice
+	again = admin.post(
+		"/api/admin/employees",
+		json={
+			"code": "T-NEW2",
+			"detail_code": "10020030",
+			"first_name": "a",
+			"last_name": "b",
+			"start_date": "1405/07/01",
+			"password": "long-enough-1",
+		},
+	)
+	assert again.status_code == 409
+	# a password is needed
+	assert (
+		admin.post(
+			"/api/admin/employees",
+			json={"code": "T-X", "first_name": "a", "last_name": "b", "start_date": "1405/07/01"},
+		).status_code
+		== 422
+	)
+
+
+def test_a_person_who_left_can_no_longer_log_in(client_for, org):
+	admin = client_for("admin")
+	r = admin.patch(
+		f"/api/admin/employees/{org.employee.id}", json={"status": "left", "end_date": "1405/07/10"}
+	)
+	assert r.status_code == 200 and not r.json()["is_active_user"]
+	fresh = TestClient(admin.app, headers={"X-Hozur": "1"})
+	from orgfactory import PASSWORD
+
+	org.users.emp.password_hash = users.hash_password(PASSWORD)
+	org.db.flush()
+	assert fresh.post("/api/auth/login", json={"username": "t-emp", "password": PASSWORD}).status_code == 401
+
+
+def test_only_the_admin_changes_employees(client_for, org):
+	assert client_for("mgr").post("/api/admin/employees", json={"code": "Z"}).status_code == 403
+	assert (
+		client_for("mgr").patch(f"/api/admin/employees/{org.employee.id}", json={"mobile": "09"}).status_code
+		== 403
+	)
+
+
+def test_designation_tree_rules(client_for, org):
+	admin = client_for("admin")
+	# nothing can be placed below itself, and the CEO designation stays at the top
+	loop = admin.patch(
+		f"/api/admin/designations/{org.manager_designation.id}", json={"parent_id": org.expert_designation.id}
+	)
+	assert loop.status_code == 422
+	assert (
+		admin.patch(
+			f"/api/admin/designations/{org.manager_designation.id}", json={"is_ceo": True}
+		).status_code
+		== 422
+	)
+	# taking a designation away keeps the history
+	hold = org.db.scalars(
+		select(DesignationAssignment).where(DesignationAssignment.employee_id == org.employee.id)
+	).one()
+	r = admin.patch(f"/api/admin/designation-assignments/{hold.id}", json={"valid_to": "1405/07/10"})
+	assert r.status_code == 200 and r.json()["valid_to"] == "1405/07/10"
+	job = org.db.scalars(select(Job).order_by(Job.id.desc())).first()
+	assert job.payload["employee_ids"] == [org.employee.id]
+
+
+def test_delegation_over_http(client_for, org):
+	mgr = client_for("mgr")
+	r = mgr.post("/api/delegations", json={"delegate_id": org.other.id, "valid_to": "1405/07/30"})
+	assert r.status_code == 200, r.text
+	assert r.json()["delegator_id"] == org.manager.id and r.json()["current"]
+	assert [d["id"] for d in client_for("emp").get("/api/delegations").json()] == []
+	assert len(mgr.get("/api/delegations").json()) == 1
+	assert (
+		client_for("emp").post("/api/delegations", json={"delegate_id": org.other.id}).status_code == 422
+	)  # nobody below
+	assert client_for("emp").delete(f"/api/delegations/{r.json()['id']}").status_code == 403
+	assert mgr.delete(f"/api/delegations/{r.json()['id']}").status_code == 200
+
+
+def test_rotation_offset_is_part_of_the_assignment(client_for, org):
+	admin = client_for("admin")
+	r = admin.post(
+		"/api/admin/work-pattern-assignments",
+		json={
+			"target_type": "employee",
+			"employee_id": org.employee.id,
+			"work_pattern_id": org.week.id,
+			"valid_from": "1405/07/01",
+			"cycle_offset_days": 14,
+		},
+	)
+	assert r.status_code == 200 and r.json()["cycle_offset_days"] == 14
+	bad = admin.post(
+		"/api/admin/work-pattern-assignments",
+		json={
+			"target_type": "company",
+			"work_pattern_id": org.week.id,
+			"valid_from": "1405/07/01",
+			"cycle_offset_days": -1,
+		},
+	)
+	assert bad.status_code == 422
+
+
+def test_excel_import_over_http(client_for, org):
+	import io
+
+	from openpyxl import load_workbook
+
+	admin = client_for("admin")
+	names = {i["name"] for i in admin.get("/api/import").json()}
+	assert {"employees", "work-locations", "designations", "holidays", "devices", "device-users"} <= names
+	sample = admin.get("/api/import/departments/template")
+	assert sample.status_code == 200 and "spreadsheetml" in sample.headers["content-type"]
+	wb = load_workbook(io.BytesIO(sample.content))
+	sheet = wb.worksheets[0]
+	sheet["A2"] = "لجستیک"
+	sheet["A3"] = "لجستیک"  # a duplicate: the second row must be reported and nothing saved
+	out = io.BytesIO()
+	wb.save(out)
+	files = {"file": ("departments.xlsx", out.getvalue(), "application/octet-stream")}
+	bad = admin.post("/api/import/departments", files=files).json()
+	assert bad["imported"] is False and [e["row"] for e in bad["errors"]] == [3]
+	assert "لجستیک" not in {d["name"] for d in admin.get("/api/admin/departments").json()}
+	sheet["A3"] = "انبار"
+	out = io.BytesIO()
+	wb.save(out)
+	files = {"file": ("departments.xlsx", out.getvalue(), "application/octet-stream")}
+	assert admin.post("/api/import/departments", files=files).json()["created"] == 2
+	assert {"لجستیک", "انبار"} <= {d["name"] for d in admin.get("/api/admin/departments").json()}
+	assert client_for("mgr").get("/api/import").status_code == 403
+	assert admin.get("/api/import/nope/template").status_code == 404
+
+
+def test_a_manager_can_list_everyone_to_pick_a_delegate(client_for, org):
+	people = client_for("mgr").get("/api/people/active").json()
+	assert {p["code"] for p in people} >= {"T-CEO", "T-MGR", "T-EMP", "T-OTHER"}  # not only their team
+	assert client_for("emp").get("/api/people/active").status_code == 403

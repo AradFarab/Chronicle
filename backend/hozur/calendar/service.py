@@ -41,7 +41,7 @@ def as_rule(h: Holiday) -> dict:
 		"closure_pay_mode": h.closure_pay_mode,
 		"scope": h.scope,
 		"province_id": h.province_id,
-		"branch_id": h.branch_id,
+		"work_location_id": h.work_location_id,
 		"status": h.status,
 	}
 
@@ -57,9 +57,11 @@ def holidays_by_date(session: Session, start: str, end: str) -> dict[str, list[d
 
 
 def day_info(
-	session: Session, jdate: str, branch_id: int | None = None, province_id: int | None = None
+	session: Session, jdate: str, work_location_id: int | None = None, province_id: int | None = None
 ) -> DayInfo:
-	return resolve_day(jdate, holidays_by_date(session, jdate, jdate).get(jdate, ()), branch_id, province_id)
+	return resolve_day(
+		jdate, holidays_by_date(session, jdate, jdate).get(jdate, ()), work_location_id, province_id
+	)
 
 
 # the bundled seed on install ------------------------------------------------------------
@@ -179,7 +181,7 @@ def plan_refresh(session: Session, year: int, source) -> RefreshPlan:
 	)
 	plan = RefreshPlan(year=year, source=source.code)
 	# Dates the operator owns: a hand-edited or manual row means "leave this date alone".
-	owned = {h.jdate for h in stored if h.edited_by_operator or h.source not in SOURCED}
+	owned = {h.jdate for h in stored if h.edited_by_admin or h.source not in SOURCED}
 	plan.kept_edits = len(owned)
 	current: dict[str, list[Holiday]] = defaultdict(list)
 	for h in stored:
@@ -353,7 +355,7 @@ EDITABLE = (
 	"status",
 	"scope",
 	"province_id",
-	"branch_id",
+	"work_location_id",
 	"closure_pay_mode",
 	"note",
 )
@@ -374,12 +376,12 @@ def _validate(values: dict) -> dict:
 	scope = values.setdefault("scope", hol.COUNTRY)
 	if scope == hol.PROVINCE and not values.get("province_id"):
 		raise ValidationError(_("Choose the province"))
-	if scope == hol.BRANCH and not values.get("branch_id"):
-		raise ValidationError(_("Choose the branch"))
+	if scope == hol.WORK_LOCATION and not values.get("work_location_id"):
+		raise ValidationError(_("Choose the work location"))
 	if scope != hol.PROVINCE:
 		values["province_id"] = None
-	if scope != hol.BRANCH:
-		values["branch_id"] = None
+	if scope != hol.WORK_LOCATION:
+		values["work_location_id"] = None
 	if values["holiday_type"] == hol.OFFICE_CLOSURE:
 		if values.get("closure_pay_mode") not in (
 			hol.CLOSURE_PAID_HOLIDAY,
@@ -429,7 +431,7 @@ def update_holiday(
 		setattr(holiday, k, v)
 	holiday.change_reason = reason
 	if holiday.source != "manual":
-		holiday.edited_by_operator = True  # a later refresh leaves this date alone
+		holiday.edited_by_admin = True  # a later refresh leaves this date alone
 	session.flush()
 	audit.log(session, "holiday", holiday.id, "update", user_id, reason, before, audit.snapshot(holiday))
 	_recalculate(session, {before["jdate"], holiday.jdate}, "holiday changed")

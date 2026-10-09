@@ -5,32 +5,40 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hozur\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-07 16:07+0000\n"
+"POT-Creation-Date: 2026-10-09 16:15+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: backend/hozur/services/excel.py:425
+msgid "0 = Saturday ... 6 = Friday; empty: Friday"
+msgstr ""
 
 #: frontend/src/pages/Periods.vue:5
 msgid "A closed month cannot change: no request, correction or recalculation touches it until it is reopened."
 msgstr ""
 
-#: backend/hozur/services/requests.py:255
+#: backend/hozur/services/requests.py:256
 msgid "A correction cannot be for a future day"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:325
-msgid "A department and its sub-departments"
+#: backend/hozur/services/excel.py:117 frontend/src/lib/resources.ts:258
+msgid "A department"
 msgstr ""
 
-#: backend/hozur/services/resources.py:289
-msgid "A department cannot be inside itself"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:324
+#: backend/hozur/services/excel.py:116 frontend/src/lib/resources.ts:257
 msgid "A designation"
 msgstr ""
 
-#: backend/hozur/services/resources.py:324
+#: backend/hozur/services/resources.py:399
+msgid "A designation cannot be below itself"
+msgstr ""
+
+#: backend/hozur/services/excel.py:303
+msgid "A designation's parent must already exist or be on an earlier row."
+msgstr ""
+
+#: backend/hozur/services/resources.py:317
 msgid "A flexible shift needs the required minutes"
 msgstr ""
 
@@ -38,39 +46,47 @@ msgstr ""
 msgid "A holiday file (JSON or CSV)"
 msgstr ""
 
-#: backend/hozur/services/resources.py:157
+#: backend/hozur/services/resources.py:156
 msgid "A linked record does not exist"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:154
+#: frontend/src/pages/Reports.vue:156
 msgid "A new report…"
+msgstr ""
+
+#: frontend/src/pages/EmployeeForm.vue:57
+msgid "A person who left or is suspended can no longer log in."
 msgstr ""
 
 #: frontend/src/lib/warnings.ts:6
 msgid "A punch has no pair: correct the day"
 msgstr ""
 
-#: backend/hozur/services/resources.py:350
+#: backend/hozur/services/resources.py:343
 msgid "A rotating pattern needs the first day of the cycle"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:453
+#: frontend/src/lib/resources.ts:386
 msgid "A specific person"
 msgstr ""
 
-#: backend/hozur/services/resources.py:253
+#: backend/hozur/services/resources.py:252
 msgid "A standard record cannot be removed"
 msgstr ""
 
-#: backend/hozur/services/resources.py:162
+#: backend/hozur/services/resources.py:161
 msgid "A value is not valid ({0})"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:24
+#: backend/hozur/services/excel.py:564 frontend/src/components/ResourceForm.vue:28
 msgid "A value may be better for the worker than the law, never worse."
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:60 frontend/src/pages/Month.vue:289
+#: backend/hozur/services/excel.py:448
+msgid "A weekly pattern fills the seven weekday columns; a rotating pattern fills the rotation column."
+msgstr ""
+
+#: backend/hozur/reports/catalog.py:60 frontend/src/pages/Month.vue:293
 msgid "Absence (Days)"
 msgstr ""
 
@@ -78,7 +94,7 @@ msgstr ""
 msgid "Absence (Hours)"
 msgstr ""
 
-#: frontend/src/lib/format.ts:59 frontend/src/pages/Month.vue:278
+#: frontend/src/lib/format.ts:59 frontend/src/pages/Month.vue:282
 msgid "Absent"
 msgstr ""
 
@@ -94,19 +110,23 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:164 frontend/src/lib/resources.ts:85 frontend/src/pages/Users.vue:50
+#: backend/hozur/services/excel.py:219 backend/hozur/services/excel.py:275 backend/hozur/services/excel.py:344 frontend/src/lib/people.ts:39 frontend/src/lib/resources.ts:84 frontend/src/pages/Users.vue:51
 msgid "Active"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:244
+#: frontend/src/pages/Calendar.vue:247
 msgid "Add"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:5 frontend/src/pages/Devices.vue:6
+#: frontend/src/pages/OrgChart.vue:34
+msgid "Add a child"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:5 frontend/src/pages/Devices.vue:7
 msgid "Add a device"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:18
+#: frontend/src/components/ResourceForm.vue:22
 msgid "Add a row"
 msgstr ""
 
@@ -114,11 +134,11 @@ msgstr ""
 msgid "Add a time"
 msgstr ""
 
-#: backend/hozur/services/requests.py:260
+#: backend/hozur/services/requests.py:261
 msgid "Add at least one time"
 msgstr ""
 
-#: frontend/src/pages/Devices.vue:15
+#: frontend/src/pages/Devices.vue:16
 msgid "Add the device with its IP address and port; you can test the connection right away."
 msgstr ""
 
@@ -126,63 +146,67 @@ msgstr ""
 msgid "Add the times the device missed. They count only after approval; device punches are never changed."
 msgstr ""
 
-#: frontend/src/lib/resources.ts:84 frontend/src/pages/Organization.vue:14
+#: backend/hozur/services/excel.py:274 frontend/src/lib/resources.ts:83 frontend/src/pages/Organization.vue:13
 msgid "Address"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:271
-msgid "All branches"
+#: frontend/src/pages/DeviceForm.vue:274
+msgid "All work locations"
 msgstr ""
 
 #: frontend/src/pages/Settings.vue:24
 msgid "Allow leave beyond the balance"
 msgstr ""
 
-#: frontend/src/lib/format.ts:89
+#: backend/hozur/services/excel.py:765
+msgid "Allowed values"
+msgstr ""
+
+#: backend/hozur/services/excel.py:252 frontend/src/lib/format.ts:89
 msgid "Always In"
 msgstr ""
 
-#: frontend/src/lib/format.ts:90
+#: backend/hozur/services/excel.py:253 frontend/src/lib/format.ts:90
 msgid "Always Out"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:506
+#: frontend/src/lib/resources.ts:437
 msgid "Annual leave (working days)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:507
+#: frontend/src/lib/resources.ts:438
 msgid "Annual leave for hard and harmful work (weeks)"
 msgstr ""
 
-#: backend/hozur/services/resources.py:153
+#: backend/hozur/services/resources.py:152
 msgid "Another record already has this value"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:318 frontend/src/pages/Calendar.vue:29 frontend/src/pages/Calendar.vue:69
+#: backend/hozur/services/excel.py:456 backend/hozur/services/excel.py:599 frontend/src/lib/resources.ts:251 frontend/src/pages/Calendar.vue:30 frontend/src/pages/Calendar.vue:70
 msgid "Applies to"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:138
+#: frontend/src/pages/Calendar.vue:139
 msgid "Apply the chosen changes"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:464
+#: frontend/src/lib/resources.ts:397
 msgid "Approval exception"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:463
+#: backend/hozur/services/excel.py:534 frontend/src/lib/resources.ts:396
 msgid "Approval exceptions"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:430 frontend/src/lib/resources.ts:479
+#: backend/hozur/services/excel.py:545 frontend/src/lib/resources.ts:366 frontend/src/lib/resources.ts:410
 msgid "Approval process"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:429
+#: backend/hozur/services/excel.py:520 frontend/src/lib/resources.ts:365
 msgid "Approval processes"
 msgstr ""
 
-#: frontend/src/components/AppShell.vue:100 frontend/src/lib/resources.ts:431 frontend/src/lib/resources.ts:465 frontend/src/pages/Manage.vue:55 frontend/src/pages/Today.vue:86
+#: frontend/src/components/AppShell.vue:100 frontend/src/pages/Manage.vue:64 frontend/src/pages/Today.vue:86
 msgid "Approvals"
 msgstr ""
 
@@ -194,27 +218,31 @@ msgstr ""
 msgid "Approved"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:447
+#: frontend/src/lib/resources.ts:381
 msgid "Approver"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:190
+#: frontend/src/pages/EmployeeForm.vue:175
 msgid "Article 59"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:201
+#: frontend/src/pages/EmployeeForm.vue:185
 msgid "Article 78"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:30
+#: frontend/src/components/ResourceForm.vue:34
 msgid "Article {0}"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:126
+#: frontend/src/lib/resources.ts:118
 msgid "Articles 52 and 61: shorter hours, no overtime"
 msgstr ""
 
-#: backend/hozur/services/users.py:167
+#: backend/hozur/services/excel.py:367
+msgid "At least 8 characters; the person can change it"
+msgstr ""
+
+#: backend/hozur/services/users.py:172
 msgid "At least one active admin is needed"
 msgstr ""
 
@@ -226,11 +254,11 @@ msgstr ""
 msgid "Attendance"
 msgstr ""
 
-#: frontend/src/pages/Devices.vue:4 frontend/src/pages/Manage.vue:49
+#: backend/hozur/services/excel.py:610 frontend/src/pages/Devices.vue:4 frontend/src/pages/Manage.vue:83
 msgid "Attendance devices"
 msgstr ""
 
-#: frontend/src/components/PageHeader.vue:3 frontend/src/pages/Calendar.vue:4 frontend/src/pages/DeviceForm.vue:4 frontend/src/pages/ResourceList.vue:4
+#: frontend/src/components/PageHeader.vue:3 frontend/src/pages/Calendar.vue:4 frontend/src/pages/DeviceForm.vue:4 frontend/src/pages/Employees.vue:4 frontend/src/pages/ResourceList.vue:4
 msgid "Back"
 msgstr ""
 
@@ -238,35 +266,27 @@ msgstr ""
 msgid "Back to today"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:196
+#: backend/hozur/services/excel.py:359 frontend/src/pages/EmployeeForm.vue:180
 msgid "Biometric consent date"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:193
+#: backend/hozur/services/excel.py:356 frontend/src/pages/EmployeeForm.vue:148
 msgid "Birth date"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:40 frontend/src/lib/resources.ts:182 frontend/src/lib/resources.ts:75 frontend/src/pages/Calendar.vue:79 frontend/src/pages/DeviceForm.vue:19
-msgid "Branch"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:74
-msgid "Branches"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:240
+#: backend/hozur/services/excel.py:399 frontend/src/lib/resources.ts:174
 msgid "Break end"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:241
+#: backend/hozur/services/excel.py:400 frontend/src/lib/resources.ts:175
 msgid "Break minutes without punching"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:239
+#: backend/hozur/services/excel.py:398 frontend/src/lib/resources.ts:173
 msgid "Break start"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:452 frontend/src/pages/Organization.vue:13 frontend/src/pages/Users.vue:93
+#: frontend/src/lib/resources.ts:103 frontend/src/lib/resources.ts:385 frontend/src/pages/OrgChart.vue:30
 msgid "CEO"
 msgstr ""
 
@@ -274,12 +294,16 @@ msgstr ""
 msgid "Calculations are still running; try again in a minute"
 msgstr ""
 
-#: frontend/src/pages/Manage.vue:46 frontend/src/pages/Manage.vue:47
+#: frontend/src/pages/Manage.vue:73
 msgid "Calendar and periods"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:420
+#: backend/hozur/services/excel.py:510 frontend/src/lib/resources.ts:356
 msgid "Can be hourly"
+msgstr ""
+
+#: frontend/src/pages/EmployeeForm.vue:55
+msgid "Can manage everything in the app"
 msgstr ""
 
 #: frontend/src/pages/NewRequest.vue:122
@@ -298,19 +322,19 @@ msgstr ""
 msgid "Cannot reach time.ir: {0}"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:403
+#: backend/hozur/services/excel.py:507 frontend/src/lib/resources.ts:339
 msgid "Category"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:244
+#: frontend/src/pages/Calendar.vue:247
 msgid "Change"
 msgstr ""
 
-#: frontend/src/pages/Audit.vue:3 frontend/src/pages/Manage.vue:58
+#: frontend/src/pages/Audit.vue:3 frontend/src/pages/Manage.vue:95
 msgid "Change history"
 msgstr ""
 
-#: frontend/src/components/UserMenu.vue:61 frontend/src/pages/Account.vue:3
+#: frontend/src/components/UserMenu.vue:68 frontend/src/pages/Account.vue:3
 msgid "Change password"
 msgstr ""
 
@@ -318,7 +342,7 @@ msgstr ""
 msgid "Changed"
 msgstr ""
 
-#: frontend/src/components/FieldInput.vue:35
+#: frontend/src/components/AssignmentDialog.vue:11 frontend/src/components/AssignmentDialog.vue:18 frontend/src/components/FieldInput.vue:38 frontend/src/components/RotationBuilder.vue:10 frontend/src/components/RotationBuilder.vue:18 frontend/src/pages/Delegations.vue:51 frontend/src/pages/Delegations.vue:58
 msgid "Choose"
 msgstr ""
 
@@ -326,8 +350,12 @@ msgstr ""
 msgid "Choose a date"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:157
+#: backend/hozur/calendar/service.py:159
 msgid "Choose a holiday file"
+msgstr ""
+
+#: backend/hozur/services/excel.py:714
+msgid "Choose a value from the list"
 msgstr ""
 
 #: frontend/src/pages/Month.vue:13 frontend/src/pages/NewRequest.vue:11 frontend/src/pages/Requests.vue:14
@@ -338,27 +366,47 @@ msgstr ""
 msgid "Choose at least one column"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:389
+#: backend/hozur/services/excel.py:668 backend/hozur/services/excel.py:669
+msgid "Choose from the list"
+msgstr ""
+
+#: backend/hozur/calendar/service.py:391
 msgid "Choose how the office closure is paid"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:378
-msgid "Choose the branch"
+#: frontend/src/components/RotationBuilder.vue:69
+msgid "Choose shift A"
+msgstr ""
+
+#: frontend/src/components/RotationBuilder.vue:70
+msgid "Choose shift B"
 msgstr ""
 
 #: backend/hozur/services/devices.py:497
 msgid "Choose the device and enter the device user id"
 msgstr ""
 
-#: backend/hozur/services/requests.py:120
+#: frontend/src/components/ExcelImport.vue:7
+msgid "Choose the filled file and upload it."
+msgstr ""
+
+#: backend/hozur/services/requests.py:121
 msgid "Choose the leave type"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:376
+#: frontend/src/pages/Delegations.vue:134
+msgid "Choose the person who gets the approvals"
+msgstr ""
+
+#: backend/hozur/calendar/service.py:378
 msgid "Choose the province"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:83
+#: backend/hozur/calendar/service.py:380
+msgid "Choose the work location"
+msgstr ""
+
+#: backend/hozur/services/excel.py:273 frontend/src/lib/resources.ts:82
 msgid "City"
 msgstr ""
 
@@ -366,7 +414,7 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:347
+#: frontend/src/pages/DeviceForm.vue:350
 msgid "Clock Difference (Seconds)"
 msgstr ""
 
@@ -382,15 +430,23 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:245
+#: frontend/src/pages/OrgChart.vue:24
+msgid "Collapse"
+msgstr ""
+
+#: backend/hozur/services/excel.py:404 frontend/src/lib/resources.ts:179
 msgid "Colour"
+msgstr ""
+
+#: backend/hozur/services/excel.py:762
+msgid "Column"
 msgstr ""
 
 #: backend/hozur/devices/file_import.py:114
 msgid "Column {0} not found in the file"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:27
+#: backend/hozur/services/excel.py:576 frontend/src/pages/Reports.vue:28
 msgid "Columns"
 msgstr ""
 
@@ -398,15 +454,19 @@ msgstr ""
 msgid "Comm Key"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:129
+#: backend/hozur/services/excel.py:617
+msgid "Comm key"
+msgstr ""
+
+#: backend/hozur/services/excel.py:299 frontend/src/lib/resources.ts:121
 msgid "Committee ruling date"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:128
+#: backend/hozur/services/excel.py:298 frontend/src/lib/resources.ts:120
 msgid "Committee ruling number"
 msgstr ""
 
-#: frontend/src/pages/Manage.vue:42 frontend/src/pages/Organization.vue:3
+#: frontend/src/pages/Manage.vue:49 frontend/src/pages/Organization.vue:3
 msgid "Company"
 msgstr ""
 
@@ -414,15 +474,15 @@ msgstr ""
 msgid "Company Holiday Work"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:10
+#: backend/hozur/services/excel.py:226 backend/hozur/services/excel.py:597 frontend/src/lib/labels.ts:10
 msgid "Company holiday"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:27
+#: backend/hozur/services/excel.py:239 frontend/src/lib/labels.ts:27
 msgid "Confirmed"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:359 frontend/src/pages/Devices.vue:167
+#: frontend/src/pages/DeviceForm.vue:362 frontend/src/pages/Devices.vue:170
 msgid "Connected: {0}"
 msgstr ""
 
@@ -430,7 +490,7 @@ msgstr ""
 msgid "Connection"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:171
+#: backend/hozur/services/excel.py:345 frontend/src/pages/EmployeeForm.vue:156
 msgid "Contract"
 msgstr ""
 
@@ -440,6 +500,10 @@ msgstr ""
 
 #: backend/hozur/reports/catalog.py:56
 msgid "Credited Work"
+msgstr ""
+
+#: frontend/src/pages/Delegations.vue:24 frontend/src/pages/EmployeeForm.vue:83
+msgid "Current"
 msgstr ""
 
 #: frontend/src/pages/Account.vue:10
@@ -454,15 +518,19 @@ msgstr ""
 msgid "Daily Leave"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:64
+#: backend/hozur/services/excel.py:108 frontend/src/lib/resources.ts:64
 msgid "Daily leave"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:44 backend/hozur/services/requests.py:126 backend/hozur/services/requests.py:205 backend/hozur/services/requests.py:230 backend/hozur/services/requests.py:253 frontend/src/lib/resources.ts:368 frontend/src/pages/Calendar.vue:26 frontend/src/pages/Calendar.vue:60 frontend/src/pages/NewRequest.vue:25 frontend/src/pages/NewRequest.vue:45 frontend/src/pages/NewRequest.vue:59 frontend/src/pages/NewRequest.vue:77
+#: backend/hozur/services/excel.py:679
+msgid "Data entry"
+msgstr ""
+
+#: backend/hozur/reports/catalog.py:44 backend/hozur/services/excel.py:496 backend/hozur/services/excel.py:589 backend/hozur/services/requests.py:127 backend/hozur/services/requests.py:206 backend/hozur/services/requests.py:231 backend/hozur/services/requests.py:254 frontend/src/lib/resources.ts:308 frontend/src/pages/Calendar.vue:27 frontend/src/pages/Calendar.vue:61 frontend/src/pages/NewRequest.vue:25 frontend/src/pages/NewRequest.vue:45 frontend/src/pages/NewRequest.vue:59 frontend/src/pages/NewRequest.vue:77
 msgid "Date"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:44 backend/hozur/reports/catalog.py:45 backend/hozur/reports/catalog.py:46 backend/hozur/reports/catalog.py:47 backend/hozur/reports/catalog.py:48 backend/hozur/reports/catalog.py:49 backend/hozur/reports/catalog.py:50 backend/hozur/reports/catalog.py:51 backend/hozur/reports/catalog.py:52 frontend/src/pages/Reports.vue:164
+#: backend/hozur/reports/catalog.py:44 backend/hozur/reports/catalog.py:45 backend/hozur/reports/catalog.py:46 backend/hozur/reports/catalog.py:47 backend/hozur/reports/catalog.py:48 backend/hozur/reports/catalog.py:49 backend/hozur/reports/catalog.py:50 backend/hozur/reports/catalog.py:51 backend/hozur/reports/catalog.py:52 frontend/src/pages/Reports.vue:166
 msgid "Day"
 msgstr ""
 
@@ -470,11 +538,11 @@ msgstr ""
 msgid "Day Type"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:296
+#: frontend/src/lib/resources.ts:230
 msgid "Day of the cycle"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:80 backend/hozur/reports/catalog.py:81 backend/hozur/reports/catalog.py:82 backend/hozur/reports/catalog.py:83 backend/hozur/reports/catalog.py:84 frontend/src/lib/resources.ts:284 frontend/src/pages/Reports.vue:169
+#: backend/hozur/reports/catalog.py:80 backend/hozur/reports/catalog.py:81 backend/hozur/reports/catalog.py:82 backend/hozur/reports/catalog.py:83 backend/hozur/reports/catalog.py:84 backend/hozur/services/excel.py:260 frontend/src/lib/resources.ts:217 frontend/src/pages/Reports.vue:171
 msgid "Days"
 msgstr ""
 
@@ -482,11 +550,23 @@ msgstr ""
 msgid "Days Employed"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:81 frontend/src/pages/Month.vue:288
+#: backend/hozur/reports/catalog.py:81 frontend/src/pages/Month.vue:292
 msgid "Days Present"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:168
+#: frontend/src/components/RotationBuilder.vue:15
+msgid "Days of shift A"
+msgstr ""
+
+#: frontend/src/components/RotationBuilder.vue:23
+msgid "Days of shift B"
+msgstr ""
+
+#: frontend/src/components/RotationBuilder.vue:30
+msgid "Days off at the end (optional)"
+msgstr ""
+
+#: backend/hozur/services/excel.py:259 frontend/src/pages/Reports.vue:170
 msgid "Decimal hours"
 msgstr ""
 
@@ -498,71 +578,83 @@ msgstr ""
 msgid "Declined"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:419
+#: backend/hozur/services/excel.py:509 frontend/src/lib/resources.ts:355
 msgid "Deducted from the leave balance"
 msgstr ""
 
-#: frontend/src/pages/ApprovalDefaults.vue:3 frontend/src/pages/Manage.vue:55
+#: frontend/src/pages/ApprovalDefaults.vue:3 frontend/src/pages/Manage.vue:68
 msgid "Default approval per request type"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:102
-msgid "Default approver"
 msgstr ""
 
 #: frontend/src/pages/Settings.vue:25
 msgid "Default calendar source"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:60 frontend/src/pages/Calendar.vue:90
+#: frontend/src/components/UserMenu.vue:63 frontend/src/pages/Delegations.vue:3 frontend/src/pages/Manage.vue:69
+msgid "Delegation of approvals"
+msgstr ""
+
+#: frontend/src/components/ResourceForm.vue:64 frontend/src/pages/Calendar.vue:91 frontend/src/pages/Delegations.vue:34
 msgid "Delete"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:170
+#: frontend/src/components/ResourceForm.vue:182 frontend/src/pages/Delegations.vue:157
 msgid "Delete this record?"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:175 frontend/src/pages/Audit.vue:62
+#: frontend/src/components/ResourceForm.vue:187 frontend/src/pages/Audit.vue:62 frontend/src/pages/Delegations.vue:161
 msgid "Deleted"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:41 frontend/src/lib/resources.ts:183 frontend/src/lib/resources.ts:347 frontend/src/lib/resources.ts:91 frontend/src/pages/Reports.vue:10 frontend/src/pages/Reports.vue:163
+#: backend/hozur/reports/catalog.py:41 backend/hozur/services/excel.py:347 backend/hozur/services/excel.py:473 frontend/src/lib/resources.ts:280 frontend/src/lib/resources.ts:90 frontend/src/pages/EmployeeForm.vue:168 frontend/src/pages/Employees.vue:17 frontend/src/pages/Reports.vue:11 frontend/src/pages/Reports.vue:165
 msgid "Department"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:90
+#: backend/hozur/services/excel.py:281 frontend/src/lib/resources.ts:89
 msgid "Departments"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:107
-msgid "Deputy"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:108
-msgid "Deputy from"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:109
-msgid "Deputy until"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:130 frontend/src/lib/resources.ts:303 frontend/src/lib/resources.ts:387 frontend/src/lib/resources.ts:424 frontend/src/lib/resources.ts:438
+#: backend/hozur/services/excel.py:300 backend/hozur/services/excel.py:443 backend/hozur/services/excel.py:514 backend/hozur/services/excel.py:523 backend/hozur/services/excel.py:555 backend/hozur/services/excel.py:580 frontend/src/lib/resources.ts:122 frontend/src/lib/resources.ts:237 frontend/src/lib/resources.ts:325 frontend/src/lib/resources.ts:360 frontend/src/lib/resources.ts:372
 msgid "Description"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:42 frontend/src/lib/resources.ts:115 frontend/src/lib/resources.ts:184 frontend/src/lib/resources.ts:339
+#: backend/hozur/reports/catalog.py:42 backend/hozur/services/excel.py:318 backend/hozur/services/excel.py:350 backend/hozur/services/excel.py:466 frontend/src/components/AssignmentDialog.vue:16 frontend/src/lib/resources.ts:133 frontend/src/lib/resources.ts:272 frontend/src/lib/resources.ts:98 frontend/src/pages/EmployeeForm.vue:189
 msgid "Designation"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:114
+#: frontend/src/lib/resources.ts:106
+msgid "Designation above"
+msgstr ""
+
+#: backend/hozur/services/excel.py:355
+msgid "Designation from"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:128
+msgid "Designation held"
+msgstr ""
+
+#: backend/hozur/services/excel.py:287 frontend/src/lib/resources.ts:97 frontend/src/pages/EmployeeForm.vue:74 frontend/src/pages/Employees.vue:18
 msgid "Designations"
+msgstr ""
+
+#: frontend/src/pages/OrgChart.vue:8
+msgid "Designations form a tree. Whoever holds the designation above approves the requests of the people below. Several people may hold one designation."
+msgstr ""
+
+#: backend/hozur/services/excel.py:307 frontend/src/lib/resources.ts:127
+msgid "Designations held"
 msgstr ""
 
 #: frontend/src/pages/NewRequest.vue:37
 msgid "Destination"
 msgstr ""
 
-#: frontend/src/lib/format.ts:78
+#: backend/hozur/services/excel.py:332 frontend/src/pages/EmployeeForm.vue:131
+msgid "Detail code"
+msgstr ""
+
+#: backend/hozur/services/excel.py:630 frontend/src/lib/format.ts:78
 msgid "Device"
 msgstr ""
 
@@ -574,15 +666,15 @@ msgstr ""
 msgid "Device Name"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:346
+#: frontend/src/pages/DeviceForm.vue:349
 msgid "Device Time"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:18
+#: backend/hozur/services/excel.py:613 frontend/src/pages/DeviceForm.vue:18
 msgid "Device Type"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:378
+#: frontend/src/pages/DeviceForm.vue:381
 msgid "Device clock set to {0} {1}"
 msgstr ""
 
@@ -602,7 +694,11 @@ msgstr ""
 msgid "Device tools"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:155
+#: backend/hozur/services/excel.py:631
+msgid "Device user id"
+msgstr ""
+
+#: backend/hozur/services/excel.py:628 frontend/src/pages/DeviceForm.vue:155
 msgid "Device users"
 msgstr ""
 
@@ -610,35 +706,43 @@ msgstr ""
 msgid "Device {0} receives punches by file import"
 msgstr ""
 
-#: frontend/src/pages/Manage.vue:48 frontend/src/pages/Today.vue:17
+#: frontend/src/pages/Manage.vue:80 frontend/src/pages/Today.vue:17
 msgid "Devices"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:450
-msgid "Direct manager"
+#: frontend/src/pages/Devices.vue:32
+msgid "Disabled"
 msgstr ""
 
-#: frontend/src/pages/Devices.vue:31
-msgid "Disabled"
+#: frontend/src/components/ExcelImport.vue:12
+msgid "Download the sample"
+msgstr ""
+
+#: frontend/src/components/ExcelImport.vue:6
+msgid "Download the sample and fill it in, one row for each record."
 msgstr ""
 
 #: frontend/src/components/PunchList.vue:21
 msgid "Duplicate"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:162
+#: frontend/src/pages/DeviceForm.vue:163
 msgid "Each device user must point to an employee; users whose ID equals an employee code are mapped automatically."
 msgstr ""
 
-#: backend/hozur/services/resources.py:357
+#: backend/hozur/services/resources.py:350
 msgid "Each weekday can appear once"
+msgstr ""
+
+#: backend/hozur/services/excel.py:394
+msgid "Earlier than the start: the shift ends the next day"
 msgstr ""
 
 #: backend/hozur/reports/catalog.py:58 frontend/src/components/DayNumbers.vue:28
 msgid "Early Leave"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:408
+#: backend/hozur/services/excel.py:241 frontend/src/lib/resources.ts:344
 msgid "Earned"
 msgstr ""
 
@@ -646,11 +750,11 @@ msgstr ""
 msgid "Economic code"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:384
+#: backend/hozur/services/excel.py:554 frontend/src/lib/resources.ts:322
 msgid "Effective from"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:156
+#: backend/hozur/services/excel.py:341 frontend/src/pages/EmployeeForm.vue:150
 msgid "Email"
 msgstr ""
 
@@ -666,11 +770,11 @@ msgstr ""
 msgid "Emergency overtime above 8 hours was not counted (Article 60)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:499
+#: frontend/src/lib/resources.ts:430
 msgid "Emergency overtime cap (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:136 frontend/src/lib/resources.ts:331 frontend/src/lib/resources.ts:367 frontend/src/lib/resources.ts:470 frontend/src/pages/Month.vue:12 frontend/src/pages/NewRequest.vue:10 frontend/src/pages/Reports.vue:11 frontend/src/pages/Requests.vue:13 frontend/src/pages/Users.vue:91
+#: backend/hozur/services/excel.py:311 backend/hozur/services/excel.py:459 backend/hozur/services/excel.py:495 backend/hozur/services/excel.py:536 backend/hozur/services/excel.py:633 frontend/src/components/AssignmentDialog.vue:9 frontend/src/lib/resources.ts:132 frontend/src/lib/resources.ts:264 frontend/src/lib/resources.ts:307 frontend/src/lib/resources.ts:401 frontend/src/pages/Month.vue:12 frontend/src/pages/NewRequest.vue:10 frontend/src/pages/Reports.vue:12 frontend/src/pages/Requests.vue:13 frontend/src/pages/Users.vue:92
 msgid "Employee"
 msgstr ""
 
@@ -678,63 +782,103 @@ msgstr ""
 msgid "Employee Code"
 msgstr ""
 
-#: backend/hozur/api/routes/admin.py:186 backend/hozur/api/routes/admin.py:263 backend/hozur/api/routes/attendance.py:145 backend/hozur/api/routes/attendance.py:34 backend/hozur/services/requests.py:102
+#: backend/hozur/api/routes/attendance.py:145 backend/hozur/api/routes/attendance.py:34 backend/hozur/api/routes/people.py:54 backend/hozur/services/delegations.py:42 backend/hozur/services/employees.py:45 backend/hozur/services/requests.py:103
 msgid "Employee not found"
 msgstr ""
 
-#: frontend/src/pages/Users.vue:47
-msgid "Employee record"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:135
+#: backend/hozur/services/excel.py:327 frontend/src/pages/Employees.vue:5 frontend/src/pages/Manage.vue:55
 msgid "Employees"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:64
+#: frontend/src/pages/Users.vue:8
+msgid "Employees get their login when they are added in the Employees screen. Here you add a login without an employee record, such as one for IT staff."
+msgstr ""
+
+#: frontend/src/pages/EmployeeForm.vue:15
+msgid "Employment"
+msgstr ""
+
+#: backend/hozur/services/excel.py:362
+msgid "Empty: the personnel code"
+msgstr ""
+
+#: backend/hozur/services/excel.py:355
+msgid "Empty: the start date"
+msgstr ""
+
+#: backend/hozur/services/excel.py:622 frontend/src/pages/DeviceForm.vue:64
 msgid "Enabled"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:226
+#: backend/hozur/services/excel.py:390 frontend/src/lib/resources.ts:160 frontend/src/pages/Delegations.vue:34
 msgid "End"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:181
+#: backend/hozur/services/excel.py:343 frontend/src/pages/EmployeeForm.vue:166
 msgid "End date"
 msgstr ""
 
-#: backend/hozur/api/routes/admin.py:69 backend/hozur/services/devices.py:127 backend/hozur/services/devices.py:586
+#: frontend/src/pages/Delegations.vue:157
+msgid "End this delegation?"
+msgstr ""
+
+#: frontend/src/pages/Delegations.vue:25
+msgid "Ended"
+msgstr ""
+
+#: backend/hozur/api/routes/admin.py:62 backend/hozur/services/devices.py:127 backend/hozur/services/devices.py:586
 msgid "Enter a name"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:370
+#: backend/hozur/services/excel.py:725
+msgid "Enter a number"
+msgstr ""
+
+#: backend/hozur/services/users.py:50
+msgid "Enter a password"
+msgstr ""
+
+#: backend/hozur/calendar/service.py:372
 msgid "Enter a title"
 msgstr ""
 
-#: backend/hozur/services/users.py:48
+#: backend/hozur/services/users.py:53
 msgid "Enter a username"
 msgstr ""
 
-#: backend/hozur/services/resources.py:328
+#: backend/hozur/services/resources.py:321
 msgid "Enter both the start and the end of the break"
+msgstr ""
+
+#: backend/hozur/services/excel.py:735
+msgid "Enter the date as 1405/07/14"
 msgstr ""
 
 #: backend/hozur/services/devices.py:134
 msgid "Enter the device IP address"
 msgstr ""
 
-#: backend/hozur/services/requests.py:242
+#: frontend/src/components/RotationBuilder.vue:71
+msgid "Enter the number of days"
+msgstr ""
+
+#: backend/hozur/services/requests.py:243
 msgid "Enter the overtime minutes"
 msgstr ""
 
-#: backend/hozur/services/requests.py:86
+#: backend/hozur/services/employees.py:94
+msgid "Enter the personnel code, the name and the start date"
+msgstr ""
+
+#: backend/hozur/services/requests.py:87
 msgid "Enter the reason"
 msgstr ""
 
-#: backend/hozur/services/requests.py:432
+#: backend/hozur/services/requests.py:431
 msgid "Enter the reason for cancelling"
 msgstr ""
 
-#: backend/hozur/services/requests.py:244
+#: backend/hozur/services/requests.py:245
 msgid "Enter the reason for exceptional or emergency overtime"
 msgstr ""
 
@@ -746,31 +890,47 @@ msgstr ""
 msgid "Enter the reason for reopening"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:424 backend/hozur/calendar/service.py:447 backend/hozur/services/resources.py:220
+#: backend/hozur/calendar/service.py:426 backend/hozur/calendar/service.py:449 backend/hozur/services/resources.py:219
 msgid "Enter the reason for the change"
 msgstr ""
 
-#: backend/hozur/services/requests.py:256
+#: backend/hozur/services/requests.py:257
 msgid "Enter the reason for the correction"
 msgstr ""
 
-#: backend/hozur/services/requests.py:225
+#: backend/hozur/services/requests.py:226
 msgid "Enter the reason for the mission"
 msgstr ""
 
-#: backend/hozur/services/resources.py:326
+#: backend/hozur/services/excel.py:154
+msgid "Enter the rotation, for example Morning*14, Night*14"
+msgstr ""
+
+#: backend/hozur/services/resources.py:319
 msgid "Enter the start and end time"
 msgstr ""
 
-#: frontend/src/pages/ApprovalDefaults.vue:39
-msgid "Entered by an operator for someone"
+#: backend/hozur/services/excel.py:745
+msgid "Enter the time as 08:30"
 msgstr ""
 
-#: frontend/src/lib/format.ts:71 frontend/src/pages/DeviceForm.vue:373 frontend/src/pages/Devices.vue:183
+#: frontend/src/pages/ApprovalDefaults.vue:39
+msgid "Entered by the system admin for someone"
+msgstr ""
+
+#: frontend/src/lib/format.ts:71 frontend/src/pages/DeviceForm.vue:376 frontend/src/pages/Devices.vue:186
 msgid "Error"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:172
+#: backend/hozur/services/excel.py:372
+msgid "Every employee is also a user: the username and password create the login."
+msgstr ""
+
+#: backend/hozur/services/excel.py:766
+msgid "Example"
+msgstr ""
+
+#: backend/hozur/services/excel.py:262 frontend/src/pages/Reports.vue:174
 msgid "Excel"
 msgstr ""
 
@@ -782,15 +942,19 @@ msgstr ""
 msgid "Exceptional Overtime"
 msgstr ""
 
+#: frontend/src/pages/OrgChart.vue:24
+msgid "Expand"
+msgstr ""
+
 #: backend/hozur/reports/catalog.py:62 backend/hozur/reports/catalog.py:63 backend/hozur/reports/catalog.py:64 backend/hozur/reports/catalog.py:65 backend/hozur/reports/catalog.py:66 backend/hozur/reports/catalog.py:67 backend/hozur/reports/catalog.py:68 backend/hozur/reports/catalog.py:69 backend/hozur/reports/catalog.py:70 backend/hozur/reports/catalog.py:71
 msgid "Extra Work"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:513
+#: frontend/src/lib/resources.ts:444
 msgid "Extra maternity leave for twins or more (days)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:244
+#: backend/hozur/services/excel.py:403 frontend/src/lib/resources.ts:178
 msgid "Extra work counts after (minutes)"
 msgstr ""
 
@@ -798,15 +962,27 @@ msgstr ""
 msgid "Extra work without an approved overtime request"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:152
+#: backend/hozur/services/excel.py:218 frontend/src/pages/EmployeeForm.vue:145
 msgid "Female"
+msgstr ""
+
+#: backend/hozur/services/excel.py:578
+msgid "Field keys separated by commas, e.g. employee, employee_name, worked_minutes"
 msgstr ""
 
 #: frontend/src/lib/format.ts:78
 msgid "File Import"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:343
+#: frontend/src/components/RotationBuilder.vue:37
+msgid "Fill the days"
+msgstr ""
+
+#: frontend/src/components/RotationBuilder.vue:6
+msgid "Fills the days of the cycle: shift A for some days, then shift B, then days off. You can edit the rows afterwards."
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:346
 msgid "Firmware"
 msgstr ""
 
@@ -814,19 +990,23 @@ msgstr ""
 msgid "First In"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:278
+#: backend/hozur/services/excel.py:427 frontend/src/lib/resources.ts:211
 msgid "First day of the cycle"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:142
+#: frontend/src/pages/EmployeeForm.vue:20
+msgid "First designation"
+msgstr ""
+
+#: backend/hozur/services/excel.py:336 frontend/src/pages/EmployeeForm.vue:136
 msgid "First name"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:221
+#: backend/hozur/services/excel.py:384 backend/hozur/services/excel.py:385 frontend/src/lib/resources.ts:155
 msgid "Fixed"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:222
+#: backend/hozur/services/excel.py:384 frontend/src/lib/resources.ts:156
 msgid "Flexible"
 msgstr ""
 
@@ -834,27 +1014,39 @@ msgstr ""
 msgid "For a USB export or an Excel/CSV file from another program. Punches already stored are skipped."
 msgstr ""
 
+#: frontend/src/lib/resources.ts:291
+msgid "For a rotating pattern: moves this group along the cycle by this many days, so two groups can follow one pattern half a cycle apart"
+msgstr ""
+
+#: backend/hozur/services/excel.py:573 backend/hozur/services/excel.py:764
+msgid "Format"
+msgstr ""
+
 #: backend/hozur/reports/catalog.py:69
 msgid "Friday Work"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:354 frontend/src/pages/Reports.vue:8
+#: backend/hozur/services/excel.py:319 backend/hozur/services/excel.py:485 backend/hozur/services/excel.py:634 frontend/src/components/AssignmentDialog.vue:20 frontend/src/lib/resources.ts:134 frontend/src/lib/resources.ts:295 frontend/src/pages/Delegations.vue:60 frontend/src/pages/EmployeeForm.vue:23 frontend/src/pages/Reports.vue:8
 msgid "From"
 msgstr ""
 
-#: backend/hozur/services/requests.py:143 backend/hozur/services/requests.py:216 frontend/src/pages/NewRequest.vue:20 frontend/src/pages/NewRequest.vue:40
+#: backend/hozur/services/requests.py:144 backend/hozur/services/requests.py:217 frontend/src/pages/NewRequest.vue:20 frontend/src/pages/NewRequest.vue:40
 msgid "From Date"
 msgstr ""
 
-#: frontend/src/lib/format.ts:88
+#: backend/hozur/services/excel.py:251 frontend/src/lib/format.ts:88
 msgid "From Device"
 msgstr ""
 
-#: backend/hozur/services/requests.py:128 backend/hozur/services/requests.py:207 backend/hozur/services/requests.py:236 frontend/src/pages/NewRequest.vue:27 frontend/src/pages/NewRequest.vue:47 frontend/src/pages/NewRequest.vue:62
+#: backend/hozur/services/requests.py:129 backend/hozur/services/requests.py:208 backend/hozur/services/requests.py:237 frontend/src/pages/NewRequest.vue:27 frontend/src/pages/NewRequest.vue:47 frontend/src/pages/NewRequest.vue:62
 msgid "From Time"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:176
+#: frontend/src/pages/Delegations.vue:38 frontend/src/pages/EmployeeForm.vue:87
+msgid "From {0}"
+msgstr ""
+
+#: frontend/src/pages/Delegations.vue:38 frontend/src/pages/DeviceForm.vue:177 frontend/src/pages/EmployeeForm.vue:86
 msgid "From {0} to {1}"
 msgstr ""
 
@@ -862,55 +1054,71 @@ msgstr ""
 msgid "Full Name"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:144 frontend/src/pages/Users.vue:37
+#: frontend/src/pages/Users.vue:44
 msgid "Full name"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:175
+#: backend/hozur/services/excel.py:220 frontend/src/pages/EmployeeForm.vue:160
 msgid "Full time"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:148
+#: backend/hozur/services/excel.py:339 frontend/src/pages/EmployeeForm.vue:141
 msgid "Gender"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:243
+#: frontend/src/components/AssignmentDialog.vue:2 frontend/src/pages/EmployeeForm.vue:75
+msgid "Give a designation"
+msgstr ""
+
+#: frontend/src/pages/OrgChart.vue:33
+msgid "Give to someone"
+msgstr ""
+
+#: backend/hozur/services/excel.py:402 frontend/src/lib/resources.ts:177
 msgid "Grace for early leave (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:242
+#: backend/hozur/services/excel.py:401 frontend/src/lib/resources.ts:176
 msgid "Grace for late arrival (minutes)"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:21
+#: frontend/src/pages/Reports.vue:22
 msgid "Group by"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:412
+#: backend/hozur/services/excel.py:680
+msgid "Guide"
+msgstr ""
+
+#: backend/hozur/services/excel.py:245 frontend/src/lib/resources.ts:348
 msgid "Hajj"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:509
+#: frontend/src/lib/resources.ts:440
 msgid "Hajj leave (days)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:123
+#: frontend/src/pages/Delegations.vue:57
+msgid "Hand the approvals to"
+msgstr ""
+
+#: frontend/src/pages/Delegations.vue:8
+msgid "Hand your approvals to another person for a period. Both of you can then approve the requests that wait for you."
+msgstr ""
+
+#: backend/hozur/services/excel.py:297 frontend/src/lib/resources.ts:115 frontend/src/pages/OrgChart.vue:31
 msgid "Hard and harmful work"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:492
+#: frontend/src/lib/resources.ts:423
 msgid "Hard and harmful work per day (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:493
+#: frontend/src/lib/resources.ts:424
 msgid "Hard and harmful work per week (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:98
-msgid "Has sub-departments"
-msgstr ""
-
-#: backend/hozur/reports/catalog.py:48 frontend/src/lib/format.ts:62 frontend/src/pages/Calendar.vue:58
+#: backend/hozur/reports/catalog.py:48 frontend/src/lib/format.ts:62 frontend/src/pages/Calendar.vue:59
 msgid "Holiday"
 msgstr ""
 
@@ -918,15 +1126,15 @@ msgstr ""
 msgid "Holiday Work"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:422 backend/hozur/calendar/service.py:445
+#: backend/hozur/calendar/service.py:424 backend/hozur/calendar/service.py:447
 msgid "Holiday not found"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:82 frontend/src/pages/Calendar.vue:5
+#: backend/hozur/reports/catalog.py:82 backend/hozur/services/excel.py:587 frontend/src/pages/Calendar.vue:5
 msgid "Holidays"
 msgstr ""
 
-#: frontend/src/pages/Manage.vue:46
+#: frontend/src/pages/Manage.vue:75
 msgid "Holidays and yearly refresh"
 msgstr ""
 
@@ -934,7 +1142,7 @@ msgstr ""
 msgid "Holidays shipped with the app"
 msgstr ""
 
-#: frontend/src/lib/format.ts:118 frontend/src/lib/resources.ts:177 frontend/src/pages/NewRequest.vue:156
+#: backend/hozur/services/excel.py:220 frontend/src/lib/format.ts:118 frontend/src/pages/EmployeeForm.vue:162 frontend/src/pages/NewRequest.vue:156
 msgid "Hourly"
 msgstr ""
 
@@ -942,32 +1150,36 @@ msgstr ""
 msgid "Hourly Leave"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:65
+#: backend/hozur/services/excel.py:109 frontend/src/lib/resources.ts:65
 msgid "Hourly leave"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:510
+#: frontend/src/lib/resources.ts:441
 msgid "Hourly leave that makes one day (minutes)"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:167
+#: backend/hozur/services/excel.py:258 frontend/src/pages/Reports.vue:169
 msgid "Hours:minutes"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:66
+#: backend/hozur/services/excel.py:602 frontend/src/pages/Calendar.vue:67
 msgid "How is it paid?"
 msgstr ""
 
-#: frontend/src/components/AppShell.vue:138 frontend/src/components/AppShell.vue:8 frontend/src/pages/Login.vue:7
+#: frontend/src/components/AppShell.vue:142 frontend/src/components/AppShell.vue:8 frontend/src/pages/Login.vue:7
 msgid "Hozur"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:38
+#: backend/hozur/services/excel.py:615 frontend/src/pages/DeviceForm.vue:38
 msgid "IP Address"
 msgstr ""
 
 #: backend/hozur/reports/catalog.py:37 backend/hozur/reports/catalog.py:38 backend/hozur/reports/catalog.py:39 backend/hozur/reports/catalog.py:40 backend/hozur/reports/catalog.py:41 backend/hozur/reports/catalog.py:42
 msgid "Identity"
+msgstr ""
+
+#: frontend/src/components/ExcelImport.vue:8
+msgid "If any row is wrong, nothing is saved and the wrong rows are listed."
 msgstr ""
 
 #: frontend/src/pages/NewRequest.vue:96
@@ -994,11 +1206,15 @@ msgstr ""
 msgid "Import a punch file"
 msgstr ""
 
+#: frontend/src/components/ExcelImport.vue:2 frontend/src/components/ExcelImport.vue:3
+msgid "Import from Excel"
+msgstr ""
+
 #: frontend/src/lib/format.ts:82 frontend/src/pages/NewRequest.vue:159
 msgid "In"
 msgstr ""
 
-#: frontend/src/lib/format.ts:58 frontend/src/pages/Month.vue:277
+#: frontend/src/lib/format.ts:58 frontend/src/pages/Month.vue:281
 msgid "Incomplete"
 msgstr ""
 
@@ -1010,43 +1226,51 @@ msgstr ""
 msgid "Invalid punch time {0}"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:376
+#: backend/hozur/services/excel.py:666
+msgid "Jalali date, e.g. 1405/07/14"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:316
 msgid "Labor rule set"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:375
+#: backend/hozur/services/excel.py:551 frontend/src/lib/resources.ts:315
 msgid "Labor rule sets"
+msgstr ""
+
+#: frontend/src/pages/EmployeeForm.vue:61
+msgid "Labor-law details"
 msgstr ""
 
 #: backend/hozur/reports/catalog.py:51 frontend/src/components/DayNumbers.vue:22
 msgid "Last Out"
 msgstr ""
 
-#: frontend/src/pages/Devices.vue:46
+#: frontend/src/pages/Devices.vue:47
 msgid "Last Read"
 msgstr ""
 
-#: frontend/src/pages/Users.vue:14
+#: frontend/src/pages/Users.vue:21
 msgid "Last login"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:143
+#: backend/hozur/services/excel.py:337 frontend/src/pages/EmployeeForm.vue:137
 msgid "Last name"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:57 frontend/src/components/DayNumbers.vue:27 frontend/src/pages/Month.vue:292
+#: backend/hozur/reports/catalog.py:57 frontend/src/components/DayNumbers.vue:27 frontend/src/pages/Month.vue:296
 msgid "Late"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:229
+#: backend/hozur/services/excel.py:396 frontend/src/lib/resources.ts:163
 msgid "Latest start"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:30
+#: frontend/src/components/ResourceForm.vue:34
 msgid "Law: {0}"
 msgstr ""
 
-#: frontend/src/lib/format.ts:60 frontend/src/lib/format.ts:99 frontend/src/pages/Month.vue:101 frontend/src/pages/Month.vue:279 frontend/src/pages/NewRequest.vue:149
+#: frontend/src/lib/format.ts:60 frontend/src/lib/format.ts:99 frontend/src/pages/Month.vue:101 frontend/src/pages/Month.vue:283 frontend/src/pages/NewRequest.vue:149
 msgid "Leave"
 msgstr ""
 
@@ -1074,35 +1298,35 @@ msgstr ""
 msgid "Leave by Type"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:508
+#: frontend/src/lib/resources.ts:439
 msgid "Leave carried to the next year (days)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:393
+#: frontend/src/lib/resources.ts:331
 msgid "Leave type"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:392
+#: backend/hozur/services/excel.py:504 frontend/src/lib/resources.ts:330
 msgid "Leave types"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:166
+#: backend/hozur/services/excel.py:219 frontend/src/lib/people.ts:41
 msgid "Left"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:385
+#: frontend/src/lib/resources.ts:323
 msgid "Legal baseline"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:423
+#: backend/hozur/services/excel.py:513 frontend/src/lib/resources.ts:359
 msgid "Limit from the rule set (parameter)"
 msgstr ""
 
-#: frontend/src/pages/Approvals.vue:5 frontend/src/pages/Devices.vue:11 frontend/src/pages/Month.vue:69 frontend/src/pages/Requests.vue:18 frontend/src/pages/Today.vue:23
+#: frontend/src/pages/Approvals.vue:5 frontend/src/pages/Devices.vue:12 frontend/src/pages/Month.vue:69 frontend/src/pages/Requests.vue:18 frontend/src/pages/Today.vue:23
 msgid "Loading..."
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:345 frontend/src/pages/Devices.vue:54
+#: frontend/src/pages/DeviceForm.vue:348 frontend/src/pages/Devices.vue:55
 msgid "Log Records on Device"
 msgstr ""
 
@@ -1110,28 +1334,24 @@ msgstr ""
 msgid "Log in"
 msgstr ""
 
-#: frontend/src/components/UserMenu.vue:62
+#: frontend/src/components/UserMenu.vue:69
 msgid "Log out"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:494
+#: frontend/src/pages/EmployeeForm.vue:32
+msgid "Login"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:425
 msgid "Longest span of split shifts (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:151
+#: backend/hozur/services/excel.py:218 frontend/src/pages/EmployeeForm.vue:144
 msgid "Male"
 msgstr ""
 
 #: frontend/src/components/AppShell.vue:112 frontend/src/pages/Manage.vue:3
 msgid "Manage"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:99 frontend/src/pages/Users.vue:92
-msgid "Manager"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:451
-msgid "Manager of the parent department"
 msgstr ""
 
 #: frontend/src/lib/format.ts:78
@@ -1142,23 +1362,23 @@ msgstr ""
 msgid "Manual entry"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:68
+#: backend/hozur/services/excel.py:112 frontend/src/lib/resources.ts:68
 msgid "Manual time entry"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:411
+#: backend/hozur/services/excel.py:244 frontend/src/lib/resources.ts:347
 msgid "Marriage or bereavement"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:511
+#: frontend/src/lib/resources.ts:442
 msgid "Marriage or bereavement leave (days)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:413
+#: backend/hozur/services/excel.py:246 frontend/src/lib/resources.ts:349
 msgid "Maternity"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:512
+#: frontend/src/lib/resources.ts:443
 msgid "Maternity leave (days)"
 msgstr ""
 
@@ -1170,7 +1390,7 @@ msgstr ""
 msgid "Missing request header"
 msgstr ""
 
-#: frontend/src/lib/format.ts:109 frontend/src/lib/format.ts:61 frontend/src/lib/format.ts:99 frontend/src/lib/resources.ts:66 frontend/src/pages/Month.vue:280 frontend/src/pages/NewRequest.vue:150
+#: backend/hozur/services/excel.py:110 frontend/src/lib/format.ts:109 frontend/src/lib/format.ts:61 frontend/src/lib/format.ts:99 frontend/src/lib/resources.ts:66 frontend/src/pages/Month.vue:284 frontend/src/pages/NewRequest.vue:150
 msgid "Mission"
 msgstr ""
 
@@ -1182,11 +1402,11 @@ msgstr ""
 msgid "Mission (Hours)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:155
+#: backend/hozur/services/excel.py:340 frontend/src/pages/EmployeeForm.vue:149
 msgid "Mobile"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:341
+#: frontend/src/pages/DeviceForm.vue:344
 msgid "Model"
 msgstr ""
 
@@ -1194,7 +1414,7 @@ msgstr ""
 msgid "Month"
 msgstr ""
 
-#: frontend/src/pages/Manage.vue:47 frontend/src/pages/Periods.vue:3
+#: frontend/src/pages/Manage.vue:76 frontend/src/pages/Periods.vue:3
 msgid "Monthly period lock"
 msgstr ""
 
@@ -1202,15 +1422,15 @@ msgstr ""
 msgid "More than 15 hours from first to last punch (Article 54)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:421
+#: backend/hozur/services/excel.py:511 frontend/src/lib/resources.ts:357
 msgid "Most days in one request"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:490
+#: frontend/src/lib/resources.ts:421
 msgid "Most work per day (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:491
+#: frontend/src/lib/resources.ts:422
 msgid "Most work per week (minutes)"
 msgstr ""
 
@@ -1218,11 +1438,19 @@ msgstr ""
 msgid "My requests"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:120 frontend/src/lib/resources.ts:213 frontend/src/lib/resources.ts:257 frontend/src/lib/resources.ts:383 frontend/src/lib/resources.ts:400 frontend/src/lib/resources.ts:437 frontend/src/lib/resources.ts:81 frontend/src/lib/resources.ts:96 frontend/src/pages/Organization.vue:5 frontend/src/pages/Users.vue:12
+#: frontend/src/pages/Delegations.vue:51
+msgid "Myself"
+msgstr ""
+
+#: backend/hozur/services/excel.py:271 backend/hozur/services/excel.py:282 backend/hozur/services/excel.py:289 backend/hozur/services/excel.py:378 backend/hozur/services/excel.py:412 backend/hozur/services/excel.py:506 backend/hozur/services/excel.py:522 backend/hozur/services/excel.py:553 backend/hozur/services/excel.py:570 backend/hozur/services/excel.py:612 frontend/src/lib/resources.ts:102 frontend/src/lib/resources.ts:147 frontend/src/lib/resources.ts:190 frontend/src/lib/resources.ts:321 frontend/src/lib/resources.ts:336 frontend/src/lib/resources.ts:371 frontend/src/lib/resources.ts:80 frontend/src/lib/resources.ts:93 frontend/src/pages/Employees.vue:16 frontend/src/pages/Organization.vue:5 frontend/src/pages/Users.vue:19
 msgid "Name"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:49
+#: backend/hozur/services/excel.py:632
+msgid "Name on the device"
+msgstr ""
+
+#: frontend/src/pages/Reports.vue:50
 msgid "Name to save this report"
 msgstr ""
 
@@ -1230,7 +1458,7 @@ msgstr ""
 msgid "National Code"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:145
+#: backend/hozur/services/excel.py:338 frontend/src/pages/EmployeeForm.vue:138
 msgid "National code"
 msgstr ""
 
@@ -1238,11 +1466,19 @@ msgstr ""
 msgid "National id of the company"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:7 frontend/src/pages/ResourceList.vue:6 frontend/src/pages/Users.vue:4
+#: frontend/src/pages/Calendar.vue:8 frontend/src/pages/Delegations.vue:4 frontend/src/pages/Employees.vue:7 frontend/src/pages/ResourceList.vue:7 frontend/src/pages/Users.vue:4
 msgid "New"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:58
+#: frontend/src/pages/Delegations.vue:44
+msgid "New delegation"
+msgstr ""
+
+#: frontend/src/pages/EmployeeForm.vue:3
+msgid "New employee"
+msgstr ""
+
+#: frontend/src/pages/Calendar.vue:59
 msgid "New holiday"
 msgstr ""
 
@@ -1250,7 +1486,7 @@ msgstr ""
 msgid "New password"
 msgstr ""
 
-#: frontend/src/pages/Users.vue:56
+#: frontend/src/pages/EmployeeForm.vue:46 frontend/src/pages/Users.vue:57
 msgid "New password (leave empty to keep)"
 msgstr ""
 
@@ -1262,11 +1498,15 @@ msgstr ""
 msgid "New request"
 msgstr ""
 
-#: frontend/src/pages/Users.vue:34
+#: frontend/src/pages/OrgChart.vue:4
+msgid "New top designation"
+msgstr ""
+
+#: frontend/src/pages/Users.vue:41
 msgid "New user"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:96
+#: frontend/src/components/ResourceForm.vue:107
 msgid "New {0}"
 msgstr ""
 
@@ -1274,7 +1514,7 @@ msgstr ""
 msgid "Next month"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:13 frontend/src/pages/Periods.vue:10
+#: frontend/src/pages/Calendar.vue:14 frontend/src/pages/Periods.vue:10
 msgid "Next year"
 msgstr ""
 
@@ -1282,43 +1522,55 @@ msgstr ""
 msgid "Night Work"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:497
+#: frontend/src/lib/resources.ts:428
 msgid "Night work ends (minute of the day)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:501
+#: frontend/src/lib/resources.ts:432
 msgid "Night work premium (percent)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:496
+#: frontend/src/lib/resources.ts:427
 msgid "Night work starts (minute of the day)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:505
+#: frontend/src/lib/resources.ts:436
 msgid "Night-shift premium (percent)"
+msgstr ""
+
+#: backend/hozur/services/excel.py:703 backend/hozur/services/excel.py:853
+msgid "No"
 msgstr ""
 
 #: backend/hozur/devices/base.py:115 backend/hozur/services/devices.py:132
 msgid "No adapter registered for device type {0}"
 msgstr ""
 
-#: backend/hozur/services/approvals.py:52
+#: backend/hozur/services/approvals.py:66
 msgid "No approval process is set for {0}"
 msgstr ""
 
-#: backend/hozur/services/approvals.py:80
-msgid "No approver found for step {0} ({1}). Set the manager of the department or the CEO."
+#: backend/hozur/services/approvals.py:100
+msgid "No approver found for step {0}. Hang the employee under a designation that someone holds."
 msgstr ""
 
-#: frontend/src/pages/Devices.vue:13
+#: frontend/src/pages/Delegations.vue:15
+msgid "No delegation yet"
+msgstr ""
+
+#: frontend/src/pages/EmployeeForm.vue:77
+msgid "No designation yet"
+msgstr ""
+
+#: frontend/src/pages/Devices.vue:14
 msgid "No device yet."
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:161
+#: frontend/src/pages/Reports.vue:163
 msgid "No grouping"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:51
+#: frontend/src/pages/Calendar.vue:52
 msgid "No holidays for this year"
 msgstr ""
 
@@ -1346,11 +1598,15 @@ msgstr ""
 msgid "No requests yet"
 msgstr ""
 
+#: frontend/src/pages/OrgChart.vue:55
+msgid "Nobody holds this designation"
+msgstr ""
+
 #: frontend/src/lib/format.ts:122 frontend/src/pages/NewRequest.vue:164
 msgid "Normal"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:23
+#: backend/hozur/services/excel.py:237 frontend/src/lib/labels.ts:23
 msgid "Normal workday (make up later)"
 msgstr ""
 
@@ -1358,23 +1614,27 @@ msgstr ""
 msgid "Not Scheduled"
 msgstr ""
 
-#: backend/hozur/services/requests.py:339
+#: backend/hozur/services/requests.py:340
 msgid "Not enough leave: {0} days available, {1} requested"
 msgstr ""
 
-#: backend/hozur/api/routes/admin.py:163 backend/hozur/api/routes/admin.py:98 backend/hozur/api/routes/devices.py:169 backend/hozur/services/devices.py:488 backend/hozur/services/devices.py:580 backend/hozur/services/reports.py:312 backend/hozur/services/resources.py:198 backend/hozur/services/resources.py:628 frontend/src/pages/DeviceForm.vue:302 frontend/src/pages/ResourceList.vue:34
+#: backend/hozur/api/routes/admin.py:155 backend/hozur/api/routes/admin.py:91 backend/hozur/api/routes/devices.py:169 backend/hozur/services/delegations.py:69 backend/hozur/services/devices.py:488 backend/hozur/services/devices.py:580 backend/hozur/services/excel.py:647 backend/hozur/services/reports.py:308 backend/hozur/services/resources.py:197 backend/hozur/services/resources.py:631 frontend/src/pages/DeviceForm.vue:305 frontend/src/pages/ResourceList.vue:35
 msgid "Not found"
 msgstr ""
 
-#: backend/hozur/api/deps.py:62 backend/hozur/api/deps.py:68 backend/hozur/api/routes/attendance.py:135 backend/hozur/api/routes/attendance.py:36 backend/hozur/services/access.py:133 backend/hozur/services/reports.py:262 backend/hozur/services/reports.py:314 backend/hozur/services/reports.py:333 backend/hozur/services/requests.py:379 backend/hozur/services/resources.py:138
+#: backend/hozur/api/deps.py:62 backend/hozur/api/routes/attendance.py:135 backend/hozur/api/routes/attendance.py:36 backend/hozur/api/routes/people.py:42 backend/hozur/services/access.py:221 backend/hozur/services/delegations.py:71 backend/hozur/services/reports.py:260 backend/hozur/services/reports.py:310 backend/hozur/services/reports.py:329 backend/hozur/services/requests.py:379 backend/hozur/services/resources.py:137
 msgid "Not permitted"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:356 frontend/src/pages/Calendar.vue:83
+#: frontend/src/pages/Delegations.vue:25
+msgid "Not started"
+msgstr ""
+
+#: backend/hozur/services/excel.py:321 backend/hozur/services/excel.py:487 backend/hozur/services/excel.py:604 backend/hozur/services/excel.py:767 frontend/src/components/AssignmentDialog.vue:22 frontend/src/lib/resources.ts:136 frontend/src/lib/resources.ts:297 frontend/src/pages/Calendar.vue:84 frontend/src/pages/Delegations.vue:62
 msgid "Note"
 msgstr ""
 
-#: frontend/src/pages/ResourceList.vue:27
+#: frontend/src/pages/Employees.vue:37 frontend/src/pages/OrgChart.vue:14 frontend/src/pages/ResourceList.vue:28
 msgid "Nothing here yet"
 msgstr ""
 
@@ -1382,11 +1642,19 @@ msgstr ""
 msgid "Nothing is waiting for you"
 msgstr ""
 
-#: backend/hozur/services/resources.py:353
+#: frontend/src/components/ExcelImport.vue:27
+msgid "Nothing was saved. Fix these rows and upload again."
+msgstr ""
+
+#: backend/hozur/services/excel.py:664
+msgid "Number"
+msgstr ""
+
+#: backend/hozur/services/resources.py:346
 msgid "Number the days of the cycle 1, 2, 3, ..."
 msgstr ""
 
-#: backend/hozur/services/resources.py:419
+#: backend/hozur/services/resources.py:441
 msgid "Number the steps 1, 2, 3, ..."
 msgstr ""
 
@@ -1394,15 +1662,15 @@ msgstr ""
 msgid "Nursing Breaks"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:515
+#: frontend/src/lib/resources.ts:446
 msgid "Nursing break (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:201
+#: backend/hozur/services/excel.py:361 frontend/src/pages/EmployeeForm.vue:185
 msgid "Nursing breaks until"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:517
+#: frontend/src/lib/resources.ts:448
 msgid "Nursing breaks until the child is (months)"
 msgstr ""
 
@@ -1410,55 +1678,55 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:9
+#: backend/hozur/services/excel.py:225 frontend/src/lib/labels.ts:9
 msgid "Office closure"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:8
+#: backend/hozur/services/excel.py:224 frontend/src/lib/labels.ts:8
 msgid "Official (announced)"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:7
+#: backend/hozur/services/excel.py:223 frontend/src/lib/labels.ts:7
 msgid "Official (lunar)"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:6
+#: backend/hozur/services/excel.py:222 frontend/src/lib/labels.ts:6
 msgid "Official (solar)"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:100
+#: frontend/src/pages/Calendar.vue:101
 msgid "Once a year, load the next year's official holidays. You see every change first; dates you edited by hand and closed months are never changed."
 msgstr ""
 
-#: frontend/src/lib/resources.ts:422
+#: backend/hozur/services/excel.py:512 frontend/src/lib/resources.ts:358
 msgid "Once in the whole service"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:16
-msgid "One branch"
-msgstr ""
-
-#: frontend/src/lib/resources.ts:323
+#: backend/hozur/services/excel.py:115 backend/hozur/services/excel.py:456 frontend/src/lib/resources.ts:256
 msgid "One employee"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:516
+#: frontend/src/lib/resources.ts:447
 msgid "One nursing break every (minutes)"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:15
+#: backend/hozur/services/excel.py:230 frontend/src/lib/labels.ts:15
 msgid "One province"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:158
+#: backend/hozur/services/excel.py:256 frontend/src/pages/Reports.vue:160
 msgid "One row per day"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:157
+#: backend/hozur/services/excel.py:256 backend/hozur/services/excel.py:571 frontend/src/pages/Reports.vue:159
 msgid "One row per person"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:361
+#: backend/hozur/services/excel.py:231 frontend/src/lib/labels.ts:16
+msgid "One work location"
+msgstr ""
+
+#: backend/hozur/services/excel.py:493 frontend/src/lib/resources.ts:302
 msgid "One-day shift changes"
 msgstr ""
 
@@ -1466,27 +1734,31 @@ msgstr ""
 msgid "Only a warning: nothing happens automatically (Article 27)."
 msgstr ""
 
-#: backend/hozur/services/requests.py:430
-msgid "Only an operator can cancel this request"
-msgstr ""
-
 #: frontend/src/pages/DeviceForm.vue:62
 msgid "Only for older firmware"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:193
+#: backend/hozur/services/excel.py:356 frontend/src/pages/EmployeeForm.vue:148
 msgid "Only for young-worker rules"
 msgstr ""
 
-#: frontend/src/pages/Users.vue:94
-msgid "Operator"
+#: backend/hozur/services/delegations.py:46
+msgid "Only someone with people below them can delegate their approvals"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:116 frontend/src/lib/resources.ts:137 frontend/src/lib/resources.ts:76 frontend/src/lib/resources.ts:92 frontend/src/pages/Manage.vue:42
+#: backend/hozur/services/requests.py:429
+msgid "Only the system admin can cancel this request"
+msgstr ""
+
+#: frontend/src/pages/Manage.vue:47
 msgid "Organization"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:415
+#: frontend/src/pages/Manage.vue:53 frontend/src/pages/OrgChart.vue:3
+msgid "Organization chart"
+msgstr ""
+
+#: backend/hozur/services/excel.py:248 backend/hozur/services/excel.py:507 frontend/src/lib/resources.ts:351
 msgid "Other"
 msgstr ""
 
@@ -1494,11 +1766,11 @@ msgstr ""
 msgid "Out"
 msgstr ""
 
-#: backend/hozur/services/requests.py:198
+#: backend/hozur/services/requests.py:199
 msgid "Overlaps leave request {0}"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:62 frontend/src/components/DayNumbers.vue:33 frontend/src/lib/format.ts:110 frontend/src/lib/format.ts:99 frontend/src/lib/resources.ts:67 frontend/src/pages/NewRequest.vue:151
+#: backend/hozur/reports/catalog.py:62 backend/hozur/services/excel.py:111 backend/hozur/services/excel.py:543 frontend/src/components/DayNumbers.vue:33 frontend/src/lib/format.ts:110 frontend/src/lib/format.ts:99 frontend/src/lib/resources.ts:67 frontend/src/pages/NewRequest.vue:151
 msgid "Overtime"
 msgstr ""
 
@@ -1510,15 +1782,15 @@ msgstr ""
 msgid "Overtime above the daily cap was not counted (Article 59)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:498
+#: frontend/src/lib/resources.ts:429
 msgid "Overtime cap per day (minutes)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:192
+#: backend/hozur/services/excel.py:358 frontend/src/pages/EmployeeForm.vue:177
 msgid "Overtime consent date"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:500
+#: frontend/src/lib/resources.ts:431
 msgid "Overtime premium (percent)"
 msgstr ""
 
@@ -1526,7 +1798,7 @@ msgstr ""
 msgid "Overtime you assign needs the employee's acceptance (Article 59)."
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:173
+#: backend/hozur/services/excel.py:262 frontend/src/pages/Reports.vue:175
 msgid "PDF"
 msgstr ""
 
@@ -1534,7 +1806,7 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:418
+#: backend/hozur/services/excel.py:508 frontend/src/lib/resources.ts:354
 msgid "Paid"
 msgstr ""
 
@@ -1542,31 +1814,35 @@ msgstr ""
 msgid "Paid Days (Attendance)"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:22
+#: backend/hozur/services/excel.py:236 frontend/src/lib/labels.ts:22
 msgid "Paid by the employer, counted as work"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:21
+#: backend/hozur/services/excel.py:235 frontend/src/lib/labels.ts:21
 msgid "Paid holiday"
 msgstr ""
 
-#: frontend/src/lib/format.ts:91
+#: backend/hozur/services/excel.py:254 frontend/src/lib/format.ts:91
 msgid "Pair by order"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:386
+#: frontend/src/lib/resources.ts:324
 msgid "Parameters"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:97
-msgid "Parent department"
+#: backend/hozur/services/excel.py:292
+msgid "Parent designation"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:176
+#: frontend/src/lib/resources.ts:384
+msgid "Parent in the chart"
+msgstr ""
+
+#: backend/hozur/services/excel.py:220 frontend/src/pages/EmployeeForm.vue:161
 msgid "Part time"
 msgstr ""
 
-#: frontend/src/pages/Login.vue:15 frontend/src/pages/Users.vue:56
+#: backend/hozur/services/excel.py:365 frontend/src/pages/EmployeeForm.vue:46 frontend/src/pages/Login.vue:15 frontend/src/pages/Users.vue:57
 msgid "Password"
 msgstr ""
 
@@ -1574,19 +1850,19 @@ msgstr ""
 msgid "Password changed"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:414
+#: backend/hozur/services/excel.py:247 frontend/src/lib/resources.ts:350
 msgid "Paternity"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:514
+#: frontend/src/lib/resources.ts:445
 msgid "Paternity leave (days)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:310
+#: frontend/src/lib/resources.ts:244
 msgid "Pattern assignment"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:309
+#: backend/hozur/services/excel.py:454 frontend/src/lib/resources.ts:243
 msgid "Pattern assignments"
 msgstr ""
 
@@ -1594,11 +1870,11 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:456 frontend/src/pages/Reports.vue:162
+#: frontend/src/lib/resources.ts:389 frontend/src/pages/EmployeeForm.vue:8 frontend/src/pages/Reports.vue:164
 msgid "Person"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:141
+#: backend/hozur/services/excel.py:329 frontend/src/pages/EmployeeForm.vue:128 frontend/src/pages/Employees.vue:15
 msgid "Personnel code"
 msgstr ""
 
@@ -1610,11 +1886,11 @@ msgstr ""
 msgid "Please log in"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:39
+#: backend/hozur/services/excel.py:616 frontend/src/pages/DeviceForm.vue:39
 msgid "Port"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:28
+#: backend/hozur/services/excel.py:239 frontend/src/lib/labels.ts:28
 msgid "Predicted"
 msgstr ""
 
@@ -1626,11 +1902,11 @@ msgstr ""
 msgid "Presence"
 msgstr ""
 
-#: frontend/src/lib/format.ts:57 frontend/src/pages/Month.vue:276
+#: frontend/src/lib/format.ts:57 frontend/src/pages/Month.vue:280
 msgid "Present"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:168
+#: frontend/src/pages/DeviceForm.vue:169
 msgid "Press “Read Users from Device”."
 msgstr ""
 
@@ -1638,15 +1914,15 @@ msgstr ""
 msgid "Previous month"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:11 frontend/src/pages/Periods.vue:8
+#: frontend/src/pages/Calendar.vue:12 frontend/src/pages/Periods.vue:8
 msgid "Previous year"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:82 frontend/src/pages/Calendar.vue:73
+#: backend/hozur/services/excel.py:272 backend/hozur/services/excel.py:600 frontend/src/lib/resources.ts:81 frontend/src/pages/Calendar.vue:74
 msgid "Province"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:24
+#: backend/hozur/services/excel.py:618 frontend/src/pages/DeviceForm.vue:24
 msgid "Punch Direction"
 msgstr ""
 
@@ -1658,7 +1934,15 @@ msgstr ""
 msgid "Punches of this day"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:58
+#: backend/hozur/services/excel.py:295
+msgid "Put parents above their children in the sheet"
+msgstr ""
+
+#: frontend/src/components/RotationBuilder.vue:4
+msgid "Quick rotation"
+msgstr ""
+
+#: backend/hozur/services/excel.py:619 frontend/src/pages/DeviceForm.vue:58
 msgid "Read Every (Minutes)"
 msgstr ""
 
@@ -1674,15 +1958,15 @@ msgstr ""
 msgid "Read again from"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:81 frontend/src/pages/Devices.vue:75
+#: frontend/src/pages/DeviceForm.vue:81 frontend/src/pages/Devices.vue:76
 msgid "Read punches now"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:370 frontend/src/pages/Approvals.vue:39 frontend/src/pages/Audit.vue:18 frontend/src/pages/NewRequest.vue:115 frontend/src/pages/NewRequest.vue:31 frontend/src/pages/NewRequest.vue:51 frontend/src/pages/NewRequest.vue:65
+#: backend/hozur/services/excel.py:498 frontend/src/lib/resources.ts:310 frontend/src/pages/Approvals.vue:39 frontend/src/pages/Audit.vue:18 frontend/src/pages/NewRequest.vue:115 frontend/src/pages/NewRequest.vue:31 frontend/src/pages/NewRequest.vue:51 frontend/src/pages/NewRequest.vue:65
 msgid "Reason"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:285
+#: frontend/src/pages/Calendar.vue:288
 msgid "Reason for deleting"
 msgstr ""
 
@@ -1690,7 +1974,7 @@ msgstr ""
 msgid "Reason for reopening"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:47 frontend/src/lib/resources.ts:304 frontend/src/pages/Calendar.vue:84
+#: backend/hozur/services/excel.py:444 backend/hozur/services/excel.py:556 frontend/src/components/ResourceForm.vue:51 frontend/src/lib/resources.ts:238 frontend/src/pages/Calendar.vue:85
 msgid "Reason for the change"
 msgstr ""
 
@@ -1702,7 +1986,7 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:96
+#: frontend/src/pages/Calendar.vue:97
 msgid "Refresh the holidays of a year"
 msgstr ""
 
@@ -1710,7 +1994,7 @@ msgstr ""
 msgid "Refreshed"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:17
+#: frontend/src/pages/Calendar.vue:18
 msgid "Refreshed {0}"
 msgstr ""
 
@@ -1730,7 +2014,7 @@ msgstr ""
 msgid "Rejected: {0}"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:16 frontend/src/pages/Calendar.vue:244 frontend/src/pages/NewRequest.vue:108
+#: frontend/src/components/ResourceForm.vue:20 frontend/src/pages/Calendar.vue:247 frontend/src/pages/NewRequest.vue:108
 msgid "Remove"
 msgstr ""
 
@@ -1750,19 +2034,19 @@ msgstr ""
 msgid "Report field not allowed: {0}"
 msgstr ""
 
-#: frontend/src/components/AppShell.vue:107 frontend/src/pages/Reports.vue:3
-msgid "Reports"
+#: backend/hozur/services/excel.py:568
+msgid "Report templates"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:185
-msgid "Reports to"
+#: frontend/src/components/AppShell.vue:107 frontend/src/pages/Reports.vue:3
+msgid "Reports"
 msgstr ""
 
 #: frontend/src/pages/Today.vue:80
 msgid "Request leave"
 msgstr ""
 
-#: backend/hozur/services/requests.py:377 backend/hozur/services/requests.py:388
+#: backend/hozur/services/requests.py:374 backend/hozur/services/requests.py:388
 msgid "Request not found"
 msgstr ""
 
@@ -1770,7 +2054,7 @@ msgstr ""
 msgid "Request submitted: {0}"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:473
+#: backend/hozur/services/excel.py:539 frontend/src/lib/resources.ts:404
 msgid "Request type"
 msgstr ""
 
@@ -1782,11 +2066,11 @@ msgstr ""
 msgid "Requests"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:54 frontend/src/components/DayNumbers.vue:23
+#: backend/hozur/reports/catalog.py:54 backend/hozur/services/excel.py:763 frontend/src/components/DayNumbers.vue:23
 msgid "Required"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:235
+#: backend/hozur/services/excel.py:397 frontend/src/lib/resources.ts:169
 msgid "Required minutes"
 msgstr ""
 
@@ -1802,23 +2086,39 @@ msgstr ""
 msgid "Rest Days"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:502
+#: frontend/src/lib/resources.ts:433
 msgid "Rest day work premium (percent)"
 msgstr ""
 
-#: frontend/src/pages/Users.vue:13 frontend/src/pages/Users.vue:39
+#: frontend/src/pages/Users.vue:20 frontend/src/pages/Users.vue:46
 msgid "Roles"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:266
+#: backend/hozur/services/excel.py:418 frontend/src/lib/resources.ts:199
 msgid "Rotating"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:495
+#: backend/hozur/services/excel.py:427
+msgid "Rotating patterns only"
+msgstr ""
+
+#: backend/hozur/services/excel.py:441
+msgid "Rotating patterns: shift*days, e.g. Morning*14, Night*14"
+msgstr ""
+
+#: backend/hozur/services/excel.py:483
+msgid "Rotating patterns: shifts this group along the cycle"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:426
 msgid "Rotating shifts: most work in four weeks (minutes)"
 msgstr ""
 
-#: backend/hozur/services/requests.py:267
+#: backend/hozur/services/excel.py:440
+msgid "Rotation"
+msgstr ""
+
+#: backend/hozur/services/requests.py:268
 msgid "Row {0}"
 msgstr ""
 
@@ -1838,47 +2138,55 @@ msgstr ""
 msgid "Row {0} of the holiday file: {1} is not a Jalali date"
 msgstr ""
 
-#: backend/hozur/services/requests.py:288
+#: backend/hozur/services/requests.py:289
 msgid "Row {0} repeats an earlier row"
 msgstr ""
 
-#: backend/hozur/services/requests.py:280
+#: backend/hozur/services/requests.py:281
 msgid "Row {0}: that punch is not a punch of this person on {1}"
 msgstr ""
 
-#: backend/hozur/services/requests.py:286
+#: backend/hozur/services/requests.py:287
 msgid "Row {0}: unknown action"
 msgstr ""
 
-#: backend/hozur/services/requests.py:270
+#: backend/hozur/services/requests.py:271
 msgid "Row {0}: unknown direction"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:17
+#: frontend/src/components/ExcelImport.vue:29
+msgid "Row {0}: {1}"
+msgstr ""
+
+#: backend/hozur/services/excel.py:571 frontend/src/pages/Reports.vue:18
 msgid "Rows"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:377 frontend/src/lib/resources.ts:394
+#: frontend/src/pages/Manage.vue:62
 msgid "Rules"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:54 frontend/src/pages/Account.vue:22 frontend/src/pages/Calendar.vue:89 frontend/src/pages/DeviceForm.vue:66 frontend/src/pages/Organization.vue:16 frontend/src/pages/Settings.vue:29 frontend/src/pages/Users.vue:61
+#: backend/hozur/api/routes/imports.py:27
+msgid "Sample"
+msgstr ""
+
+#: frontend/src/components/AssignmentDialog.vue:32 frontend/src/components/ResourceForm.vue:58 frontend/src/pages/Account.vue:22 frontend/src/pages/Calendar.vue:90 frontend/src/pages/Delegations.vue:66 frontend/src/pages/DeviceForm.vue:66 frontend/src/pages/EmployeeForm.vue:68 frontend/src/pages/Organization.vue:15 frontend/src/pages/Settings.vue:29 frontend/src/pages/Users.vue:62
 msgid "Save"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:50
+#: frontend/src/pages/Reports.vue:51
 msgid "Save as a report"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:159 frontend/src/pages/ApprovalDefaults.vue:47 frontend/src/pages/Calendar.vue:273 frontend/src/pages/DeviceForm.vue:315 frontend/src/pages/DeviceForm.vue:473 frontend/src/pages/Organization.vue:60 frontend/src/pages/Reports.vue:251 frontend/src/pages/Settings.vue:77 frontend/src/pages/Users.vue:157
+#: frontend/src/components/AssignmentDialog.vue:96 frontend/src/components/ResourceForm.vue:171 frontend/src/pages/ApprovalDefaults.vue:47 frontend/src/pages/Calendar.vue:276 frontend/src/pages/Delegations.vue:146 frontend/src/pages/DeviceForm.vue:318 frontend/src/pages/DeviceForm.vue:481 frontend/src/pages/EmployeeForm.vue:272 frontend/src/pages/EmployeeForm.vue:275 frontend/src/pages/Organization.vue:57 frontend/src/pages/Reports.vue:254 frontend/src/pages/Settings.vue:77 frontend/src/pages/Users.vue:152
 msgid "Saved"
 msgstr ""
 
-#: frontend/src/pages/ResourceList.vue:8
+#: frontend/src/pages/Employees.vue:9 frontend/src/pages/ResourceList.vue:9
 msgid "Search"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:342
+#: frontend/src/pages/DeviceForm.vue:345
 msgid "Serial Number"
 msgstr ""
 
@@ -1886,39 +2194,47 @@ msgstr ""
 msgid "Set Device Clock"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:10 frontend/src/pages/Manage.vue:57 frontend/src/pages/Settings.vue:3
+#: frontend/src/pages/DeviceForm.vue:10 frontend/src/pages/Manage.vue:94 frontend/src/pages/Settings.vue:3
 msgid "Settings"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:49 frontend/src/lib/resources.ts:207
+#: backend/hozur/reports/catalog.py:49 frontend/src/lib/resources.ts:142
 msgid "Shift"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:300 frontend/src/lib/resources.ts:369
+#: backend/hozur/services/excel.py:497 frontend/src/lib/resources.ts:234 frontend/src/lib/resources.ts:309
 msgid "Shift (empty = day off)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:362
+#: frontend/src/components/RotationBuilder.vue:10
+msgid "Shift A"
+msgstr ""
+
+#: frontend/src/components/RotationBuilder.vue:18
+msgid "Shift B"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:303
 msgid "Shift change"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:206
+#: backend/hozur/services/excel.py:376 frontend/src/lib/resources.ts:141
 msgid "Shifts"
 msgstr ""
 
-#: frontend/src/pages/Audit.vue:7 frontend/src/pages/Reports.vue:57
+#: frontend/src/pages/Audit.vue:7 frontend/src/pages/Reports.vue:58
 msgid "Show"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:110
+#: frontend/src/pages/Calendar.vue:111
 msgid "Show the changes"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:24
+#: backend/hozur/services/excel.py:572 frontend/src/pages/Reports.vue:25
 msgid "Show times as"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:409
+#: backend/hozur/services/excel.py:242 frontend/src/lib/resources.ts:345
 msgid "Sick"
 msgstr ""
 
@@ -1926,31 +2242,59 @@ msgstr ""
 msgid "Skipped"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:107
+#: frontend/src/pages/Calendar.vue:108
 msgid "Source"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:16
+#: frontend/src/pages/Calendar.vue:17
 msgid "Source: {0}"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:225
+#: backend/hozur/services/excel.py:387 frontend/src/lib/resources.ts:159
 msgid "Start"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:180
+#: backend/hozur/services/excel.py:342 frontend/src/pages/EmployeeForm.vue:165
 msgid "Start date"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:46 frontend/src/lib/resources.ts:159 frontend/src/pages/Calendar.vue:30 frontend/src/pages/Calendar.vue:82
+#: backend/hozur/services/excel.py:481
+msgid "Start offset in the cycle (days)"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:289
+msgid "Start the cycle later by (days)"
+msgstr ""
+
+#: backend/hozur/reports/catalog.py:46 backend/hozur/services/excel.py:344 backend/hozur/services/excel.py:603 frontend/src/pages/Calendar.vue:31 frontend/src/pages/Calendar.vue:83 frontend/src/pages/EmployeeForm.vue:153 frontend/src/pages/Employees.vue:19
 msgid "Status"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:444
+#: frontend/src/lib/resources.ts:378
 msgid "Step"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:441
+#: backend/hozur/services/excel.py:524
+msgid "Step 1"
+msgstr ""
+
+#: backend/hozur/services/excel.py:525
+msgid "Step 2"
+msgstr ""
+
+#: backend/hozur/services/excel.py:526
+msgid "Step 3"
+msgstr ""
+
+#: backend/hozur/services/excel.py:527
+msgid "Step 4"
+msgstr ""
+
+#: backend/hozur/services/excel.py:180
+msgid "Step {0}: {1} is not parent, CEO or an employee code"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:375
 msgid "Steps"
 msgstr ""
 
@@ -1966,15 +2310,15 @@ msgstr ""
 msgid "Submitted"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:165
+#: backend/hozur/services/excel.py:219 frontend/src/lib/people.ts:40
 msgid "Suspended"
 msgstr ""
 
-#: frontend/src/pages/Audit.vue:15 frontend/src/pages/Manage.vue:56 frontend/src/pages/Manage.vue:57 frontend/src/pages/Manage.vue:58
+#: frontend/src/pages/Audit.vue:15 frontend/src/pages/Manage.vue:91
 msgid "System"
 msgstr ""
 
-#: frontend/src/pages/Users.vue:95
+#: backend/hozur/services/excel.py:369 frontend/src/pages/EmployeeForm.vue:54 frontend/src/pages/Users.vue:93
 msgid "System admin"
 msgstr ""
 
@@ -1982,52 +2326,88 @@ msgstr ""
 msgid "Table, e.g. employee"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:75 frontend/src/pages/Devices.vue:72
+#: frontend/src/pages/EmployeeForm.vue:89 frontend/src/pages/OrgChart.vue:48 frontend/src/pages/OrgChart.vue:49
+msgid "Take away"
+msgstr ""
+
+#: frontend/src/components/AssignmentDialog.vue:2
+msgid "Take the designation away"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:75 frontend/src/pages/Devices.vue:73
 msgid "Test Connection"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:174
+#: backend/hozur/services/excel.py:663
+msgid "Text"
+msgstr ""
+
+#: backend/hozur/services/excel.py:262 frontend/src/pages/Reports.vue:176
 msgid "Text (CSV)"
+msgstr ""
+
+#: backend/hozur/services/resources.py:394
+msgid "The CEO designation must be at the top of the chart"
 msgstr ""
 
 #: backend/hozur/devices/zkteco.py:71
 msgid "The ZKTeco comm key must be a number"
 msgstr ""
 
+#: backend/hozur/services/excel.py:333
+msgid "The accounting detail code (کد تفصیلی)"
+msgstr ""
+
 #: frontend/src/pages/DeviceForm.vue:108
 msgid "The app only reads from the device; it never clears the device logs."
 msgstr ""
 
-#: backend/hozur/services/approvals.py:86
-msgid "The approver of step {0} has no user account"
-msgstr ""
-
-#: backend/hozur/services/resources.py:336
+#: backend/hozur/services/resources.py:329
 msgid "The break must be inside the shift"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:333
+#: frontend/src/pages/Calendar.vue:336
 msgid "The calendar was refreshed"
 msgstr ""
 
-#: backend/hozur/services/users.py:189
+#: backend/hozur/services/users.py:194
 msgid "The current password is wrong"
+msgstr ""
+
+#: frontend/src/components/RotationBuilder.vue:34
+msgid "The cycle will have {0} days"
 msgstr ""
 
 #: frontend/src/pages/Today.vue:46
 msgid "The day is not over; the numbers are final after your last punch."
 msgstr ""
 
-#: backend/hozur/api/routes/attendance.py:124 backend/hozur/api/routes/attendance.py:62 backend/hozur/services/devices.py:499 backend/hozur/services/reports.py:258 backend/hozur/services/requests.py:147 backend/hozur/services/requests.py:220 backend/hozur/services/resources.py:294
+#: frontend/src/pages/EmployeeForm.vue:26
+msgid "The designation decides who approves this person's requests. More can be given later."
+msgstr ""
+
+#: backend/hozur/api/routes/attendance.py:124 backend/hozur/api/routes/attendance.py:62 backend/hozur/services/delegations.py:50 backend/hozur/services/devices.py:499 backend/hozur/services/reports.py:256 backend/hozur/services/requests.py:148 backend/hozur/services/requests.py:221 backend/hozur/services/resources.py:288 backend/hozur/services/resources.py:419
 msgid "The end date is before the start date"
 msgstr ""
 
-#: backend/hozur/services/requests.py:132 backend/hozur/services/requests.py:211
+#: backend/hozur/services/requests.py:133 backend/hozur/services/requests.py:212
 msgid "The end time must be after the start time"
 msgstr ""
 
 #: backend/hozur/services/devices.py:633
 msgid "The file could not be read: {0}"
+msgstr ""
+
+#: backend/hozur/services/excel.py:907
+msgid "The file is not an Excel workbook (.xlsx)"
+msgstr ""
+
+#: backend/hozur/services/excel.py:353
+msgid "The first designation they hold"
+msgstr ""
+
+#: frontend/src/components/AssignmentDialog.vue:27
+msgid "The history stays; the designation simply ends on this day."
 msgstr ""
 
 #: backend/hozur/calendar/sources.py:161
@@ -2038,7 +2418,7 @@ msgstr ""
 msgid "The holiday file is not valid JSON: {0}"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:343
+#: backend/hozur/calendar/service.py:345
 msgid "The holidays of {0} are not confirmed yet; refresh the calendar"
 msgstr ""
 
@@ -2046,7 +2426,7 @@ msgstr ""
 msgid "The legal baseline Labor Rule Set is missing; run hozur db install"
 msgstr ""
 
-#: backend/hozur/services/resources.py:390
+#: backend/hozur/services/resources.py:383
 msgid "The legal baseline is part of the app and cannot be changed"
 msgstr ""
 
@@ -2054,7 +2434,7 @@ msgstr ""
 msgid "The month {0} is not over yet"
 msgstr ""
 
-#: backend/hozur/services/resources.py:296
+#: backend/hozur/services/resources.py:290
 msgid "The national id must be 10 digits"
 msgstr ""
 
@@ -2066,12 +2446,36 @@ msgstr ""
 msgid "The period {0} is closed; reopen it first"
 msgstr ""
 
+#: frontend/src/pages/EmployeeForm.vue:134
+msgid "The person's account code in the accounting books"
+msgstr ""
+
+#: backend/hozur/services/excel.py:316
+msgid "The personnel code"
+msgstr ""
+
+#: backend/hozur/services/excel.py:149
+msgid "The rotation {0} must look like Morning*14"
+msgstr ""
+
+#: backend/hozur/services/excel.py:918
+msgid "The sheet has more than {0} rows"
+msgstr ""
+
+#: backend/hozur/services/excel.py:896
+msgid "The sheet has no column {0}"
+msgstr ""
+
 #: frontend/src/lib/warnings.ts:9
 msgid "The shift is longer than 6 hours for hard and harmful work (Article 52)"
 msgstr ""
 
 #: frontend/src/lib/warnings.ts:8
 msgid "The shift is longer than the daily limit (Article 51)"
+msgstr ""
+
+#: backend/hozur/services/excel.py:135
+msgid "The shift {0} does not exist"
 msgstr ""
 
 #: backend/hozur/devices/file_import.py:192
@@ -2082,11 +2486,15 @@ msgstr ""
 msgid "The two new passwords are not the same"
 msgstr ""
 
-#: backend/hozur/services/users.py:50
+#: frontend/src/pages/EmployeeForm.vue:50
+msgid "The username is the personnel code unless you enter another. The password needs at least 8 characters."
+msgstr ""
+
+#: backend/hozur/services/employees.py:152 backend/hozur/services/users.py:55
 msgid "The username {0} is taken"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:326
+#: backend/hozur/services/excel.py:118 frontend/src/lib/resources.ts:259
 msgid "The whole company"
 msgstr ""
 
@@ -2102,8 +2510,12 @@ msgstr ""
 msgid "Theme: light"
 msgstr ""
 
-#: backend/hozur/services/requests.py:151
+#: backend/hozur/services/requests.py:152
 msgid "There is no working day in this leave"
+msgstr ""
+
+#: backend/hozur/services/excel.py:828
+msgid "This cell is a real Excel date or time; type it as text, e.g. 1405/07/14"
 msgstr ""
 
 #: backend/hozur/services/devices.py:670
@@ -2114,15 +2526,11 @@ msgstr ""
 msgid "This device receives punches by file import; there is nothing to connect to"
 msgstr ""
 
-#: backend/hozur/services/requests.py:368
-msgid "This person has no user account to accept the overtime"
-msgstr ""
-
-#: backend/hozur/services/resources.py:156
+#: backend/hozur/services/resources.py:155
 msgid "This record is used elsewhere and cannot be removed"
 msgstr ""
 
-#: backend/hozur/services/requests.py:427
+#: backend/hozur/services/requests.py:426
 msgid "This request cannot be cancelled"
 msgstr ""
 
@@ -2134,7 +2542,7 @@ msgstr ""
 msgid "This request is waiting for someone else"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:504
+#: frontend/src/lib/resources.ts:435
 msgid "Three-shift premium (percent)"
 msgstr ""
 
@@ -2142,7 +2550,11 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:60
+#: backend/hozur/services/excel.py:667
+msgid "Time, e.g. 08:30"
+msgstr ""
+
+#: backend/hozur/services/excel.py:620 frontend/src/pages/DeviceForm.vue:60
 msgid "Timeout (Seconds)"
 msgstr ""
 
@@ -2150,15 +2562,15 @@ msgstr ""
 msgid "Times to add"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:27 frontend/src/pages/Calendar.vue:61
+#: backend/hozur/services/excel.py:590 frontend/src/pages/Calendar.vue:28 frontend/src/pages/Calendar.vue:62
 msgid "Title"
 msgstr ""
 
-#: backend/hozur/services/requests.py:144 backend/hozur/services/requests.py:217 frontend/src/pages/NewRequest.vue:21 frontend/src/pages/NewRequest.vue:41
+#: backend/hozur/services/requests.py:145 backend/hozur/services/requests.py:218 frontend/src/pages/NewRequest.vue:21 frontend/src/pages/NewRequest.vue:41
 msgid "To Date"
 msgstr ""
 
-#: backend/hozur/services/requests.py:129 backend/hozur/services/requests.py:208 backend/hozur/services/requests.py:236 frontend/src/pages/NewRequest.vue:28 frontend/src/pages/NewRequest.vue:48 frontend/src/pages/NewRequest.vue:63
+#: backend/hozur/services/requests.py:130 backend/hozur/services/requests.py:209 backend/hozur/services/requests.py:237 frontend/src/pages/NewRequest.vue:28 frontend/src/pages/NewRequest.vue:48 frontend/src/pages/NewRequest.vue:63
 msgid "To Time"
 msgstr ""
 
@@ -2174,11 +2586,11 @@ msgstr ""
 msgid "Total Overtime"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:503
+#: frontend/src/lib/resources.ts:434
 msgid "Two-shift premium (percent)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:216 frontend/src/lib/resources.ts:260 frontend/src/pages/Calendar.vue:28 frontend/src/pages/Calendar.vue:62
+#: backend/hozur/services/excel.py:381 backend/hozur/services/excel.py:415 backend/hozur/services/excel.py:593 frontend/src/lib/resources.ts:150 frontend/src/lib/resources.ts:193 frontend/src/pages/Calendar.vue:29 frontend/src/pages/Calendar.vue:63
 msgid "Type"
 msgstr ""
 
@@ -2194,15 +2606,15 @@ msgstr ""
 msgid "Unknown action"
 msgstr ""
 
-#: backend/hozur/services/approvals.py:67
+#: backend/hozur/services/approvals.py:81
 msgid "Unknown approver type {0}"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:159
+#: backend/hozur/calendar/service.py:161
 msgid "Unknown calendar source {0}"
 msgstr ""
 
-#: backend/hozur/services/reports.py:352
+#: backend/hozur/services/reports.py:348
 msgid "Unknown export format"
 msgstr ""
 
@@ -2210,15 +2622,15 @@ msgstr ""
 msgid "Unknown grouping"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:373
+#: backend/hozur/calendar/service.py:375
 msgid "Unknown holiday type"
 msgstr ""
 
-#: backend/hozur/services/requests.py:154
+#: backend/hozur/services/requests.py:155
 msgid "Unknown leave unit"
 msgstr ""
 
-#: backend/hozur/services/requests.py:223
+#: backend/hozur/services/requests.py:224
 msgid "Unknown mission unit"
 msgstr ""
 
@@ -2226,11 +2638,11 @@ msgstr ""
 msgid "Unknown month"
 msgstr ""
 
-#: backend/hozur/services/requests.py:233
+#: backend/hozur/services/requests.py:234
 msgid "Unknown overtime kind"
 msgstr ""
 
-#: backend/hozur/services/resources.py:427
+#: backend/hozur/services/resources.py:449
 msgid "Unknown report columns: {0}"
 msgstr ""
 
@@ -2238,55 +2650,59 @@ msgstr ""
 msgid "Unknown report source"
 msgstr ""
 
-#: backend/hozur/services/requests.py:312
+#: backend/hozur/services/requests.py:313
 msgid "Unknown request type"
 msgstr ""
 
-#: backend/hozur/services/users.py:53 backend/hozur/services/users.py:66
+#: backend/hozur/services/users.py:58 backend/hozur/services/users.py:71
 msgid "Unknown role {0}"
 msgstr ""
 
-#: backend/hozur/api/routes/admin.py:129
+#: backend/hozur/api/routes/admin.py:122
 msgid "Unknown settings: {0}"
 msgstr ""
 
-#: frontend/src/pages/Devices.vue:58
+#: frontend/src/pages/Devices.vue:59
 msgid "Unmapped users"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:410
+#: backend/hozur/services/excel.py:243 frontend/src/lib/resources.ts:346
 msgid "Unpaid"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:355 frontend/src/pages/Reports.vue:9
+#: backend/hozur/services/excel.py:320 backend/hozur/services/excel.py:486 backend/hozur/services/excel.py:635 frontend/src/components/AssignmentDialog.vue:21 frontend/src/components/AssignmentDialog.vue:26 frontend/src/lib/resources.ts:135 frontend/src/lib/resources.ts:296 frontend/src/pages/Delegations.vue:61 frontend/src/pages/Reports.vue:9
 msgid "Until"
+msgstr ""
+
+#: frontend/src/components/ExcelImport.vue:35
+msgid "Upload"
 msgstr ""
 
 #: frontend/src/pages/DeviceForm.vue:29
 msgid "Use Always In / Always Out for separate entry and exit devices. If people do not choose in/out on the device, use Pair by order."
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:62
+#: backend/hozur/services/excel.py:621 frontend/src/pages/DeviceForm.vue:62
 msgid "Use UDP"
 msgstr ""
 
-#: frontend/src/pages/Login.vue:12 frontend/src/pages/Users.vue:11 frontend/src/pages/Users.vue:36
+#: backend/hozur/services/excel.py:362 frontend/src/pages/EmployeeForm.vue:38 frontend/src/pages/Login.vue:12 frontend/src/pages/Users.vue:18 frontend/src/pages/Users.vue:43
 msgid "Username"
 msgstr ""
 
-#: frontend/src/pages/Manage.vue:56 frontend/src/pages/Users.vue:3
+#: frontend/src/pages/Manage.vue:93 frontend/src/pages/Users.vue:3
 msgid "Users and roles"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:168
+#: frontend/src/pages/DeviceForm.vue:169
 msgid "Users appear after the first import."
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:344 frontend/src/pages/Devices.vue:50
+#: frontend/src/pages/DeviceForm.vue:347 frontend/src/pages/Devices.vue:51
 msgid "Users on Device"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:200
+#: backend/hozur/services/excel.py:360 frontend/src/pages/EmployeeForm.vue:184
 msgid "Uses a card instead of biometrics"
 msgstr ""
 
@@ -2310,51 +2726,79 @@ msgstr ""
 msgid "Warnings"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:45 frontend/src/lib/resources.ts:289
+#: backend/hozur/reports/catalog.py:45 frontend/src/lib/resources.ts:223
 msgid "Weekday"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:265
+#: backend/hozur/services/excel.py:418 backend/hozur/services/excel.py:419 frontend/src/lib/resources.ts:198
 msgid "Weekly"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:271
+#: backend/hozur/services/excel.py:434
+msgid "Weekly patterns: the shift, empty = day off"
+msgstr ""
+
+#: backend/hozur/services/excel.py:423 frontend/src/lib/resources.ts:204
 msgid "Weekly rest day"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:105
-msgid "When set, approves instead of the manager"
+#: backend/hozur/services/excel.py:476
+msgid "When it applies to a department"
+msgstr ""
+
+#: backend/hozur/services/excel.py:469
+msgid "When it applies to a designation"
+msgstr ""
+
+#: backend/hozur/services/excel.py:462
+msgid "When it applies to one employee"
 msgstr ""
 
 #: frontend/src/pages/ApprovalDefaults.vue:5
 msgid "Which approval process each kind of request follows. Exceptions for one person are set under Approval exceptions."
 msgstr ""
 
-#: frontend/src/lib/labels.ts:17
+#: frontend/src/lib/resources.ts:110
+msgid "Whoever holds the designation above approves the requests of the people below"
+msgstr ""
+
+#: backend/hozur/services/excel.py:232 backend/hozur/services/excel.py:599 frontend/src/lib/labels.ts:17
 msgid "Whole company"
 msgstr ""
 
-#: frontend/src/lib/labels.ts:14
+#: backend/hozur/services/excel.py:229 frontend/src/lib/labels.ts:14
 msgid "Whole country"
+msgstr ""
+
+#: frontend/src/pages/Delegations.vue:49
+msgid "Whose approvals"
 msgstr ""
 
 #: frontend/src/pages/Requests.vue:38
 msgid "Withdraw"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:251 frontend/src/lib/resources.ts:353
+#: backend/hozur/reports/catalog.py:40 backend/hozur/services/excel.py:346 backend/hozur/services/excel.py:601 backend/hozur/services/excel.py:614 frontend/src/lib/resources.ts:75 frontend/src/pages/Calendar.vue:80 frontend/src/pages/DeviceForm.vue:19 frontend/src/pages/EmployeeForm.vue:167 frontend/src/pages/Reports.vue:10
+msgid "Work location"
+msgstr ""
+
+#: backend/hozur/services/excel.py:269 frontend/src/lib/resources.ts:74
+msgid "Work locations"
+msgstr ""
+
+#: backend/hozur/services/excel.py:478 frontend/src/lib/resources.ts:185 frontend/src/lib/resources.ts:286
 msgid "Work pattern"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:250
+#: backend/hozur/services/excel.py:410 frontend/src/lib/resources.ts:184
 msgid "Work patterns"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:208 frontend/src/lib/resources.ts:252 frontend/src/lib/resources.ts:311 frontend/src/lib/resources.ts:363
+#: frontend/src/pages/Manage.vue:59
 msgid "Work schedules"
 msgstr ""
 
-#: backend/hozur/reports/catalog.py:55 frontend/src/components/DayNumbers.vue:24 frontend/src/pages/Month.vue:290
+#: backend/hozur/reports/catalog.py:55 frontend/src/components/DayNumbers.vue:24 frontend/src/pages/Month.vue:294
 msgid "Worked"
 msgstr ""
 
@@ -2362,11 +2806,11 @@ msgstr ""
 msgid "Worse for the worker than the law: {0}"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:198
+#: frontend/src/pages/EmployeeForm.vue:182
 msgid "Written consent is needed before enrolling face or fingerprint"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:188
+#: backend/hozur/services/excel.py:357 frontend/src/pages/EmployeeForm.vue:173
 msgid "Written overtime consent on file"
 msgstr ""
 
@@ -2374,31 +2818,43 @@ msgstr ""
 msgid "Wrong username or password"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:106
+#: frontend/src/pages/Calendar.vue:107
 msgid "Year"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:168
+#: backend/hozur/calendar/service.py:170
 msgid "Year out of range"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:6
+#: frontend/src/pages/Calendar.vue:7
 msgid "Yearly refresh"
 msgstr ""
 
-#: backend/hozur/services/requests.py:110
-msgid "You can only assign overtime to your own team"
+#: backend/hozur/services/excel.py:703 backend/hozur/services/excel.py:781 backend/hozur/services/excel.py:851
+msgid "Yes"
+msgstr ""
+
+#: backend/hozur/services/excel.py:665
+msgid "Yes or no"
 msgstr ""
 
 #: backend/hozur/services/requests.py:111
+msgid "You can only assign overtime to your own team"
+msgstr ""
+
+#: backend/hozur/services/requests.py:112
 msgid "You can only submit requests for yourself"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:519
+#: backend/hozur/services/delegations.py:44
+msgid "You cannot delegate to yourself"
+msgstr ""
+
+#: frontend/src/lib/resources.ts:450
 msgid "Young worker age limit (years)"
 msgstr ""
 
-#: frontend/src/lib/resources.ts:518
+#: frontend/src/lib/resources.ts:449
 msgid "Young workers: shorter day (minutes)"
 msgstr ""
 
@@ -2410,11 +2866,11 @@ msgstr ""
 msgid "Your other devices will be logged out."
 msgstr ""
 
-#: backend/hozur/services/requests.py:100 frontend/src/pages/Today.vue:10
+#: backend/hozur/services/delegations.py:38 backend/hozur/services/requests.py:101 frontend/src/pages/Today.vue:10
 msgid "Your user is not linked to an employee"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:132
+#: frontend/src/pages/Calendar.vue:133
 msgid "closed month"
 msgstr ""
 
@@ -2422,8 +2878,12 @@ msgstr ""
 msgid "e.g. Main entrance"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:30
+#: frontend/src/components/ResourceForm.vue:34
 msgid "note"
+msgstr ""
+
+#: backend/hozur/services/excel.py:524 backend/hozur/services/excel.py:525 backend/hozur/services/excel.py:526 backend/hozur/services/excel.py:527
+msgid "parent, ceo, or the personnel code of a specific person"
 msgstr ""
 
 #: frontend/src/lib/labels.ts:32
@@ -2446,19 +2906,23 @@ msgstr ""
 msgid "time.ir returned no holidays for {0}"
 msgstr ""
 
-#: frontend/src/components/ResourceForm.vue:32
+#: frontend/src/components/ResourceForm.vue:36
 msgid "to be checked"
 msgstr ""
 
-#: backend/hozur/services/requests.py:180
+#: frontend/src/pages/OrgChart.vue:44
+msgid "until {0}"
+msgstr ""
+
+#: backend/hozur/services/requests.py:181
 msgid "{0} can be taken only once during employment"
 msgstr ""
 
-#: backend/hozur/services/requests.py:125
+#: backend/hozur/services/requests.py:126
 msgid "{0} cannot be taken by the hour"
 msgstr ""
 
-#: frontend/src/pages/Calendar.vue:114
+#: frontend/src/pages/Calendar.vue:115
 msgid "{0} changes · {1} unchanged · {2} edited by hand (kept)"
 msgstr ""
 
@@ -2466,23 +2930,23 @@ msgstr ""
 msgid "{0} days"
 msgstr ""
 
-#: backend/hozur/services/requests.py:168
+#: backend/hozur/services/requests.py:169
 msgid "{0} is at most {1} days"
 msgstr ""
 
-#: backend/hozur/calendar/service.py:368
+#: backend/hozur/calendar/service.py:370
 msgid "{0} is not a valid Jalali date"
 msgstr ""
 
-#: backend/hozur/services/resources.py:159
+#: backend/hozur/services/excel.py:932 backend/hozur/services/resources.py:158
 msgid "{0} is required"
 msgstr ""
 
-#: backend/hozur/api/routes/admin.py:139 backend/hozur/services/rule_sets.py:38
+#: backend/hozur/api/routes/admin.py:132 backend/hozur/services/excel.py:847 backend/hozur/services/rule_sets.py:38
 msgid "{0} must be a number"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:372 frontend/src/pages/Devices.vue:182
+#: frontend/src/pages/DeviceForm.vue:375 frontend/src/pages/Devices.vue:185
 msgid "{0} new punches"
 msgstr ""
 
@@ -2490,11 +2954,15 @@ msgstr ""
 msgid "{0} requests in this month are still waiting for approval"
 msgstr ""
 
-#: frontend/src/pages/Reports.vue:72
+#: frontend/src/components/ExcelImport.vue:24
+msgid "{0} rows imported"
+msgstr ""
+
+#: frontend/src/pages/Reports.vue:73
 msgid "{0} rows · {1} to {2}"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:405
+#: frontend/src/pages/DeviceForm.vue:408
 msgid "{0} rows: {1} new, {2} already stored, {3} duplicates, {4} errors"
 msgstr ""
 
@@ -2502,11 +2970,11 @@ msgstr ""
 msgid "{0} to {1}"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:363
+#: frontend/src/pages/DeviceForm.vue:366
 msgid "{0} users read, {1} new, {2} mapped automatically"
 msgstr ""
 
-#: frontend/src/pages/Devices.vue:168
+#: frontend/src/pages/Devices.vue:171
 msgid "{0} users, {1} records"
 msgstr ""
 
@@ -2514,18 +2982,30 @@ msgstr ""
 msgid "{0} without an employee"
 msgstr ""
 
-#: backend/hozur/services/requests.py:74
+#: backend/hozur/services/excel.py:855
+msgid "{0}: enter Yes or No"
+msgstr ""
+
+#: backend/hozur/services/excel.py:866 backend/hozur/services/requests.py:75
 msgid "{0}: enter the time as HH:MM"
 msgstr ""
 
-#: backend/hozur/services/resources.py:117
+#: backend/hozur/services/resources.py:118
 msgid "{0}: the value {1} is not valid"
 msgstr ""
 
-#: backend/hozur/services/requests.py:66
+#: backend/hozur/services/excel.py:879
+msgid "{0}: {1} does not exist"
+msgstr ""
+
+#: backend/hozur/services/excel.py:861 backend/hozur/services/requests.py:67
 msgid "{0}: {1} is not a valid Jalali date"
 msgstr ""
 
-#: frontend/src/pages/DeviceForm.vue:185
+#: backend/hozur/services/excel.py:873
+msgid "{0}: {1} is not one of the allowed values"
+msgstr ""
+
+#: frontend/src/pages/DeviceForm.vue:186
 msgid "— no employee —"
 msgstr ""

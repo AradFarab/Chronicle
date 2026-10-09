@@ -11,7 +11,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, time
 from decimal import Decimal
 
-from sqlalchemy import or_, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
 from hozur.db.models import (
@@ -22,6 +22,7 @@ from hozur.db.models import (
 	MissionRequest,
 	OvertimeRequest,
 	Request,
+	RequestApprovalApprover,
 )
 from hozur.db.models.requests import (
 	ADD_PUNCH,
@@ -93,8 +94,8 @@ def _reason(values: dict, required: bool, label: str = "") -> str | None:
 def _requester(
 	session: Session, actor: access.Actor, values: dict, kind: str, today: str
 ) -> tuple[int, bool, bool]:
-	"""(employee_id, entered_by_operator, assigned_by_manager). Employees file for themselves,
-	operators for anyone, managers may assign overtime to their team (Article 59)."""
+	"""(employee_id, entered_by_admin, assigned_by_manager). Employees file for themselves,
+	the system admin for anyone, managers may assign overtime to their team (Article 59)."""
 	employee_id = int(values.get("employee_id") or actor.employee_id or 0)
 	if not employee_id:
 		raise ValidationError(_("Your user is not linked to an employee"))
@@ -102,7 +103,7 @@ def _requester(
 		raise NotFound(_("Employee not found"))
 	if employee_id == actor.employee_id:
 		return employee_id, False, False
-	if actor.is_operator:
+	if actor.is_admin:
 		return employee_id, True, False
 	if kind == OVERTIME and access.can_see(session, actor, employee_id, today):
 		return employee_id, False, True
@@ -295,9 +296,9 @@ def _correction(session: Session, request: Request, values: dict, today: str) ->
 
 
 def submit(session: Session, actor: access.Actor, kind: str, values: dict, today: str) -> Request:
-	employee_id, by_operator, assigned = _requester(session, actor, values, kind, today)
+	employee_id, by_admin, assigned = _requester(session, actor, values, kind, today)
 	request = Request(
-		kind=kind, employee_id=employee_id, entered_by_id=actor.user_id, entered_by_operator=by_operator
+		kind=kind, employee_id=employee_id, entered_by_id=actor.user_id, entered_by_admin=by_admin
 	)
 	if kind == LEAVE:
 		request.reason = _reason(values, False)
@@ -312,10 +313,10 @@ def submit(session: Session, actor: access.Actor, kind: str, values: dict, today
 		raise ValidationError(_("Unknown request type"))
 	assert_open(session, [request.start_jdate, request.end_jdate])
 	_check_balance(session, request)
-	process = approvals.process_for(session, employee_id, request.request_type, by_operator)
+	process = approvals.process_for(session, employee_id, request.request_type, by_admin)
 	approvals.build_chain(session, request, process, today)
 	if assigned:
-		_assigned_overtime_chain(session, actor, request)
+		_assigned_overtime_chain(session, actor, request, today)
 	session.add(request)
 	session.flush()
 	session.refresh(request, ["number"])
@@ -342,21 +343,19 @@ def _check_balance(session: Session, request: Request) -> None:
 		)
 
 
-def _assigned_overtime_chain(session: Session, actor: access.Actor, request: Request) -> None:
+def _assigned_overtime_chain(session: Session, actor: access.Actor, request: Request, today: str) -> None:
 	"""Overtime assigned by a manager: the employee accepts first (Article 59); the assigning
 	manager's own steps count as approved."""
 	now = datetime.now(UTC)
-	steps = [
-		RequestApproval(
-			step=0,
-			approver_type=EMPLOYEE_ACCEPTANCE,
-			approver_id=request.employee_id,
-			approver_user_id=access.user_of(session, request.employee_id),
-			status=PENDING,
-		)
-	]
+	acceptance = RequestApproval(
+		step=0,
+		approver_type=EMPLOYEE_ACCEPTANCE,
+		approvers=approvals._approvers(session, [request.employee_id]),
+		status=PENDING,
+	)
+	steps = [acceptance]
 	for a in request.approvals:
-		if a.approver_user_id == actor.user_id and a.status == PENDING:
+		if approvals.can_act_on_step(session, actor, a, today) and not actor.is_admin:
 			a.status, a.acted_by_id, a.acted_at, a.comment = (
 				APPROVED,
 				actor.user_id,
@@ -364,8 +363,6 @@ def _assigned_overtime_chain(session: Session, actor: access.Actor, request: Req
 				"assigned the overtime",
 			)
 		steps.append(a)
-	if steps[0].approver_user_id is None:
-		raise ValidationError(_("This person has no user account to accept the overtime"))
 	request.approvals = steps
 	request.status = PENDING
 	approvals.advance(request)
@@ -375,7 +372,10 @@ def get(session: Session, actor: access.Actor, request_id: int, today: str) -> R
 	request = session.get(Request, request_id)
 	if request is None:
 		raise NotFound(_("Request not found"))
-	if not (access.can_see(session, actor, request.employee_id, today) or approvals.in_chain(actor, request)):
+	if not (
+		access.can_see(session, actor, request.employee_id, today)
+		or approvals.in_chain(session, actor, request, today)
+	):
 		raise PermissionDenied(_("Not permitted"))
 	return request
 
@@ -390,7 +390,7 @@ def act(
 		raise ValidationError(_("Unknown action"))
 	if request.status != PENDING:
 		raise ValidationError(_("This request is not waiting for approval"))
-	if not approvals.can_act(actor, request):
+	if not approvals.can_act(session, actor, request, today):
 		raise PermissionDenied(_("This request is waiting for someone else"))
 	if action == REJECT and not (comment or "").strip():
 		raise ValidationError(_("Enter the reason for rejecting"))
@@ -400,7 +400,6 @@ def act(
 	step.acted_by_id, step.acted_at, step.comment = actor.user_id, datetime.now(UTC), comment
 	if action == REJECT:
 		request.status = REJECTED
-		request.pending_approver_id = request.pending_approver_user_id = None
 		request.decided_at = datetime.now(UTC)
 	else:
 		approvals.advance(request)
@@ -420,20 +419,19 @@ def act(
 
 
 def cancel(session: Session, actor: access.Actor, request_id: int, reason: str | None, today: str) -> Request:
-	"""The employee may withdraw their own pending request; an operator may cancel any
+	"""The employee may withdraw their own pending request; the system admin may cancel any
 	request, approved ones included, with a reason."""
 	request = get(session, actor, request_id, today)
 	if request.status not in (PENDING, APPROVED):
 		raise ValidationError(_("This request cannot be cancelled"))
 	own = request.employee_id == actor.employee_id and request.status == PENDING
-	if not (own or actor.is_operator):
-		raise PermissionDenied(_("Only an operator can cancel this request"))
+	if not (own or actor.is_admin):
+		raise PermissionDenied(_("Only the system admin can cancel this request"))
 	if not own and not (reason or "").strip():
 		raise ValidationError(_("Enter the reason for cancelling"))
 	assert_open(session, [request.start_jdate, request.end_jdate])
 	previous = request.status
 	request.status = CANCELLED
-	request.pending_approver_id = request.pending_approver_user_id = None
 	request.cancelled_at = datetime.now(UTC)
 	session.flush()
 	audit.log(
@@ -511,14 +509,28 @@ def _audit_view(request: Request) -> dict:
 # lists ----------------------------------------------------------------------------------------
 
 
-def inbox(session: Session, actor: access.Actor) -> list[Request]:
-	"""Requests waiting for this user."""
-	if actor.user_id is None:
+def inbox(session: Session, actor: access.Actor, today: str) -> list[Request]:
+	"""Requests whose current step waits for this person or for someone they act for."""
+	acting = access.acting_employee_ids(session, actor.employee_id, today)
+	if not acting:
 		return []
+	first_pending = (
+		select(RequestApproval.request_id.label("request_id"), func.min(RequestApproval.step).label("step"))
+		.where(RequestApproval.status == PENDING)
+		.group_by(RequestApproval.request_id)
+		.subquery()
+	)
 	return list(
 		session.scalars(
 			select(Request)
-			.where(Request.status == PENDING, Request.pending_approver_user_id == actor.user_id)
+			.join(first_pending, first_pending.c.request_id == Request.id)
+			.join(
+				RequestApproval,
+				and_(RequestApproval.request_id == Request.id, RequestApproval.step == first_pending.c.step),
+			)
+			.join(RequestApprovalApprover, RequestApprovalApprover.approval_id == RequestApproval.id)
+			.where(Request.status == PENDING, RequestApprovalApprover.employee_id.in_(acting))
+			.distinct()
 			.order_by(Request.created_at)
 		)
 	)
@@ -543,8 +555,14 @@ def list_requests(
 				or_(
 					Request.employee_id.in_(visible or {0}),
 					Request.id.in_(
-						select(RequestApproval.request_id).where(
-							RequestApproval.approver_user_id == actor.user_id
+						select(RequestApproval.request_id)
+						.join(
+							RequestApprovalApprover, RequestApprovalApprover.approval_id == RequestApproval.id
+						)
+						.where(
+							RequestApprovalApprover.employee_id.in_(
+								access.acting_employee_ids(session, actor.employee_id, today) or {0}
+							)
 						)
 					),
 				)

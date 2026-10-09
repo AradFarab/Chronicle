@@ -12,7 +12,7 @@ export async function refreshCounts(force = false): Promise<void> {
   last = Date.now()
   try {
     counts.approvals = (await api.get<unknown[]>("/inbox")).length
-    if (session.is_operator) counts.unmappedUsers = (await api.get<unknown[]>("/devices/users/unmapped")).length
+    if (session.is_admin) counts.unmappedUsers = (await api.get<unknown[]>("/devices/users/unmapped")).length
   } catch {
     // badges are a convenience; the pages show the errors
   }

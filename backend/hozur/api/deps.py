@@ -57,12 +57,6 @@ def current_actor(user: Annotated[AppUser, Depends(current_user)], db: DB) -> ac
 	return access.actor_for(db, user)
 
 
-def require_operator(actor: Annotated[access.Actor, Depends(current_actor)]) -> access.Actor:
-	if not actor.is_operator:
-		raise PermissionDenied(_("Not permitted"))
-	return actor
-
-
 def require_admin(actor: Annotated[access.Actor, Depends(current_actor)]) -> access.Actor:
 	if not actor.is_admin:
 		raise PermissionDenied(_("Not permitted"))
@@ -70,7 +64,6 @@ def require_admin(actor: Annotated[access.Actor, Depends(current_actor)]) -> acc
 
 
 Actor = Annotated[access.Actor, Depends(current_actor)]
-Operator = Annotated[access.Actor, Depends(require_operator)]
 Admin = Annotated[access.Actor, Depends(require_admin)]
 
 

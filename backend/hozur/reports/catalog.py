@@ -37,7 +37,7 @@ FIELDS: tuple[Field, ...] = (
 	_f("employee", _("Employee Code"), _("Identity"), TEXT),
 	_f("employee_name", _("Full Name"), _("Identity"), TEXT),
 	_f("national_id", _("National Code"), _("Identity"), TEXT, column=None),
-	_f("branch", _("Branch"), _("Identity"), TEXT),
+	_f("work_location", _("Work location"), _("Identity"), TEXT),
 	_f("department", _("Department"), _("Identity"), TEXT),
 	_f("designation", _("Designation"), _("Identity"), TEXT),
 	# the day (daily rows only)

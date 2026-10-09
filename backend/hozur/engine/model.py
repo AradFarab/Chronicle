@@ -104,7 +104,7 @@ class EmployeeFlags:
 class Day:
 	jdate: str
 	weekday: int  # 0 = Saturday ... 6 = Friday
-	day_type: str  # after branch/province/company holidays are applied
+	day_type: str  # after work-location/province/company holidays are applied
 	rest_day: bool = False  # the employee's weekly rest day (Article 62)
 
 
