@@ -58,6 +58,22 @@ export const api = {
   upload: <T = unknown>(path: string, form: FormData) => request<T>("POST", path, form),
 }
 
+/** Saves a file response under the server's filename (Content-Disposition). */
+async function saveResponse(response: Response, fallbackName: string): Promise<void> {
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}))
+    throw new ApiError(data.message || response.statusText, response.status)
+  }
+  const disposition = response.headers.get("content-disposition") ?? ""
+  const match = /filename\*=UTF-8''([^;]+)/.exec(disposition)
+  const name = match ? decodeURIComponent(match[1]) : fallbackName
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(await response.blob())
+  link.download = name
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(link.href), 10_000)
+}
+
 /** POST that returns a file (report export): saves it under the server's filename. */
 export async function download(path: string, body: unknown): Promise<void> {
   const response = await fetch(url(path), {
@@ -66,16 +82,15 @@ export async function download(path: string, body: unknown): Promise<void> {
     body: JSON.stringify(body),
     credentials: "same-origin",
   })
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}))
-    throw new ApiError(data.message || response.statusText, response.status)
-  }
-  const disposition = response.headers.get("content-disposition") ?? ""
-  const match = /filename\*=UTF-8''([^;]+)/.exec(disposition)
-  const name = match ? decodeURIComponent(match[1]) : "report"
-  const link = document.createElement("a")
-  link.href = URL.createObjectURL(await response.blob())
-  link.download = name
-  link.click()
-  setTimeout(() => URL.revokeObjectURL(link.href), 10_000)
+  await saveResponse(response, "report")
+}
+
+/** GET that returns a file (the sample workbook of an Excel import). */
+export async function downloadGet(path: string, query?: Query): Promise<void> {
+  const response = await fetch(url(path, query), {
+    headers: { "X-Hozur": "1" },
+    credentials: "same-origin",
+  })
+  if (response.status === 401) onUnauthorized()
+  await saveResponse(response, "sample.xlsx")
 }

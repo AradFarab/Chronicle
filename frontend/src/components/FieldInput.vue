@@ -1,6 +1,9 @@
 <template>
+	<div v-if="field.type === 'badge'">
+		<Badge v-if="modelValue" theme="blue" :label="field.label" />
+	</div>
 	<Switch
-		v-if="field.type === 'bool'"
+		v-else-if="field.type === 'bool'"
 		:model-value="Boolean(modelValue)"
 		:label="field.label"
 		:description="field.help"
@@ -63,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { Combobox, Select, Switch, Textarea, TextInput } from "frappe-ui"
+import { Badge, Combobox, Select, Switch, Textarea, TextInput } from "frappe-ui"
 import { computed } from "vue"
 import { refOptions } from "@/lib/refs"
 import type { FieldDef } from "@/lib/resources"

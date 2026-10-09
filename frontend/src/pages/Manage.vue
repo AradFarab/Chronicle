@@ -26,8 +26,7 @@ import type { RouteLocationRaw } from "vue-router"
 import { counts } from "@/lib/counts"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
-import { RESOURCES } from "@/lib/resources"
-import { session } from "@/lib/session"
+import { resourceDef } from "@/lib/resources"
 
 interface Item {
 	label: string
@@ -36,27 +35,67 @@ interface Item {
 	count?: number
 }
 
+// the hub is for the system admin only (the router guards it too)
+const resource = (name: string): Item => {
+	const r = resourceDef(name)!
+	return { label: r.title, icon: r.icon, to: { name: "resource", params: { resource: r.name } } }
+}
+
 const groups = computed(() => {
-	const byGroup = new Map<string, Item[]>()
-	const add = (group: string, item: Item) => byGroup.set(group, [...(byGroup.get(group) ?? []), item])
-	if (session.is_admin) add(__("Organization"), { label: __("Company"), icon: "lucide-landmark", to: { name: "organization" } })
-	for (const r of RESOURCES) {
-		add(r.group, { label: r.title, icon: r.icon, to: { name: "resource", params: { resource: r.name } } })
-	}
-	add(__("Calendar and periods"), { label: __("Holidays and yearly refresh"), icon: "lucide-calendar-days", to: { name: "calendar" } })
-	add(__("Calendar and periods"), { label: __("Monthly period lock"), icon: "lucide-lock", to: { name: "periods" } })
-	add(__("Devices"), {
-		label: __("Attendance devices"),
-		icon: "lucide-fingerprint",
-		to: { name: "devices" },
-		count: counts.unmappedUsers,
-	})
-	if (session.is_admin) {
-		add(__("Approvals"), { label: __("Default approval per request type"), icon: "lucide-list-checks", to: { name: "approval-defaults" } })
-		add(__("System"), { label: __("Users and roles"), icon: "lucide-user-round-cog", to: { name: "users" } })
-		add(__("System"), { label: __("Settings"), icon: "lucide-sliders-horizontal", to: { name: "settings" } })
-		add(__("System"), { label: __("Change history"), icon: "lucide-history", to: { name: "audit" } })
-	}
-	return [...byGroup.entries()].map(([title, items]) => ({ title, items }))
+	const list: { title: string; items: Item[] }[] = [
+		{
+			title: __("Organization"),
+			items: [
+				{ label: __("Company"), icon: "lucide-landmark", to: { name: "organization" } },
+				resource("work-locations"),
+				resource("departments"),
+				resource("designations"),
+				{ label: __("Organization chart"), icon: "lucide-git-fork", to: { name: "chart" } },
+				resource("designation-assignments"),
+				{ label: __("Employees"), icon: "lucide-users", to: { name: "employees" } },
+			],
+		},
+		{
+			title: __("Work schedules"),
+			items: [resource("shifts"), resource("work-patterns"), resource("work-pattern-assignments"), resource("shift-overrides")],
+		},
+		{ title: __("Rules"), items: [resource("rule-sets"), resource("leave-types")] },
+		{
+			title: __("Approvals"),
+			items: [
+				resource("approval-processes"),
+				resource("approval-overrides"),
+				{ label: __("Default approval per request type"), icon: "lucide-list-checks", to: { name: "approval-defaults" } },
+				{ label: __("Delegation of approvals"), icon: "lucide-users-round", to: { name: "delegations" } },
+			],
+		},
+		{
+			title: __("Calendar and periods"),
+			items: [
+				{ label: __("Holidays and yearly refresh"), icon: "lucide-calendar-days", to: { name: "calendar" } },
+				{ label: __("Monthly period lock"), icon: "lucide-lock", to: { name: "periods" } },
+			],
+		},
+		{
+			title: __("Devices"),
+			items: [
+				{
+					label: __("Attendance devices"),
+					icon: "lucide-fingerprint",
+					to: { name: "devices" },
+					count: counts.unmappedUsers,
+				},
+			],
+		},
+		{
+			title: __("System"),
+			items: [
+				{ label: __("Users and roles"), icon: "lucide-user-round-cog", to: { name: "users" } },
+				{ label: __("Settings"), icon: "lucide-sliders-horizontal", to: { name: "settings" } },
+				{ label: __("Change history"), icon: "lucide-history", to: { name: "audit" } },
+			],
+		},
+	]
+	return list
 })
 </script>

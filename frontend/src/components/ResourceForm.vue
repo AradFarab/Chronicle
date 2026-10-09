@@ -5,6 +5,10 @@
 				<!-- child rows (days of a pattern, steps of a process) -->
 				<div v-if="field.type === 'children'" class="flex flex-col gap-2">
 					<p class="text-sm font-medium">{{ field.label }}</p>
+					<RotationBuilder
+						v-if="field.helper === 'rotation' && values.pattern_type === 'rotating'"
+						@fill="(rows) => (values[field.key] = rows)"
+					/>
 					<div
 						v-for="(child, i) in (values[field.key] as Record<string, unknown>[])"
 						:key="i"
@@ -53,7 +57,7 @@
 			<div class="flex gap-2">
 				<Button variant="solid" :loading="busy" @click="save">{{ __("Save") }}</Button>
 				<Button
-					v-if="row && def.canDelete && !readOnly"
+					v-if="row && def.canDelete && !readOnly && !row.is_ceo"
 					theme="red"
 					:loading="busy"
 					@click="remove"
@@ -73,6 +77,7 @@ import { fa } from "@/lib/jalali"
 import { invalidateRef } from "@/lib/refs"
 import { PARAMETER_LABELS, type FieldDef, type ResourceDef } from "@/lib/resources"
 import FieldInput from "./FieldInput.vue"
+import RotationBuilder from "./RotationBuilder.vue"
 
 interface Parameter {
 	name: string
@@ -82,7 +87,13 @@ interface Parameter {
 	legal_value: number
 }
 
-const props = defineProps<{ def: ResourceDef; row: Record<string, unknown> | null; readOnly?: boolean }>()
+// `initial` pre-fills a new record (e.g. the parent of a new designation)
+const props = defineProps<{
+	def: ResourceDef
+	row: Record<string, unknown> | null
+	readOnly?: boolean
+	initial?: Record<string, unknown>
+}>()
 const emit = defineEmits<{ saved: [] }>()
 const open = defineModel<boolean>("open", { default: false })
 
@@ -120,7 +131,7 @@ watch(
 		error.value = ""
 		reason.value = ""
 		for (const key of Object.keys(values)) delete values[key]
-		Object.assign(values, JSON.parse(JSON.stringify(props.row ?? props.def.defaults ?? {})))
+		Object.assign(values, JSON.parse(JSON.stringify(props.row ?? { ...props.def.defaults, ...props.initial })))
 		for (const f of props.def.fields) if (f.type === "children" && !values[f.key]) values[f.key] = []
 		if (props.def.fields.some((f) => f.type === "params")) {
 			parameters.value = await api.get<Parameter[]>("/admin/rule-parameters")
@@ -135,6 +146,7 @@ watch(
 function payload(): Record<string, unknown> {
 	const body: Record<string, unknown> = {}
 	for (const f of props.def.fields) {
+		if (f.type === "badge") continue
 		if (f.show && !f.show(values) && f.type !== "children") continue
 		if (f.type === "params") body[f.key] = { ...params }
 		else if (f.type === "children")

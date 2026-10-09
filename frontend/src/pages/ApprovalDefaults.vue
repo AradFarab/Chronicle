@@ -36,7 +36,7 @@ const rows = ref<Row[]>([])
 const error = ref("")
 
 function typeLabel(type: string) {
-	if (type === "operator_entry") return __("Entered by an operator for someone")
+	if (type === "admin_entry") return __("Entered by the system admin for someone")
 	return requestTypeOptions().find((o) => o.value === type)?.label ?? type
 }
 

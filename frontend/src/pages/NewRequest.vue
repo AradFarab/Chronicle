@@ -168,7 +168,7 @@ const overtimeKinds = computed(() => [
 
 const date = String(route.query.date || "") || session.today
 const employee = ref<number | null>(Number(route.query.employee) || session.employee?.id || null)
-const canChooseEmployee = computed(() => session.is_operator || (kind.value === "overtime" && session.is_manager))
+const canChooseEmployee = computed(() => session.is_admin || (kind.value === "overtime" && session.is_manager))
 // the request is for someone else only when the picker is shown and another person is chosen
 const forSomeoneElse = computed(
 	() => canChooseEmployee.value && !!employee.value && employee.value !== session.employee?.id

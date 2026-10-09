@@ -12,7 +12,7 @@ from hozur.api.deps import DB, Actor, Admin, Today
 from hozur.db.models import ApprovalDelegation, Employee
 from hozur.i18n import _
 from hozur.services import access, delegations, employees, resources
-from hozur.services.errors import NotFound
+from hozur.services.errors import NotFound, PermissionDenied
 
 router = APIRouter(prefix="/api", tags=["people"])
 
@@ -32,6 +32,20 @@ def list_employees(actor: Actor, db: DB, today: Today) -> list[dict]:
 	if visible is not None:
 		query = query.where(Employee.id.in_(visible or {0}))
 	return [employees.view(db, e, today) for e in db.scalars(query)]
+
+
+@router.get("/people/active")
+def active_people(actor: Actor, db: DB, today: Today) -> list[dict]:
+	"""Everyone who works here now (id, code, name): the pick-list for handing approvals to
+	someone. Only for those who can delegate, since it shows people outside their own team."""
+	if not (actor.is_admin or access.is_manager(db, actor, today)):
+		raise PermissionDenied(_("Not permitted"))
+	rows = db.execute(
+		select(Employee.id, Employee.code, Employee.full_name)
+		.where(Employee.status == "active", Employee.start_date <= today)
+		.order_by(Employee.code)
+	)
+	return [{"id": i, "code": c, "full_name": n, "status": "active"} for i, c, n in rows]
 
 
 @router.get("/admin/employees/{employee_id:int}")

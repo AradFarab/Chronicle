@@ -99,14 +99,14 @@ const items = computed<NavItem[]>(() => {
 			name: "approvals",
 			label: __("Approvals"),
 			icon: "lucide-inbox",
-			match: ["approvals"],
+			match: ["approvals", "delegations"],
 			count: counts.approvals,
 		},
 	]
-	if (session.is_manager || session.is_operator) {
+	if (session.is_admin || session.is_manager || session.is_ceo) {
 		list.push({ name: "reports", label: __("Reports"), icon: "lucide-chart-column", match: ["reports"] })
 	}
-	if (session.is_operator) {
+	if (session.is_admin) {
 		list.push({
 			name: "manage",
 			label: __("Manage"),
@@ -115,6 +115,10 @@ const items = computed<NavItem[]>(() => {
 				"manage",
 				"resource",
 				"organization",
+				"employees",
+				"employee",
+				"new-employee",
+				"chart",
 				"calendar",
 				"periods",
 				"users",

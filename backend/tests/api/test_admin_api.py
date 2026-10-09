@@ -422,3 +422,9 @@ def test_excel_import_over_http(client_for, org):
 	assert {"لجستیک", "انبار"} <= {d["name"] for d in admin.get("/api/admin/departments").json()}
 	assert client_for("mgr").get("/api/import").status_code == 403
 	assert admin.get("/api/import/nope/template").status_code == 404
+
+
+def test_a_manager_can_list_everyone_to_pick_a_delegate(client_for, org):
+	people = client_for("mgr").get("/api/people/active").json()
+	assert {p["code"] for p in people} >= {"T-CEO", "T-MGR", "T-EMP", "T-OTHER"}  # not only their team
+	assert client_for("emp").get("/api/people/active").status_code == 403

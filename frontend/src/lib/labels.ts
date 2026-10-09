@@ -13,7 +13,7 @@ export const holidayTypeOptions = (): Option[] => [
 export const holidayScopeOptions = (): Option[] => [
   { value: "country", label: __("Whole country") },
   { value: "province", label: __("One province") },
-  { value: "branch", label: __("One branch") },
+  { value: "work_location", label: __("One work location") },
   { value: "company", label: __("Whole company") },
 ]
 

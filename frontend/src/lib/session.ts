@@ -6,7 +6,7 @@ export interface MeEmployee {
   code: string
   full_name: string
   department_id: number | null
-  branch_id: number | null
+  work_location_id: number | null
 }
 
 export interface Me {
@@ -15,8 +15,8 @@ export interface Me {
   employee: MeEmployee | null
   organization: string
   today: string
-  is_operator: boolean
   is_admin: boolean
+  is_ceo: boolean
   is_manager: boolean
   warnings: string[]
 }
@@ -27,8 +27,8 @@ const empty: Me = {
   employee: null,
   organization: "",
   today: "",
-  is_operator: false,
   is_admin: false,
+  is_ceo: false,
   is_manager: false,
   warnings: [],
 }

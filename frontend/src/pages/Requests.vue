@@ -8,7 +8,7 @@
 		</div>
 
 		<EmployeePicker
-			v-if="session.is_operator || session.is_manager"
+			v-if="session.is_admin || session.is_manager"
 			v-model="employee"
 			:label="__('Employee')"
 			:placeholder="session.employee ? undefined : __('Choose an employee')"
@@ -29,8 +29,8 @@
 					<StatusBadge :status="r.status" />
 				</div>
 				<p class="hz-num mt-1 text-sm text-ink-gray-6">{{ requestSummary(r, leaveTypes) }}</p>
-				<p v-if="r.status === 'pending' && r.waiting_for" class="mt-1 text-xs text-ink-gray-5">
-					{{ __("Waiting for {0}", [r.waiting_for]) }}
+				<p v-if="r.status === 'pending' && r.waiting_for.length" class="mt-1 text-xs text-ink-gray-5">
+					{{ __("Waiting for {0}", [r.waiting_for.join("، ")]) }}
 				</p>
 				<p v-if="rejection(r)" class="mt-1 text-xs text-ink-red-6">{{ rejection(r) }}</p>
 				<div v-if="canCancel(r)" class="mt-2">
@@ -82,7 +82,7 @@ function rejection(r: RequestView): string {
 	return step?.comment ? __("Rejected: {0}", [step.comment]) : ""
 }
 
-// people withdraw their own pending requests; cancelling anything else is an operator's job
+// people withdraw their own pending requests; cancelling anything else is the system admin's job
 function canCancel(r: RequestView) {
 	return r.status === "pending" && r.employee_id === session.employee?.id
 }

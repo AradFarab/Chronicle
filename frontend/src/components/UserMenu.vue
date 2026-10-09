@@ -58,6 +58,13 @@ const options = computed(() => {
 			onClick: cycle,
 		},
 	]
+	if (session.is_admin || session.is_manager || session.is_ceo) {
+		list.push({
+			label: __("Delegation of approvals"),
+			icon: "lucide-users-round",
+			onClick: () => router.push({ name: "delegations" }),
+		})
+	}
 	list.push({ label: __("Change password"), icon: "lucide-key-round", onClick: () => router.push({ name: "account" }) })
 	list.push({ label: __("Log out"), icon: "lucide-log-out", onClick: logout })
 	return list

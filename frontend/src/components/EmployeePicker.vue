@@ -18,13 +18,21 @@ import { api } from "@/lib/api"
 import { fa } from "@/lib/jalali"
 import type { Employee } from "@/lib/types"
 
-const props = defineProps<{ modelValue?: number | null; label?: string; placeholder?: string }>()
+const props = defineProps<{
+	modelValue?: number | null
+	label?: string
+	placeholder?: string
+	exclude?: number | null
+	everyone?: boolean // all active employees, for managers handing something to a peer
+}>()
 const emit = defineEmits<{ "update:modelValue": [value: number | null] }>()
 
 // the server already narrows the list to the people this user may see
 const employees = ref<Employee[]>([])
 // people who have left stay out of the list unless one of them is the current choice
-const shown = computed(() => employees.value.filter((e) => e.status !== "left" || e.id === props.modelValue))
+const shown = computed(() =>
+	employees.value.filter((e) => e.id !== props.exclude && (e.status !== "left" || e.id === props.modelValue))
+)
 
 function pick(value: string) {
 	emit("update:modelValue", value ? Number(value) : null)
@@ -32,7 +40,7 @@ function pick(value: string) {
 
 onMounted(async () => {
 	try {
-		employees.value = await api.get<Employee[]>("/admin/employees")
+		employees.value = await api.get<Employee[]>(props.everyone ? "/people/active" : "/admin/employees")
 	} catch {
 		// without the list the picker stays empty; the page shows its own errors
 	}

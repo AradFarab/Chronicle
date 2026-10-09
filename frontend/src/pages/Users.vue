@@ -3,6 +3,13 @@
 		<PageHeader :title="__('Users and roles')" back="manage">
 			<Button variant="solid" icon-left="lucide-plus" @click="edit(null)">{{ __("New") }}</Button>
 		</PageHeader>
+		<p class="text-sm text-ink-gray-6">
+			{{
+				__(
+					"Employees get their login when they are added in the Employees screen. Here you add a login without an employee record, such as one for IT staff."
+				)
+			}}
+		</p>
 		<ErrorMessage :message="error" />
 		<div class="overflow-x-auto rounded-6 border border-outline-gray-1 bg-surface-base">
 			<table class="w-full text-sm">
@@ -41,12 +48,6 @@
 						<input v-model="form.roles" type="checkbox" :value="r" />{{ roleLabel(r) }}
 					</label>
 				</div>
-				<Combobox
-					v-if="!current"
-					v-model="form.employee_id"
-					:label="__('Employee record')"
-					:options="refOptions('employees')"
-				/>
 				<Switch v-if="current" v-model="form.is_active" :label="__('Active')" />
 				<TextInput
 					v-model="form.password"
@@ -65,13 +66,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Combobox, Dialog, ErrorMessage, Switch, TextInput, toast } from "frappe-ui"
+import { Button, Dialog, ErrorMessage, Switch, TextInput, toast } from "frappe-ui"
 import { onMounted, reactive, ref } from "vue"
 import PageHeader from "@/components/PageHeader.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
-import { refOptions } from "@/lib/refs"
 
 interface User {
 	id: number
@@ -83,15 +83,13 @@ interface User {
 	last_login_at: string | null
 }
 
-const ROLES = ["employee", "manager", "ceo", "operator", "admin"]
+// only two roles are stored; managers and the CEO are derived from the designations people hold
+const ROLES = ["admin", "employee"]
 
 function roleLabel(role: string) {
 	return (
 		{
 			employee: __("Employee"),
-			manager: __("Manager"),
-			ceo: __("CEO"),
-			operator: __("Operator"),
 			admin: __("System admin"),
 		}[role] ?? role
 	)
@@ -107,7 +105,6 @@ const form = reactive({
 	username: "",
 	full_name: "",
 	roles: [] as string[],
-	employee_id: null as number | null,
 	is_active: true,
 	password: "",
 })
@@ -126,8 +123,7 @@ function edit(u: User | null) {
 	Object.assign(form, {
 		username: u?.username ?? "",
 		full_name: u?.full_name ?? "",
-		roles: [...(u?.roles ?? ["employee"])],
-		employee_id: u?.employee_id ?? null,
+		roles: [...(u?.roles ?? ["admin"])],
 		is_active: u?.is_active ?? true,
 		password: "",
 	})
@@ -151,7 +147,6 @@ async function save() {
 				full_name: form.full_name,
 				password: form.password,
 				roles: form.roles,
-				employee_id: form.employee_id,
 			})
 		}
 		toast.success(__("Saved"))

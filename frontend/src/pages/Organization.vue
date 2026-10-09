@@ -10,7 +10,6 @@
 				<TextInput v-model="org.insurance_workshop_code" dir="ltr" :label="__('Insurance workshop code')" />
 				<TextInput v-model="org.phone" dir="ltr" :label="__('Phone')" />
 			</div>
-			<Combobox v-model="org.ceo_id" :label="__('CEO')" :options="refOptions('employees')" />
 			<Textarea v-model="org.address" :label="__('Address')" :rows="2" />
 			<ErrorMessage :message="error" />
 			<Button type="submit" variant="solid" :loading="busy">{{ __("Save") }}</Button>
@@ -19,12 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Combobox, ErrorMessage, Textarea, TextInput, toast } from "frappe-ui"
+import { Button, ErrorMessage, Textarea, TextInput, toast } from "frappe-ui"
 import { onMounted, reactive, ref } from "vue"
 import PageHeader from "@/components/PageHeader.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
-import { refOptions } from "@/lib/refs"
 import { session } from "@/lib/session"
 
 const org = reactive({
@@ -35,7 +33,6 @@ const org = reactive({
 	insurance_workshop_code: "",
 	phone: "",
 	address: "",
-	ceo_id: null as number | null,
 })
 const error = ref("")
 const busy = ref(false)
