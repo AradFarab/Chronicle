@@ -3,7 +3,7 @@
 One declarative `Resource` per table says which columns may be written, who may read and
 write, how to validate, and which recalculation a change needs. The generic code below does
 type coercion from JSON (Jalali dates, times, numbers), audit entries (CLAUDE.md rule 4)
-and turns database constraint errors into messages for the operator. Tables with their own
+and turns database constraint errors into messages for the system admin. Tables with their own
 workflow (requests, holidays, devices, users, periods) have their own services.
 """
 
@@ -141,7 +141,7 @@ def check(actor: access.Actor, level: str) -> None:
 
 
 def flush(session: Session, deleting: bool = False) -> None:
-	"""Flush inside a savepoint; constraint violations become messages for the operator."""
+	"""Flush inside a savepoint; constraint violations become messages for the system admin."""
 	try:
 		with session.begin_nested():
 			session.flush()

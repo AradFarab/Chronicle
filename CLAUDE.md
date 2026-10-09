@@ -25,7 +25,7 @@ If code and these documents disagree, stop and ask. Do not silently pick one.
 
 ## Scope
 
-In scope: Jalali calendar with editable holidays refreshed yearly by the operator; org structure (work location, department tags, the designation tree, employee = user); work patterns (fixed, flexible, rotating) assigned with Jalali validity dates; device ingestion; labor-law calculation engine; leave, mission, overtime and punch-correction requests with configurable approval; report builder with Excel / text / PDF export; one PWA for all roles, including every admin screen.
+In scope: Jalali calendar with editable holidays refreshed yearly by the system admin; org structure (work location, department tags, the designation tree, employee = user); work patterns (fixed, flexible, rotating) assigned with Jalali validity dates; device ingestion; labor-law calculation engine; leave, mission, overtime and punch-correction requests with configurable approval; report builder with Excel / text / PDF export; one PWA for all roles, including every admin screen.
 
 Out of scope — do not build: payroll, insurance or tax amounts; Bale or any messenger bot; punching from the PWA or phone (punches come **only** from devices); native mobile apps; multi-tenant cloud; employee monthly sign-off.
 
@@ -43,7 +43,7 @@ Out of scope — do not build: payroll, insurance or tax amounts; Bale or any me
 | Excel | openpyxl |
 | Device protocol | `pyzk` for ZKTeco (TCP 4370) |
 | Jalali math | `jdatetime` (Python), `jalaali-js` (frontend) |
-| Holidays | time.ir (official calendar) fetched on an operator's yearly refresh; bundled offline seed as fallback |
+| Holidays | time.ir (official calendar) fetched on the system admin's yearly refresh; bundled offline seed as fallback |
 | Translations | English source strings in code, Persian in `backend/hozur/locale/fa.po` (gettext) |
 | Deploy | Docker Compose on each company's own server |
 | License | GPLv3 |
@@ -60,7 +60,7 @@ We never depend on Frappe, ERPNext or Frappe HR. Code ported from Frappe HR (GPL
 2. **Labor law is data, not code.** Every legal number (8 h/day, 44 h/week, 4 h overtime cap, 26 leave days, 9 carry-over days, 7 h 20 min = one leave day, night window 22–06, etc.) lives in a `labor_rule_set` with a Jalali effective date. Validation must reject settings that are worse for the worker than the legal floor; more generous values are allowed. No legal constant may be hard-coded in the engine.
 3. **The calculation engine is pure Python.** `backend/hozur/engine/` must not import the database, FastAPI or SQLAlchemy. Inputs: punches, the day's resolved shift, the day type, approved requests, the rule set. Output: a daily attendance record. Every labor-law article gets at least one pytest case named after the article (e.g. `test_madde_59_overtime_cap`).
 4. **Raw punches are append-only.** A database trigger rejects UPDATE and DELETE on `raw_punch` (and on `audit_entry` and `leave_ledger_entry`). Corrections are separate requests that go through approval. Every change to a calculated or configured record writes an `audit_entry` (who, when, why, before/after).
-5. **Devices are configured, not coded.** IP, port, comm key, branch, polling interval and direction mode are columns of `attendance_device`, edited in the PWA. Adapters implement one interface (`fetch_since`, `list_users`, `sync_time`, `health`) and register themselves; adding a device of a supported type must never require a code change. The app must never clear device logs.
+5. **Devices are configured, not coded.** IP, port, comm key, work location, polling interval and direction mode are columns of `attendance_device`, edited in the PWA. Adapters implement one interface (`fetch_since`, `list_users`, `sync_time`, `health`) and register themselves; adding a device of a supported type must never require a code change. The app must never clear device logs.
 6. **Approval is data-driven and follows the designation tree.** A person's parent is whoever holds the nearest filled designation above theirs; the CEO holds the designation flagged `is_ceo` and has no parent. `approval_process` steps are `parent`, `ceo` or a specific person; the standard processes are parent only, parent then CEO (just the CEO when the parent is the CEO), and CEO only; the CEO's own requests need no approval. Chosen per request type, with per-employee `approval_override`. A manager can delegate approval authority to someone for a period (both can then approve). No numeric conditions. Overtime assigned by a manager needs employee acceptance (Article 59).
 7. **No automatic dismissal logic.** Absence only produces configurable disciplinary warnings.
 8. **Permissions:** the system admin and the CEO see everyone; a manager (anyone holding a designation with people below it) sees only the people below their designations, including in reports. Roles are just `admin` (system admin, مدیر سیستم) and `employee`. Every employee is also a user. Enforced in the service layer, never only in the UI.

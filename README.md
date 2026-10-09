@@ -9,10 +9,11 @@ Status: phase 1 (MVP) in progress. Working name `hozur`; the final name is still
 
 - **Employees** see their day and month, their leave balance, and file leave, mission,
   overtime and manual time entries.
-- **Managers** approve, see their department subtree and run reports for it.
-- **Operators** manage the organization, work patterns, devices (IP, port, comm key — no
-  code changes), punch-file imports, the yearly holiday refresh (time.ir) and the monthly
-  period lock, all from the PWA.
+- **Managers** (anyone with people below their designation) approve, see those people and run reports for them; they can delegate their approvals for a while.
+- **The system admin** (مدیر سیستم) manages the organization (employees are users too, designations
+  form the chart), work patterns, devices (IP, port, comm key — no code changes), punch-file
+  imports, the yearly holiday refresh (time.ir) and the monthly period lock, all from the PWA.
+  Every create form also has an Excel sample to download and an Excel import.
 
 | Document | |
 | --- | --- |

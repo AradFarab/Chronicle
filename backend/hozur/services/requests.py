@@ -419,7 +419,7 @@ def act(
 
 
 def cancel(session: Session, actor: access.Actor, request_id: int, reason: str | None, today: str) -> Request:
-	"""The employee may withdraw their own pending request; an operator may cancel any
+	"""The employee may withdraw their own pending request; the system admin may cancel any
 	request, approved ones included, with a reason."""
 	request = get(session, actor, request_id, today)
 	if request.status not in (PENDING, APPROVED):
