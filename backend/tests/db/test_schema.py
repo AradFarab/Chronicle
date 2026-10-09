@@ -9,6 +9,7 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from hozur.db.models import (
+	AppUser,
 	AttendanceDevice,
 	CorrectionItem,
 	Employee,
@@ -42,7 +43,10 @@ def device(db):
 
 @pytest.fixture
 def employee(db):
-	e = Employee(code="T-1", first_name="سارا", last_name="کریمی", start_date="1405/07/01")
+	user = AppUser(username="t-1", full_name="سارا کریمی")
+	db.add(user)
+	db.flush()
+	e = Employee(code="T-1", first_name="سارا", last_name="کریمی", start_date="1405/07/01", user_id=user.id)
 	db.add(e)
 	db.flush()
 	return e

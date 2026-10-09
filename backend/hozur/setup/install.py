@@ -10,7 +10,7 @@ from hozur.db.models import (
 	ApprovalProcess,
 	ApprovalProcessStep,
 	AppSetting,
-	Department,
+	Designation,
 	LaborRuleSet,
 	LeaveType,
 	Province,
@@ -23,7 +23,7 @@ from hozur.setup import data
 
 def run(session: Session) -> None:
 	ensure_provinces(session)
-	ensure_root_department(session)
+	ensure_ceo_designation(session)
 	ensure_approval_processes(session)
 	ensure_leave_types(session)
 	ensure_rule_set_baseline(session)
@@ -41,9 +41,10 @@ def ensure_provinces(session: Session) -> None:
 	session.add_all(Province(name=name) for name in data.PROVINCES if name not in existing)
 
 
-def ensure_root_department(session: Session) -> None:
-	if not session.scalar(select(Department.id).where(Department.name == data.ROOT_DEPARTMENT)):
-		session.add(Department(name=data.ROOT_DEPARTMENT, is_group=True))
+def ensure_ceo_designation(session: Session) -> None:
+	"""The designation whose holder approves the "CEO" steps. Rename it, never delete it."""
+	if not session.scalar(select(Designation.id).where(Designation.is_ceo)):
+		session.add(Designation(name=data.CEO_DESIGNATION, is_ceo=True))
 
 
 def ensure_approval_processes(session: Session) -> None:

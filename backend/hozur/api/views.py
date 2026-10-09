@@ -33,7 +33,7 @@ def employee_name(session: Session, employee_id: int | None) -> str | None:
 	return e.full_name if e else None
 
 
-def request_view(session: Session, r: Request, actor: access.Actor | None = None) -> dict:
+def request_view(session: Session, r: Request, actor: access.Actor | None = None, today: str = "") -> dict:
 	view = {
 		"id": r.id,
 		"number": r.number,
@@ -45,14 +45,14 @@ def request_view(session: Session, r: Request, actor: access.Actor | None = None
 		"start_jdate": r.start_jdate,
 		"end_jdate": r.end_jdate,
 		"reason": r.reason,
-		"entered_by_operator": r.entered_by_operator,
+		"entered_by_admin": r.entered_by_admin,
 		"created_at": jalali_moment(r.created_at),
-		"waiting_for": employee_name(session, r.pending_approver_id),
+		"waiting_for": [employee_name(session, e) for e in approvals.waiting_for(r)],
 		"approvals": [
 			{
 				"step": a.step,
 				"approver_type": a.approver_type,
-				"approver_name": employee_name(session, a.approver_id),
+				"approver_names": [employee_name(session, p.employee_id) for p in a.approvers],
 				"status": a.status,
 				"acted_at": jalali_moment(a.acted_at),
 				"comment": a.comment,
@@ -97,7 +97,7 @@ def request_view(session: Session, r: Request, actor: access.Actor | None = None
 		]
 	if actor is not None:
 		step = approvals.current_step(r)
-		view["can_act"] = approvals.can_act(actor, r)
+		view["can_act"] = approvals.can_act(session, actor, r, today)
 		view["is_acceptance"] = bool(step and step.approver_type == "employee_acceptance")
 	return view
 
@@ -111,9 +111,9 @@ def holiday_view(h: Holiday) -> dict:
 		"status": h.status,
 		"scope": h.scope,
 		"province_id": h.province_id,
-		"branch_id": h.branch_id,
+		"work_location_id": h.work_location_id,
 		"closure_pay_mode": h.closure_pay_mode,
 		"source": h.source,
 		"note": h.note,
-		"edited_by_operator": h.edited_by_operator,
+		"edited_by_admin": h.edited_by_admin,
 	}

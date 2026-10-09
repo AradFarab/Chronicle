@@ -17,7 +17,6 @@ from sqlalchemy.orm import Session
 
 from hozur.calendar.service import holidays_by_date
 from hozur.db.models import (
-	Branch,
 	DailyAttendance,
 	DailyAttendanceLeave,
 	Designation,
@@ -27,6 +26,7 @@ from hozur.db.models import (
 	MissionRequest,
 	OvertimeRequest,
 	Request,
+	WorkLocation,
 )
 from hozur.db.models.org import SUSPENDED
 from hozur.db.models.requests import APPROVED, HOURLY, LEAVE, MISSION, OVERTIME
@@ -47,6 +47,7 @@ from hozur.engine.rules import RuleSet
 from hozur.jalali.calendar import resolve_day
 from hozur.jalali.dates import add_days, iter_days, parse_jdate
 from hozur.services import audit, settings
+from hozur.services.access import designations_on
 from hozur.services.periods import closed_months
 from hozur.services.punches import effective_punches
 from hozur.services.rule_sets import rule_set_for
@@ -139,6 +140,7 @@ class Calculator:
 		self._holiday_range: tuple[str, str] | None = None
 		self._provinces: dict[int, int] = {}
 		self._hard: dict[int, bool] = {}
+		self._held: dict[tuple[int, str], list[int]] = {}
 		self._leave_types: dict[int, LeaveType] = {}
 		self._closed: dict[tuple[int, int], bool] = {}
 
@@ -158,14 +160,20 @@ class Calculator:
 			self._holidays = holidays_by_date(self.session, *self._holiday_range)
 		return self._holidays.get(jdate, [])
 
-	def _province(self, branch_id: int | None) -> int | None:
-		if not branch_id:
+	def _province(self, work_location_id: int | None) -> int | None:
+		if not work_location_id:
 			return None
-		if branch_id not in self._provinces:
-			self._provinces[branch_id] = self.session.scalar(
-				select(Branch.province_id).where(Branch.id == branch_id)
+		if work_location_id not in self._provinces:
+			self._provinces[work_location_id] = self.session.scalar(
+				select(WorkLocation.province_id).where(WorkLocation.id == work_location_id)
 			)
-		return self._provinces[branch_id]
+		return self._provinces[work_location_id]
+
+	def _designations(self, employee_id: int, jdate: str) -> list[int]:
+		key = (employee_id, jdate)
+		if key not in self._held:
+			self._held[key] = designations_on(self.session, employee_id, jdate)
+		return self._held[key]
 
 	def _hard_harmful(self, designation_id: int | None) -> bool:
 		if not designation_id:
@@ -194,7 +202,7 @@ class Calculator:
 	def _flags(self, emp: Employee, jdate: str, schedule: Schedule, rules: RuleSet) -> EmployeeFlags:
 		return EmployeeFlags(
 			juvenile=bool(emp.birth_date) and _age_on(emp.birth_date, jdate) < rules.juvenile_max_age_years,
-			hard_harmful=self._hard_harmful(emp.designation_id),
+			hard_harmful=any(self._hard_harmful(d) for d in self._designations(emp.id, jdate)),
 			nursing=bool(emp.nursing_until) and jdate <= emp.nursing_until,
 			rotating=schedule.rotating,
 			standing_overtime_consent=emp.overtime_consent_on_file
@@ -253,8 +261,8 @@ class Calculator:
 
 	def run(self, emp: Employee, jdate: str) -> tuple[DailyResult, dict, dict[int, tuple[int, Decimal]]]:
 		"""Engine result, the row values and the per-leave-type minutes/days of one day."""
-		branch_id = emp.branch_id
-		day = resolve_day(jdate, self._holidays_on(jdate), branch_id, self._province(branch_id))
+		location_id = emp.work_location_id
+		day = resolve_day(jdate, self._holidays_on(jdate), location_id, self._province(location_id))
 		schedule = self.schedules.resolve(emp.id, jdate)
 		window = _punch_window(
 			schedule,
@@ -277,8 +285,8 @@ class Calculator:
 			"day_type": day.day_type,
 			"holiday_title": day.title or None,
 			"department_id": emp.department_id,
-			"branch_id": branch_id,
-			"designation_id": emp.designation_id,
+			"work_location_id": location_id,
+			"designation_id": (self._designations(emp.id, jdate) or [None])[0],
 			"work_pattern_id": schedule.pattern_id,
 			"shift_id": schedule.shift_id,
 			"rest_day": schedule.rest_day,

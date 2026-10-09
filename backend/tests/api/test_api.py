@@ -28,8 +28,13 @@ def test_unsafe_requests_need_the_custom_header(client_for):
 
 def test_me_describes_the_user(client_for, org):
 	me = client_for("mgr").get("/api/me").json()
-	assert me["employee"]["id"] == org.manager.id and me["is_manager"] and not me["is_operator"]
-	assert me["roles"] == ["employee", "manager"]
+	assert (
+		me["employee"]["id"] == org.manager.id
+		and me["is_manager"]
+		and not me["is_admin"]
+		and not me["is_ceo"]
+	)
+	assert me["roles"] == ["employee"]  # being a manager comes from the designation, not a role
 
 
 def test_leave_request_through_the_api(client_for, org):
@@ -50,7 +55,7 @@ def test_leave_request_through_the_api(client_for, org):
 	assert (
 		body["number"].startswith("LV-")
 		and body["status"] == "pending"
-		and body["waiting_for"] == org.manager.full_name
+		and body["waiting_for"] == [org.manager.full_name]
 	)
 	inbox = mgr.get("/api/inbox").json()
 	assert [x["id"] for x in inbox] == [body["id"]] and inbox[0]["can_act"]

@@ -41,7 +41,7 @@ FORCED_DIRECTION = {"always_in": IN, "always_out": OUT, "pair_by_order": UNKNOWN
 DEVICE_FIELDS = (
 	"name",
 	"adapter_type",
-	"branch_id",
+	"work_location_id",
 	"enabled",
 	"direction_mode",
 	"host",

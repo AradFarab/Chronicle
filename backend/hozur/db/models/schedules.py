@@ -106,7 +106,9 @@ class WorkPatternDay(IdMixin, Base):
 
 
 class WorkPatternAssignment(IdMixin, TimestampMixin, Base):
-	"""Resolution order: employee, designation, department (walking up), company."""
+	"""Resolution order: employee, designation, department, company. For a rotating pattern,
+	`cycle_offset_days` shifts this group along the cycle, so two groups of guards can follow the
+	same pattern half a cycle apart."""
 
 	__tablename__ = "work_pattern_assignment"
 	__table_args__ = (
@@ -118,6 +120,7 @@ class WorkPatternAssignment(IdMixin, TimestampMixin, Base):
 			name="target_matches_type",
 		),
 		CheckConstraint("valid_to IS NULL OR valid_to >= valid_from", name="valid_range"),
+		CheckConstraint("cycle_offset_days >= 0", name="cycle_offset_non_negative"),
 	)
 
 	target_type: Mapped[str] = mapped_column(String(20))
@@ -127,6 +130,7 @@ class WorkPatternAssignment(IdMixin, TimestampMixin, Base):
 	work_pattern_id: Mapped[int] = mapped_column(ForeignKey("work_pattern.id"))
 	valid_from: Mapped[str] = mapped_column(JDate)
 	valid_to: Mapped[str | None] = mapped_column(JDate)
+	cycle_offset_days: Mapped[int] = mapped_column(Integer, server_default="0")
 	note: Mapped[str | None] = mapped_column(Text)
 
 

@@ -1,6 +1,6 @@
 """Report builder: rows from daily_attendance, so every number matches the app.
 
-Visibility applies (CLAUDE.md rule 8): a manager only gets their department subtree. A
+Visibility applies (CLAUDE.md rule 8): a manager only gets the people below their designations. A
 report can only ask for catalog fields (hozur.reports.catalog), never arbitrary columns.
 """
 
@@ -16,7 +16,6 @@ from sqlalchemy.orm import Session
 from hozur.clock import now_jalali
 from hozur.db.models import (
 	AppUser,
-	Branch,
 	DailyAttendance,
 	Department,
 	Designation,
@@ -25,6 +24,7 @@ from hozur.db.models import (
 	Organization,
 	ReportTemplate,
 	Shift,
+	WorkLocation,
 )
 from hozur.i18n import _, translate
 from hozur.jalali.dates import WEEKDAY_NAMES, iter_days, month_bounds, normalize_jdate
@@ -155,14 +155,12 @@ def _day_rows(session: Session, filters: dict, visible: set[int] | None) -> list
 	)
 	if filters.get("employee_id"):
 		query = query.where(DailyAttendance.employee_id == int(filters["employee_id"]))
-	if filters.get("branch_id"):
-		query = query.where(DailyAttendance.branch_id == int(filters["branch_id"]))
+	if filters.get("work_location_id"):
+		query = query.where(DailyAttendance.work_location_id == int(filters["work_location_id"]))
 	if filters.get("designation_id"):
 		query = query.where(DailyAttendance.designation_id == int(filters["designation_id"]))
 	if filters.get("department_id"):
-		query = query.where(
-			DailyAttendance.department_id.in_(access.subtree(session, {int(filters["department_id"])}))
-		)
+		query = query.where(DailyAttendance.department_id == int(filters["department_id"]))
 	if visible is not None:
 		query = query.where(DailyAttendance.employee_id.in_(visible or {0}))
 	rows = list(session.scalars(query.order_by(DailyAttendance.employee_id, DailyAttendance.jdate)))
@@ -173,7 +171,7 @@ def _day_rows(session: Session, filters: dict, visible: set[int] | None) -> list
 		)
 	}
 	departments = _names(session, Department, {r.department_id for r in rows if r.department_id})
-	branches = _names(session, Branch, {r.branch_id for r in rows if r.branch_id})
+	locations = _names(session, WorkLocation, {r.work_location_id for r in rows if r.work_location_id})
 	designations = _names(session, Designation, {r.designation_id for r in rows if r.designation_id})
 	shifts = _names(session, Shift, {r.shift_id for r in rows if r.shift_id})
 	types = {t.id: t for t in session.scalars(select(LeaveType))}
@@ -186,7 +184,7 @@ def _day_rows(session: Session, filters: dict, visible: set[int] | None) -> list
 			employee=emp.code,
 			employee_name=emp.full_name,
 			national_id=emp.national_id,
-			branch=branches.get(r.branch_id),
+			work_location=locations.get(r.work_location_id),
 			department=departments.get(r.department_id),
 			designation=designations.get(r.designation_id),
 			jdate=r.jdate,
@@ -266,7 +264,7 @@ def build(session: Session, actor: access.Actor, today: str, spec: dict, filters
 		"employee",
 		"employee_name",
 		"national_id",
-		"branch",
+		"work_location",
 		"department",
 		"designation",
 	)
@@ -279,7 +277,7 @@ def build(session: Session, actor: access.Actor, today: str, spec: dict, filters
 	elif group == "employee":
 		rows = _sum_rows(rows, columns, lambda r: r["employee_id"], identity)
 	elif group == "department":
-		rows = _sum_rows(rows, columns, lambda r: r["department"], ("department", "branch"))
+		rows = _sum_rows(rows, columns, lambda r: r["department"], ("department", "work_location"))
 	elif group == "day":
 		rows = _sum_rows(
 			rows, columns, lambda r: r["jdate"], ("jdate", "weekday_name", "day_type", "holiday_title")
@@ -301,9 +299,7 @@ def visible_templates(session: Session, actor: access.Actor) -> list[ReportTempl
 
 
 def _may_use(actor: access.Actor, t: ReportTemplate) -> bool:
-	return (
-		actor.is_operator or actor.sees_all or t.is_standard or bool(set(t.shared_roles or ()) & actor.roles)
-	)
+	return actor.is_admin or actor.sees_all or t.is_standard or bool(set(t.shared_roles or ()) & actor.roles)
 
 
 def template_spec(session: Session, actor: access.Actor, template_id: int) -> dict:
@@ -329,7 +325,7 @@ def spec_for(session: Session, actor: access.Actor, template_id: int | None, spe
 	"""A saved template (anyone it is shared with) or an ad-hoc spec (operators)."""
 	if template_id:
 		return template_spec(session, actor, template_id)
-	if not actor.is_operator:
+	if not actor.is_admin:
 		raise PermissionDenied(_("Not permitted"))
 	return dict(spec or {})
 

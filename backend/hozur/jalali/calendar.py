@@ -9,7 +9,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
 from hozur.jalali.dates import FRIDAY, weekday
-from hozur.jalali.holidays import BRANCH, COMPANY, COUNTRY, PREDICTED, PROVINCE, day_off_kind
+from hozur.jalali.holidays import COMPANY, COUNTRY, PREDICTED, PROVINCE, WORK_LOCATION, day_off_kind
 
 WORKDAY, FRIDAY_TYPE, OFFICIAL_HOLIDAY, COMPANY_HOLIDAY = (
 	"workday",
@@ -33,18 +33,25 @@ class DayInfo:
 		return " / ".join(self.titles)
 
 
-def applies(holiday: Mapping, branch_id: int | None, province_id: int | None) -> bool:
-	"""Does a holiday row apply to someone in this branch / province?"""
+def applies(holiday: Mapping, work_location_id: int | None, province_id: int | None) -> bool:
+	"""Does a holiday row apply to someone at this work location / province?"""
 	scope = holiday.get("scope")
 	return (
 		scope in (COUNTRY, COMPANY)
 		or (scope == PROVINCE and province_id is not None and holiday.get("province_id") == province_id)
-		or (scope == BRANCH and branch_id is not None and holiday.get("branch_id") == branch_id)
+		or (
+			scope == WORK_LOCATION
+			and work_location_id is not None
+			and holiday.get("work_location_id") == work_location_id
+		)
 	)
 
 
 def resolve_day(
-	jdate: str, holidays: Iterable[Mapping] = (), branch_id: int | None = None, province_id: int | None = None
+	jdate: str,
+	holidays: Iterable[Mapping] = (),
+	work_location_id: int | None = None,
+	province_id: int | None = None,
 ) -> DayInfo:
 	"""Day type for one person: official holidays win over company holidays, which win over
 	the plain weekday. `holidays` are the rows on that date (any scope)."""
@@ -52,7 +59,7 @@ def resolve_day(
 	by_kind: dict[str, list[Mapping]] = {"official": [], "company": []}
 	for h in holidays:
 		kind = day_off_kind(h)
-		if kind and applies(h, branch_id, province_id):
+		if kind and applies(h, work_location_id, province_id):
 			by_kind[kind].append(h)
 	for kind, day_type in (("official", OFFICIAL_HOLIDAY), ("company", COMPANY_HOLIDAY)):
 		rows = by_kind[kind]

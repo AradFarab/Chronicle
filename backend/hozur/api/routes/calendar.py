@@ -8,7 +8,7 @@ from fastapi import APIRouter, File, Form, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from hozur.api.deps import DB, Actor, Operator
+from hozur.api.deps import DB, Actor, Admin
 from hozur.api.views import holiday_view, jalali_moment
 from hozur.calendar import service
 from hozur.db.models import CalendarYear, Holiday
@@ -50,17 +50,17 @@ def holidays(year: int, actor: Actor, db: DB) -> list[dict]:
 
 
 @router.post("/holidays")
-def create(values: dict[str, Any], actor: Operator, db: DB) -> dict:
+def create(values: dict[str, Any], actor: Admin, db: DB) -> dict:
 	return holiday_view(service.create_holiday(db, values, actor.user_id))
 
 
 @router.patch("/holidays/{holiday_id}")
-def update(holiday_id: int, body: HolidayChange, actor: Operator, db: DB) -> dict:
+def update(holiday_id: int, body: HolidayChange, actor: Admin, db: DB) -> dict:
 	return holiday_view(service.update_holiday(db, holiday_id, body.values, body.reason or "", actor.user_id))
 
 
 @router.post("/holidays/{holiday_id}/delete")
-def delete(holiday_id: int, body: Reason, actor: Operator, db: DB) -> dict:
+def delete(holiday_id: int, body: Reason, actor: Admin, db: DB) -> dict:
 	service.delete_holiday(db, holiday_id, body.reason, actor.user_id)
 	return {"ok": True}
 
@@ -72,7 +72,7 @@ async def _source(db, source: str, file: UploadFile | None):
 
 @router.post("/refresh/preview")
 async def preview(
-	actor: Operator,
+	actor: Admin,
 	db: DB,
 	year: Annotated[int, Form()],
 	source: Annotated[str, Form()] = "time_ir",
@@ -85,7 +85,7 @@ async def preview(
 
 @router.post("/refresh/apply")
 async def apply(
-	actor: Operator,
+	actor: Admin,
 	db: DB,
 	year: Annotated[int, Form()],
 	source: Annotated[str, Form()] = "time_ir",

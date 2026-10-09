@@ -20,8 +20,8 @@ HOLIDAY_TYPES = (OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL, OFFICE_CLO
 OFFICIAL_TYPES = (OFFICIAL_SOLAR, OFFICIAL_LUNAR, OFFICIAL_OCCASIONAL)
 
 CONFIRMED, PREDICTED = "confirmed", "predicted"
-COUNTRY, PROVINCE, BRANCH, COMPANY = "country", "province", "branch", "company"
-SCOPES = (COUNTRY, PROVINCE, BRANCH, COMPANY)
+COUNTRY, PROVINCE, WORK_LOCATION, COMPANY = "country", "province", "work_location", "company"
+SCOPES = (COUNTRY, PROVINCE, WORK_LOCATION, COMPANY)
 
 # Hijri month names as they appear in official calendars (time.ir writes the lunar date of
 # an event in brackets, e.g. "عید غدیر [ ۱۸ ذوالحجه ]").

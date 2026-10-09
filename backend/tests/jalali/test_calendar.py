@@ -115,7 +115,7 @@ def test_predicted_flag():
 	assert predicted and all(d.predicted and d.day_type == cal.OFFICIAL_HOLIDAY for d in predicted)
 
 
-def test_resolve_province_and_branch_holidays():
+def test_resolve_province_and_work_location_holidays():
 	tehran_only = {
 		"title": "t",
 		"holiday_type": hol.OFFICIAL_OCCASIONAL,
@@ -124,9 +124,14 @@ def test_resolve_province_and_branch_holidays():
 	}
 	assert cal.resolve_day("1405/07/14", [tehran_only], 1, 8).day_type == cal.OFFICIAL_HOLIDAY
 	assert cal.resolve_day("1405/07/14", [tehran_only], 2, 4).day_type == cal.WORKDAY
-	branch = {"title": "b", "holiday_type": hol.COMPANY_INTERNAL, "scope": hol.BRANCH, "branch_id": 1}
-	assert cal.resolve_day("1405/07/14", [branch], 1, None).day_type == cal.COMPANY_HOLIDAY
-	assert cal.resolve_day("1405/07/14", [branch], 2, None).day_type == cal.WORKDAY
+	location = {
+		"title": "b",
+		"holiday_type": hol.COMPANY_INTERNAL,
+		"scope": hol.WORK_LOCATION,
+		"work_location_id": 1,
+	}
+	assert cal.resolve_day("1405/07/14", [location], 1, None).day_type == cal.COMPANY_HOLIDAY
+	assert cal.resolve_day("1405/07/14", [location], 2, None).day_type == cal.WORKDAY
 
 
 def test_office_closure_pay_modes():

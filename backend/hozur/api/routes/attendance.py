@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from hozur.api.deps import DB, Actor, Operator, Today
+from hozur.api.deps import DB, Actor, Admin, Today
 from hozur.api.views import hm, jalali_moment
 from hozur.db.models import DailyAttendance, Employee, LeaveType
 from hozur.i18n import _
@@ -117,7 +117,7 @@ def day_details(employee_id: int, jdate: str, actor: Actor, db: DB, today: Today
 
 
 @router.post("/attendance/recalculate")
-def recalculate(body: Recalculation, actor: Operator, db: DB, today: Today) -> dict:
+def recalculate(body: Recalculation, actor: Admin, db: DB, today: Today) -> dict:
 	"""Recalculate now (operator button). Closed periods are skipped."""
 	start, end = normalize_jdate(body.from_date), normalize_jdate(body.to_date)
 	if end < start:
@@ -163,12 +163,12 @@ def list_periods(year: int, actor: Actor, db: DB) -> list[dict]:
 
 
 @router.post("/periods/{year}/{month}/close")
-def close_period(year: int, month: int, body: PeriodAction, actor: Operator, db: DB, today: Today) -> dict:
+def close_period(year: int, month: int, body: PeriodAction, actor: Admin, db: DB, today: Today) -> dict:
 	row = periods.close(db, year, month, today, actor.user_id, body.note)
 	return {"jyear": row.jyear, "jmonth": row.jmonth, "status": row.status}
 
 
 @router.post("/periods/{year}/{month}/reopen")
-def reopen_period(year: int, month: int, body: PeriodAction, actor: Operator, db: DB) -> dict:
+def reopen_period(year: int, month: int, body: PeriodAction, actor: Admin, db: DB) -> dict:
 	row = periods.reopen(db, year, month, actor.user_id, body.note or "")
 	return {"jyear": row.jyear, "jmonth": row.jmonth, "status": row.status}

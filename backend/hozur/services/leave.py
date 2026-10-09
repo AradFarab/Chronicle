@@ -9,11 +9,12 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from hozur.calendar.service import holidays_by_date
-from hozur.db.models import Branch, Designation, Employee, LeaveLedgerEntry, LeaveType
+from hozur.db.models import Designation, Employee, LeaveLedgerEntry, LeaveType, WorkLocation
 from hozur.db.models.org import SUSPENDED
 from hozur.engine.periodic import annual_leave_entitlement, year_end_carry_over
 from hozur.jalali.calendar import COMPANY_HOLIDAY, OFFICIAL_HOLIDAY, resolve_day
 from hozur.jalali.dates import iter_days, month_bounds, year_bounds
+from hozur.services.access import designations_on
 from hozur.services.rule_sets import rule_set_for
 from hozur.services.schedules import ScheduleResolver
 
@@ -71,10 +72,10 @@ def add_entry(
 
 
 def province_of(session: Session, employee: Employee) -> tuple[int | None, int | None]:
-	if not employee.branch_id:
+	if not employee.work_location_id:
 		return None, None
-	return employee.branch_id, session.scalar(
-		select(Branch.province_id).where(Branch.id == employee.branch_id)
+	return employee.work_location_id, session.scalar(
+		select(WorkLocation.province_id).where(WorkLocation.id == employee.work_location_id)
 	)
 
 
@@ -85,11 +86,11 @@ def working_days(
 	company holidays and weekly rest days inside a leave are not leave (Article 64)."""
 	resolver = resolver or ScheduleResolver(session)
 	employee = session.get(Employee, employee_id)
-	branch_id, province_id = province_of(session, employee)
+	work_location_id, province_id = province_of(session, employee)
 	holidays = holidays_by_date(session, start, end)
 	days = []
 	for jdate in iter_days(start, end):
-		if resolve_day(jdate, holidays.get(jdate, ()), branch_id, province_id).day_type in (
+		if resolve_day(jdate, holidays.get(jdate, ()), work_location_id, province_id).day_type in (
 			OFFICIAL_HOLIDAY,
 			COMPANY_HOLIDAY,
 		):
@@ -129,8 +130,13 @@ def allocate_month(session: Session, year: int, month: int) -> int:
 		days = employed_days(emp, start, end)
 		if exists or not days:
 			continue
-		hard = bool(emp.designation_id) and bool(
-			session.scalar(select(Designation.hard_and_harmful).where(Designation.id == emp.designation_id))
+		held = designations_on(session, emp.id, end)
+		hard = bool(held) and bool(
+			session.scalar(
+				select(func.count())
+				.select_from(Designation)
+				.where(Designation.id.in_(held), Designation.hard_and_harmful)
+			)
 		)
 		amount = annual_leave_entitlement(days, year_days, rules, hard_harmful=hard)
 		add_entry(session, emp.id, leave_type.id, ALLOCATION, end, amount, note=note)

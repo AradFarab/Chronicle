@@ -92,7 +92,7 @@ def test_refresh_confirms_a_predicted_year(installed):
 def test_refresh_leaves_operator_edits_and_skipped_items(installed):
 	rows = year_holidays(installed, 1406)
 	edited = next(h for h in rows.values() if h.holiday_type == hol.OFFICIAL_LUNAR)
-	edited.title, edited.edited_by_operator = "ویرایش اپراتور", True
+	edited.title, edited.edited_by_admin = "ویرایش اپراتور", True
 	installed.flush()
 	plan = service.plan_refresh(installed, 1406, FakeSource([official("1406/02/02", "تعطیلی جدید")]))
 	assert edited.jdate not in {i.jdate for i in plan.items}
@@ -142,7 +142,7 @@ def test_operator_edits_holidays_with_audit_and_recalculation(installed):
 	# editing a holiday that came from a source marks it, so a refresh leaves it alone
 	nowruz = next(h for (jd, _t), h in year_holidays(installed, 1406).items() if jd == "1406/01/01")
 	service.update_holiday(installed, nowruz.id, {"title": "نوروز ۱۴۰۶"}, "عنوان", user_id=None)
-	assert nowruz.edited_by_operator
+	assert nowruz.edited_by_admin
 	with pytest.raises(ValidationError, match="reason"):
 		service.delete_holiday(installed, closure.id, "", None)
 	service.delete_holiday(installed, closure.id, "اشتباه", None)

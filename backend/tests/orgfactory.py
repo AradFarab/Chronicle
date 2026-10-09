@@ -1,5 +1,5 @@
-"""A small test company: root > فروش (manager M, reports to the CEO) > تیم فروش (no manager):
-E works there. Imported by tests/conftest.py (the `org` fixture) and by tests directly."""
+"""A small test company: CEO > sales manager > sales expert, and an accountant under the CEO.
+Every employee is also a user. Imported by tests/conftest.py (the `org` fixture) and by tests."""
 
 from __future__ import annotations
 
@@ -12,6 +12,8 @@ from hozur.db.models import (
 	AppUser,
 	AttendanceDevice,
 	Department,
+	Designation,
+	DesignationAssignment,
 	DeviceUserMap,
 	Employee,
 	Organization,
@@ -22,7 +24,7 @@ from hozur.db.models import (
 	WorkPatternDay,
 )
 from hozur.services.access import actor_for
-from hozur.setup import data, install
+from hozur.setup import install
 
 TODAY = "1405/07/14"  # a Tuesday
 PASSWORD = "secret-pass-1405"  # set on test users that log in through the API
@@ -36,41 +38,50 @@ def make_user(db, username, *roles):
 	return user
 
 
-def make_employee(db, code, department=None, user=None, **kw):
+def make_employee(db, code, designation=None, department=None, roles=("employee",), **kw):
+	"""An employee is also a user (username = lower-case code); optionally holds a designation."""
+	user = make_user(db, code.lower(), *roles)
 	e = Employee(
 		code=code,
 		first_name="کارمند",
 		last_name=code,
 		start_date="1404/01/15",
 		department_id=department.id if department else None,
-		user_id=user.id if user else None,
+		user_id=user.id,
 		**kw,
 	)
 	db.add(e)
 	db.flush()
-	return e
+	if designation:
+		db.add(
+			DesignationAssignment(employee_id=e.id, designation_id=designation.id, valid_from=e.start_date)
+		)
+		db.flush()
+	return e, user
 
 
 def build_org(db):
+	"""CEO > sales manager > sales expert; the accountant sits right under the CEO."""
 	install.run(db)
-	root = db.scalar(select(Department).where(Department.name == data.ROOT_DEPARTMENT))
-	ceo_user = make_user(db, "ceo", "ceo", "employee")
-	mgr_user = make_user(db, "mgr", "manager", "employee")
-	emp_user = make_user(db, "emp", "employee")
-	op_user = make_user(db, "op", "operator")
+	ceo_d = db.scalar(select(Designation).where(Designation.is_ceo))
+	mgr_d = Designation(name="مدیر فروش", parent_id=ceo_d.id)
+	db.add(mgr_d)
+	db.flush()
+	expert_d = Designation(name="کارشناس فروش", parent_id=mgr_d.id)
+	acct_d = Designation(name="حسابدار", parent_id=ceo_d.id)
+	db.add_all([expert_d, acct_d])
+	db.flush()
+	sales = Department(name="فروش")
+	finance = Department(name="مالی")
+	db.add_all([sales, finance])
+	db.flush()
+	ceo, ceo_user = make_employee(db, "T-CEO", ceo_d, finance)
+	manager, mgr_user = make_employee(db, "T-MGR", mgr_d, sales)
+	employee, emp_user = make_employee(db, "T-EMP", expert_d, sales)
+	other, other_user = make_employee(db, "T-OTHER", acct_d, finance)
+	db.merge(Organization(id=1, name="شرکت آزمایشی"))
+	op_user = make_user(db, "op", "admin")  # a system admin without an employee record
 	admin_user = make_user(db, "admin", "admin")
-	ceo = make_employee(db, "T-CEO", root, ceo_user)
-	sales = Department(name="فروش", parent_id=root.id, is_group=True)
-	db.add(sales)
-	db.flush()
-	team = Department(name="تیم فروش", parent_id=sales.id)
-	db.add(team)
-	db.flush()
-	manager = make_employee(db, "T-MGR", sales, mgr_user, reports_to_id=ceo.id)
-	sales.manager_id = manager.id
-	employee = make_employee(db, "T-EMP", team, emp_user)
-	other = make_employee(db, "T-OTHER", root)
-	db.merge(Organization(id=1, name="شرکت آزمایشی", ceo_id=ceo.id))
 	# Saturday-Wednesday 08:00-16:30 with a 40-minute lunch (470 minutes), Thursday/Friday off
 	office = Shift(
 		name="T-Office",
@@ -98,20 +109,24 @@ def build_org(db):
 	db.flush()
 	# actors: boss (the CEO's login), mgr, emp, op, admin; org.ceo / org.manager / org.employee are employees
 	actors = {
-		name: actor_for(db, u)
+		name: actor_for(db, u, TODAY)
 		for name, u in (
 			("boss", ceo_user),
 			("mgr", mgr_user),
 			("emp", emp_user),
 			("op", op_user),
 			("admin", admin_user),
+			("anyone", other_user),
 		)
 	}
 	return SimpleNamespace(
 		db=db,
-		root=root,
+		ceo_designation=ceo_d,
+		manager_designation=mgr_d,
+		expert_designation=expert_d,
+		accountant_designation=acct_d,
 		sales=sales,
-		team=team,
+		finance=finance,
 		ceo=ceo,
 		manager=manager,
 		employee=employee,
@@ -119,6 +134,8 @@ def build_org(db):
 		office=office,
 		week=week,
 		device=device,
-		users=SimpleNamespace(ceo=ceo_user, mgr=mgr_user, emp=emp_user, op=op_user, admin=admin_user),
+		users=SimpleNamespace(
+			ceo=ceo_user, mgr=mgr_user, emp=emp_user, op=op_user, admin=admin_user, other=other_user
+		),
 		**actors,
 	)

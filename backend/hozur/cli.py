@@ -68,7 +68,7 @@ def main(argv: list[str] | None = None) -> None:
 	user.add_argument("username")
 	user.add_argument("--name")
 	user.add_argument("--password", help="prompted when omitted")
-	user.add_argument("--role", action="append", default=[], help="admin, operator, ceo, manager, employee")
+	user.add_argument("--role", action="append", default=[], help="admin (system admin) or employee")
 	user.set_defaults(func=_create_user)
 
 	serve = sub.add_parser("serve", help="run the web server")

@@ -19,7 +19,7 @@ def me(actor: Actor, db: DB, today: Today) -> dict:
 	user = db.get(AppUser, actor.user_id)
 	employee = db.get(Employee, actor.employee_id) if actor.employee_id else None
 	warnings = []
-	if actor.is_operator:
+	if actor.is_admin:
 		warning = refresh_warning(db, today)
 		if warning:
 			warnings.append(warning.translated(actor.language))
@@ -37,14 +37,14 @@ def me(actor: Actor, db: DB, today: Today) -> dict:
 				"code": employee.code,
 				"full_name": employee.full_name,
 				"department_id": employee.department_id,
-				"branch_id": employee.branch_id,
+				"work_location_id": employee.work_location_id,
 			}
 			if employee
 			else None
 		),
 		"organization": db.scalar(select(Organization.name).where(Organization.id == 1)) or "",
 		"today": today,
-		"is_operator": actor.is_operator,
+		"is_ceo": actor.is_ceo,
 		"is_admin": actor.is_admin,
 		"is_manager": access.is_manager(db, actor, today),
 		"warnings": warnings,

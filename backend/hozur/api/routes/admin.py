@@ -12,9 +12,9 @@ from sqlalchemy import select
 from hozur.api.deps import DB, Actor, Admin, Today
 from hozur.api.views import jalali_moment
 from hozur.db.models import ApprovalDefault, AppUser, AuditEntry, Employee, Organization
-from hozur.db.models.requests import OPERATOR_ENTRY, REQUEST_TYPES
+from hozur.db.models.requests import ADMIN_ENTRY, REQUEST_TYPES
 from hozur.i18n import _
-from hozur.services import access, audit, resources, settings, users
+from hozur.services import audit, resources, settings, users
 from hozur.services.errors import NotFound, ValidationError
 from hozur.setup.data import SETTINGS
 
@@ -29,12 +29,6 @@ def _ctx(db, actor, today) -> resources.Context:
 	return resources.Context(db, actor, today)
 
 
-def _employees(ctx: resources.Context) -> list[Employee]:
-	rows = resources.list_rows(ctx, resources.resource("employees"))
-	visible = access.visible_employee_ids(ctx.session, ctx.actor, ctx.today)
-	return rows if visible is None else [e for e in rows if e.id in visible]
-
-
 # organization (one row) -----------------------------------------------------------------------
 
 ORGANIZATION_FIELDS = (
@@ -43,7 +37,6 @@ ORGANIZATION_FIELDS = (
 	"national_id",
 	"economic_code",
 	"insurance_workshop_code",
-	"ceo_id",
 	"phone",
 	"address",
 )
@@ -87,14 +80,14 @@ def put_organization(values: dict[str, Any], actor: Admin, db: DB) -> dict:
 @router.get("/approval-defaults")
 def approval_defaults(actor: Admin, db: DB) -> list[dict]:
 	rows = {r.request_type: r.process_id for r in db.scalars(select(ApprovalDefault))}
-	return [{"request_type": t, "process_id": rows.get(t)} for t in (*REQUEST_TYPES, OPERATOR_ENTRY)]
+	return [{"request_type": t, "process_id": rows.get(t)} for t in (*REQUEST_TYPES, ADMIN_ENTRY)]
 
 
 @router.put("/approval-defaults/{request_type}")
 def set_approval_default(
 	request_type: str, values: dict[str, Any], actor: Admin, db: DB, today: Today
 ) -> dict:
-	if request_type not in (*REQUEST_TYPES, OPERATOR_ENTRY):
+	if request_type not in (*REQUEST_TYPES, ADMIN_ENTRY):
 		raise NotFound(_("Not found"))
 	row = resources.set_approval_default(_ctx(db, actor, today), request_type, int(values["process_id"]))
 	return {"request_type": row.request_type, "process_id": row.process_id}
@@ -150,7 +143,6 @@ class NewUser(BaseModel):
 	full_name: str | None = None
 	password: str
 	roles: list[str] = []
-	employee_id: int | None = None
 
 
 class Password(BaseModel):
@@ -179,12 +171,11 @@ def list_users(actor: Admin, db: DB) -> list[dict]:
 
 @router.post("/users")
 def create_user(body: NewUser, actor: Admin, db: DB) -> dict:
-	user = users.create_user(db, body.username, body.full_name or body.username, body.password, body.roles)
-	if body.employee_id:
-		employee = db.get(Employee, body.employee_id)
-		if employee is None:
-			raise NotFound(_("Employee not found"))
-		employee.user_id = user.id
+	"""A login with no employee record (e.g. an IT admin). Employees get theirs when they are
+	created, in the employees screen."""
+	user = users.create_user(
+		db, body.username, body.full_name or body.username, body.password, body.roles, require_password=True
+	)
 	resources.flush(db)
 	audit.log(
 		db,
@@ -250,18 +241,14 @@ def audit_trail(
 def list_rows(name: str, actor: Actor, db: DB, today: Today) -> list[dict]:
 	resource = resources.resource(name)
 	ctx = _ctx(db, actor, today)
-	rows = _employees(ctx) if name == "employees" else resources.list_rows(ctx, resource)
-	return [resources.view(resource, r) for r in rows]
+	return [resources.view(resource, r) for r in resources.list_rows(ctx, resource)]
 
 
 @router.get("/{name}/{row_id}")
 def get_row(name: str, row_id: int, actor: Actor, db: DB, today: Today) -> dict:
 	resource = resources.resource(name)
 	ctx = _ctx(db, actor, today)
-	row = resources.get_row(ctx, resource, row_id)
-	if name == "employees" and not access.can_see(db, actor, row.id, today):
-		raise NotFound(_("Employee not found"))
-	return resources.view(resource, row)
+	return resources.view(resource, resources.get_row(ctx, resource, row_id))
 
 
 @router.post("/{name}")

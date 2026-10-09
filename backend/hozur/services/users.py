@@ -42,7 +42,12 @@ def create_user(
 	full_name: str,
 	password: str | None,
 	roles: list[str] | tuple[str, ...] = (),
+	require_password: bool = False,
 ) -> AppUser:
+	"""A login. Employees always get a password at creation; an account without one (a CLI
+	admin created for someone else to set up) cannot log in until a password is set."""
+	if require_password and not password:
+		raise ValidationError(_("Enter a password"))
 	username = (username or "").strip().lower()
 	if not username:
 		raise ValidationError(_("Enter a username"))

@@ -44,19 +44,15 @@ DAILY_LEAVE, HOURLY_LEAVE, MISSION_TYPE, OVERTIME_TYPE, CORRECTION_TYPE = (
 	"attendance_correction",
 )
 REQUEST_TYPES = (DAILY_LEAVE, HOURLY_LEAVE, MISSION_TYPE, OVERTIME_TYPE, CORRECTION_TYPE)
-# The default process for requests an operator enters for someone else.
-OPERATOR_ENTRY = "operator_entry"
+# The default process for requests the system admin enters for someone else.
+ADMIN_ENTRY = "admin_entry"
 PENDING, APPROVED, REJECTED, CANCELLED, SKIPPED = "pending", "approved", "rejected", "cancelled", "skipped"
 REQUEST_STATUSES = (PENDING, APPROVED, REJECTED, CANCELLED)
 STEP_STATUSES = (PENDING, APPROVED, REJECTED, SKIPPED)
-DIRECT_MANAGER, PARENT_DEPARTMENT_MANAGER, CEO, SPECIFIC_PERSON, EMPLOYEE_ACCEPTANCE = (
-	"direct_manager",
-	"parent_department_manager",
-	"ceo",
-	"specific_person",
-	"employee_acceptance",
-)
-PROCESS_APPROVER_TYPES = (DIRECT_MANAGER, PARENT_DEPARTMENT_MANAGER, CEO, SPECIFIC_PERSON)
+# A step is resolved to people when the request is submitted: PARENT = whoever holds the
+# nearest filled designation above the requester, CEO = whoever holds the CEO designation.
+PARENT, CEO, SPECIFIC_PERSON, EMPLOYEE_ACCEPTANCE = "parent", "ceo", "specific_person", "employee_acceptance"
+PROCESS_APPROVER_TYPES = (PARENT, CEO, SPECIFIC_PERSON)
 DAILY, HOURLY = "daily", "hourly"
 OVERTIME_KINDS = ("normal", "exceptional", "emergency")
 ADD_PUNCH, IGNORE_PUNCH = "add_punch", "ignore_punch"
@@ -94,7 +90,7 @@ class ApprovalDefault(Base):
 	"""The process used for a request type unless the employee has an override."""
 
 	__tablename__ = "approval_default"
-	__table_args__ = (enum_check("request_type", (*REQUEST_TYPES, OPERATOR_ENTRY)),)
+	__table_args__ = (enum_check("request_type", (*REQUEST_TYPES, ADMIN_ENTRY)),)
 
 	request_type: Mapped[str] = mapped_column(String(30), primary_key=True)
 	process_id: Mapped[int] = mapped_column(ForeignKey("approval_process.id"))
@@ -126,11 +122,8 @@ class Request(IdMixin, TimestampMixin, Base):
 			name="type_matches_kind",
 		),
 		CheckConstraint("end_jdate >= start_jdate", name="date_range"),
-		CheckConstraint(
-			"(status = 'pending') OR pending_approver_user_id IS NULL", name="pending_only_when_pending"
-		),
 		Index("ix_request_employee_id_start_jdate", "employee_id", "start_jdate"),
-		Index("ix_request_inbox", "pending_approver_user_id", postgresql_where=text("status = 'pending'")),
+		Index("ix_request_status", "status", postgresql_where=text("status = 'pending'")),
 	)
 
 	kind: Mapped[str] = mapped_column(String(20))
@@ -144,10 +137,7 @@ class Request(IdMixin, TimestampMixin, Base):
 	reason: Mapped[str | None] = mapped_column(Text)
 	approval_process_id: Mapped[int | None] = mapped_column(ForeignKey("approval_process.id"))
 	entered_by_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id", ondelete="SET NULL"))
-	entered_by_operator: Mapped[bool] = mapped_column(Boolean, server_default=false())
-	# Mirror of the current pending step, for a fast inbox.
-	pending_approver_id: Mapped[int | None] = mapped_column(ForeignKey("employee.id"))
-	pending_approver_user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id"))
+	entered_by_admin: Mapped[bool] = mapped_column(Boolean, server_default=false())
 	decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 	cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 	number: Mapped[str] = mapped_column(
@@ -248,7 +238,8 @@ class CorrectionItem(IdMixin, Base):
 
 
 class RequestApproval(IdMixin, Base):
-	"""One step of a request's approval chain, copied from the process when submitted."""
+	"""One step of a request's approval chain, copied from the process when submitted. Any one
+	of the step's approvers (or their delegates) can decide it."""
 
 	__tablename__ = "request_approval"
 	__table_args__ = (
@@ -260,9 +251,42 @@ class RequestApproval(IdMixin, Base):
 	request_id: Mapped[int] = mapped_column(ForeignKey("request.id", ondelete="CASCADE"))
 	step: Mapped[int] = mapped_column(SmallInteger)
 	approver_type: Mapped[str] = mapped_column(String(30))
-	approver_id: Mapped[int | None] = mapped_column(ForeignKey("employee.id"))
-	approver_user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id"))
 	status: Mapped[str] = mapped_column(String(20), server_default=PENDING)
 	acted_by_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id"))
 	acted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 	comment: Mapped[str | None] = mapped_column(Text)
+
+	approvers: Mapped[list[RequestApprovalApprover]] = relationship(
+		cascade="all, delete-orphan", lazy="selectin", order_by="RequestApprovalApprover.employee_id"
+	)
+
+
+class RequestApprovalApprover(Base):
+	"""Who may decide a step: the holders of the designation it resolved to."""
+
+	__tablename__ = "request_approval_approver"
+	__table_args__ = (Index("ix_request_approval_approver_user_id", "user_id"),)
+
+	approval_id: Mapped[int] = mapped_column(
+		ForeignKey("request_approval.id", ondelete="CASCADE"), primary_key=True
+	)
+	employee_id: Mapped[int] = mapped_column(ForeignKey("employee.id"), primary_key=True)
+	user_id: Mapped[int] = mapped_column(ForeignKey("app_user.id"))
+
+
+class ApprovalDelegation(IdMixin, TimestampMixin, Base):
+	"""A manager hands their approval authority to someone else for a while. Both the manager
+	and the delegate can approve; the audit trail records who really did."""
+
+	__tablename__ = "approval_delegation"
+	__table_args__ = (
+		CheckConstraint("delegator_id <> delegate_id", name="not_self"),
+		CheckConstraint("valid_to IS NULL OR valid_to >= valid_from", name="valid_range"),
+		Index("ix_approval_delegation_delegate_id", "delegate_id"),
+	)
+
+	delegator_id: Mapped[int] = mapped_column(ForeignKey("employee.id", ondelete="CASCADE"))
+	delegate_id: Mapped[int] = mapped_column(ForeignKey("employee.id", ondelete="CASCADE"))
+	valid_from: Mapped[str] = mapped_column(JDate)
+	valid_to: Mapped[str | None] = mapped_column(JDate)
+	note: Mapped[str | None] = mapped_column(Text)

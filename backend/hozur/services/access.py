@@ -1,24 +1,34 @@
-"""Who is acting, and whom they may see (CLAUDE.md rule 8: role plus department subtree).
+"""Who is acting, and whom they may see (CLAUDE.md rule 8: role plus designation subtree).
 
-- admin, operator and ceo see everyone;
-- a manager sees their direct reports and everyone in the departments they manage (or act
-  for as deputy today), including all sub-departments;
-- everybody sees themselves.
+The organization is the designation tree. A person's "parent" is whoever holds the nearest
+filled designation above theirs; their "subordinates" are everyone holding a designation below
+a designation they hold. So:
+
+- the system admin and the CEO (holder of the CEO designation) see everyone;
+- a manager sees themself and everyone below their designations (and below the designations of
+  people who delegated their authority to them);
+- everybody else sees themself.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from sqlalchemy import literal, or_, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from hozur.db.models import AppUser, Department, Employee, Organization
-from hozur.db.models.access import ADMIN, CEO, MANAGER, OPERATOR
+from hozur.clock import today_jalali
+from hozur.db.models import (
+	ApprovalDelegation,
+	AppUser,
+	Designation,
+	DesignationAssignment,
+	Employee,
+)
+from hozur.db.models.access import ADMIN
+from hozur.db.models.org import ACTIVE
 from hozur.i18n import _
 from hozur.services.errors import PermissionDenied
-
-ALL_ACCESS = frozenset({ADMIN, OPERATOR, CEO})
 
 
 @dataclass(frozen=True)
@@ -27,86 +37,169 @@ class Actor:
 	employee_id: int | None = None
 	roles: frozenset[str] = field(default_factory=frozenset)
 	language: str = "fa"
+	is_ceo: bool = False  # holds the CEO designation today
 
 	@property
 	def is_admin(self) -> bool:
 		return ADMIN in self.roles
 
 	@property
-	def is_operator(self) -> bool:
-		return bool({ADMIN, OPERATOR} & self.roles)
-
-	@property
 	def sees_all(self) -> bool:
-		return bool(ALL_ACCESS & self.roles)
+		return self.is_admin or self.is_ceo
 
 
 # Jobs, the CLI and install run as the system.
 SYSTEM = Actor(user_id=None, roles=frozenset({ADMIN}))
 
 
-def actor_for(session: Session, user: AppUser) -> Actor:
+def actor_for(session: Session, user: AppUser, today: str | None = None) -> Actor:
 	employee_id = session.scalar(select(Employee.id).where(Employee.user_id == user.id))
+	today = today or today_jalali()
 	return Actor(
-		user_id=user.id, employee_id=employee_id, roles=frozenset(user.role_names), language=user.language
+		user_id=user.id,
+		employee_id=employee_id,
+		roles=frozenset(user.role_names),
+		language=user.language,
+		is_ceo=bool(employee_id) and employee_id in ceo_ids(session, today),
 	)
 
 
-# the department tree -----------------------------------------------------------------------
+# the designation tree ---------------------------------------------------------------------------
 
 
-def subtree(session: Session, roots: set[int]) -> set[int]:
-	"""The departments and all their descendants (recursive CTE)."""
+def _active(column_from, column_to, today: str):
+	return (column_from <= today) & (column_to.is_(None) | (column_to >= today))
+
+
+def _working(today: str):
+	"""Employees who can act today: active and inside their employment dates."""
+	return (
+		(Employee.status == ACTIVE)
+		& (Employee.start_date <= today)
+		& (Employee.end_date.is_(None) | (Employee.end_date >= today))
+	)
+
+
+def designations_on(session: Session, employee_id: int, today: str) -> list[int]:
+	"""The designations a person holds today, oldest assignment first."""
+	return list(
+		session.scalars(
+			select(DesignationAssignment.designation_id)
+			.where(
+				DesignationAssignment.employee_id == employee_id,
+				_active(DesignationAssignment.valid_from, DesignationAssignment.valid_to, today),
+			)
+			.order_by(DesignationAssignment.valid_from, DesignationAssignment.id)
+		)
+	)
+
+
+def holders(session: Session, designation_ids: set[int] | list[int], today: str) -> list[int]:
+	"""Working employees who hold any of the designations today."""
+	if not designation_ids:
+		return []
+	return sorted(
+		set(
+			session.scalars(
+				select(DesignationAssignment.employee_id)
+				.join(Employee, Employee.id == DesignationAssignment.employee_id)
+				.where(
+					DesignationAssignment.designation_id.in_(list(designation_ids)),
+					_active(DesignationAssignment.valid_from, DesignationAssignment.valid_to, today),
+					_working(today),
+				)
+			)
+		)
+	)
+
+
+def descendants(session: Session, roots: set[int]) -> set[int]:
+	"""The designations and everything below them (recursive CTE)."""
 	if not roots:
 		return set()
-	tree = select(Department.id).where(Department.id.in_(roots)).cte("tree", recursive=True)
-	tree = tree.union(select(Department.id).where(Department.parent_id == tree.c.id))
+	tree = select(Designation.id).where(Designation.id.in_(roots)).cte("tree", recursive=True)
+	tree = tree.union(select(Designation.id).where(Designation.parent_id == tree.c.id))
 	return set(session.scalars(select(tree.c.id)))
 
 
-def ancestors(session: Session, department_id: int | None) -> list[int]:
-	"""The department and its parents, nearest first."""
+def ancestors(session: Session, designation_id: int | None) -> list[int]:
+	"""The designations above this one, nearest first (not including it)."""
 	out: list[int] = []
-	seen: set[int] = set()
-	while department_id and department_id not in seen:
-		out.append(department_id)
-		seen.add(department_id)
-		department_id = session.scalar(select(Department.parent_id).where(Department.id == department_id))
+	seen = {designation_id}
+	current = session.scalar(select(Designation.parent_id).where(Designation.id == designation_id))
+	while current and current not in seen:
+		out.append(current)
+		seen.add(current)
+		current = session.scalar(select(Designation.parent_id).where(Designation.id == current))
 	return out
 
 
-def _deputy_active(d: Department, today: str) -> bool:
-	return (
-		bool(d.deputy_id)
-		and bool(d.deputy_from)
-		and d.deputy_from <= today
-		and (not d.deputy_to or today <= d.deputy_to)
-	)
+def ceo_designation_id(session: Session) -> int | None:
+	return session.scalar(select(Designation.id).where(Designation.is_ceo))
 
 
-def acting_manager(session: Session, department_id: int | None, today: str) -> int | None:
-	"""The department's manager, or its deputy while the deputy period covers today."""
-	if not department_id:
-		return None
-	d = session.get(Department, department_id)
-	if d is None:
-		return None
-	return d.deputy_id if _deputy_active(d, today) else d.manager_id
+def ceo_ids(session: Session, today: str) -> list[int]:
+	ceo = ceo_designation_id(session)
+	return holders(session, {ceo}, today) if ceo else []
 
 
-def managed_departments(session: Session, employee_id: int, today: str) -> set[int]:
-	rows = session.scalars(
-		select(Department).where(
-			or_(Department.manager_id == employee_id, Department.deputy_id == employee_id)
+def parent_approvers(session: Session, employee_id: int, today: str) -> list[int]:
+	"""The people who approve this person's requests: for each designation they hold, the
+	holders of the nearest filled designation above it. Someone with nobody above them reports
+	to the CEO. The CEO has no parent."""
+	own = designations_on(session, employee_id, today)
+	found: set[int] = set()
+	for d in own:
+		for above in ancestors(session, d):
+			people = [e for e in holders(session, {above}, today) if e != employee_id]
+			if people:
+				found.update(people)
+				break
+	if not found:
+		found.update(e for e in ceo_ids(session, today) if e != employee_id)
+	return sorted(found)
+
+
+# delegation ------------------------------------------------------------------------------------
+
+
+def delegators_of(session: Session, employee_id: int, today: str) -> list[int]:
+	"""The people whose approval authority this person holds today."""
+	return list(
+		session.scalars(
+			select(ApprovalDelegation.delegator_id).where(
+				ApprovalDelegation.delegate_id == employee_id,
+				_active(ApprovalDelegation.valid_from, ApprovalDelegation.valid_to, today),
+			)
 		)
 	)
-	roots = {
-		d.id
-		for d in rows
-		if (d.manager_id == employee_id and not _deputy_active(d, today))
-		or (d.deputy_id == employee_id and _deputy_active(d, today))
-	}
-	return subtree(session, roots)
+
+
+def acting_employee_ids(session: Session, employee_id: int | None, today: str) -> set[int]:
+	"""Whom this person can approve as: themself and everyone who delegated to them."""
+	if not employee_id:
+		return set()
+	return {employee_id, *delegators_of(session, employee_id, today)}
+
+
+def acting_user_ids(session: Session, employee_id: int | None, today: str) -> set[int]:
+	ids = acting_employee_ids(session, employee_id, today)
+	return set(session.scalars(select(Employee.user_id).where(Employee.id.in_(ids)))) if ids else set()
+
+
+# visibility -------------------------------------------------------------------------------------
+
+
+def subordinate_ids(session: Session, employee_id: int | None, today: str) -> set[int]:
+	"""Everyone below the designations this person (or someone who delegated to them) holds."""
+	people = acting_employee_ids(session, employee_id, today)
+	own: set[int] = set()
+	for e in people:
+		own.update(designations_on(session, e, today))
+	if not own:
+		return set()
+	below = descendants(session, own) - own
+	return {e for e in holders(session, below, today)} - people
 
 
 def visible_employee_ids(session: Session, actor: Actor, today: str) -> set[int] | None:
@@ -115,12 +208,7 @@ def visible_employee_ids(session: Session, actor: Actor, today: str) -> set[int]
 		return None
 	if not actor.employee_id:
 		return set()
-	ids = {actor.employee_id}
-	ids.update(session.scalars(select(Employee.id).where(Employee.reports_to_id == actor.employee_id)))
-	departments = managed_departments(session, actor.employee_id, today)
-	if departments:
-		ids.update(session.scalars(select(Employee.id).where(Employee.department_id.in_(departments))))
-	return ids
+	return {actor.employee_id} | subordinate_ids(session, actor.employee_id, today)
 
 
 def can_see(session: Session, actor: Actor, employee_id: int, today: str) -> bool:
@@ -134,55 +222,9 @@ def assert_can_see(session: Session, actor: Actor, employee_id: int, today: str)
 
 
 def is_manager(session: Session, actor: Actor, today: str) -> bool:
-	if MANAGER in actor.roles or actor.sees_all:
+	if actor.sees_all:
 		return True
-	visible = visible_employee_ids(session, actor, today)
-	return visible is None or len(visible) > 1
-
-
-# approvers ----------------------------------------------------------------------------------
-
-
-def _manager_above(session: Session, employee_id: int, department_id: int | None, today: str) -> int | None:
-	"""Walk up the tree to the first acting manager who is not the employee."""
-	for dep in ancestors(session, department_id):
-		manager = acting_manager(session, dep, today)
-		if manager and manager != employee_id:
-			return manager
-	return None
-
-
-def direct_manager(session: Session, employee_id: int, today: str) -> int | None:
-	"""reports_to, else the department's manager; a manager's direct manager is the manager of
-	the department above (design doc, approval section)."""
-	emp = session.get(Employee, employee_id)
-	if emp is None:
-		return None
-	if emp.reports_to_id and emp.reports_to_id != employee_id:
-		return emp.reports_to_id
-	return _manager_above(session, employee_id, emp.department_id, today)
-
-
-def parent_department_manager(session: Session, employee_id: int, today: str) -> int | None:
-	emp = session.get(Employee, employee_id)
-	if emp is None or not emp.department_id:
-		return None
-	direct = direct_manager(session, employee_id, today)
-	chain = ancestors(session, emp.department_id)[1:]
-	for i, dep in enumerate(chain):
-		manager = acting_manager(session, dep, today)
-		if manager and manager != employee_id:
-			if manager == direct:
-				# the direct manager already runs this department: go one level higher
-				return _manager_above(
-					session, employee_id, chain[i + 1] if i + 1 < len(chain) else None, today
-				)
-			return manager
-	return None
-
-
-def ceo_id(session: Session) -> int | None:
-	return session.scalar(select(Organization.ceo_id).where(Organization.id == literal(1)))
+	return bool(actor.employee_id) and bool(subordinate_ids(session, actor.employee_id, today))
 
 
 def user_of(session: Session, employee_id: int | None) -> int | None:

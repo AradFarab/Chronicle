@@ -10,8 +10,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from hozur.db.base import Base, IdMixin, TimestampMixin
 from hozur.db.types import enum_check
 
-ADMIN, OPERATOR, CEO, MANAGER, EMPLOYEE = "admin", "operator", "ceo", "manager", "employee"
-ROLES = (ADMIN, OPERATOR, CEO, MANAGER, EMPLOYEE)
+# The system admin (مدیر سیستم) does everything an operator used to do. Who is the CEO or a
+# manager is not a role: it follows from the designation a person holds.
+ADMIN, EMPLOYEE = "admin", "employee"
+ROLES = (ADMIN, EMPLOYEE)
 
 
 class AppUser(IdMixin, TimestampMixin, Base):
