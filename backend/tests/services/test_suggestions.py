@@ -88,3 +88,24 @@ def test_someone_else_cannot_dismiss_my_suggestion(org):
 	other = org.anyone
 	with pytest.raises(PermissionDenied):
 		suggestions.dismiss(org.db, other, open_ones(org)["attendance_correction"].id)
+
+
+def test_two_overtime_windows_give_two_suggestions_of_exactly_the_time_worked():
+	from hozur.engine.daily import calculate_day
+	from hozur.engine.model import Day, EmployeeFlags, Punch, Shift
+	from hozur.engine.rules import baseline_rule_set
+
+	shift = Shift(
+		"9-5",
+		start=9 * 60,
+		end=17 * 60,
+		overtime_windows=((7 * 60, 8 * 60 + 30), (17 * 60, 19 * 60)),
+	)
+	punches = [Punch(7 * 60 * 60), Punch(18 * 60 * 60)]
+	result = calculate_day(Day("1405/07/12", 1, "workday"), shift, punches, baseline_rule_set())
+	found = [
+		(p["from_minute"], p["to_minute"], p["minutes"])
+		for p in suggestions.proposals(result, shift, EmployeeFlags())
+		if p["request_type"] == "overtime"
+	]
+	assert found == [(420, 510, 90), (1020, 1080, 60)]

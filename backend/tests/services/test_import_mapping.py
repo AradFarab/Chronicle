@@ -122,3 +122,15 @@ def test_a_night_shift_break_after_midnight_is_the_next_day(org):
 	assert excel.run(ctx(org), "shifts", content, mapping=mapping).imported
 	shift = org.db.scalar(select(Shift).where(Shift.name == "شب"))
 	assert [(g.start_minute, g.end_minute) for g in shift.segments] == [(1500, 1530)]
+
+
+def test_a_duplicate_or_a_broken_row_is_a_row_error_not_a_crash(org):
+	content = workbook(
+		["نام", "نوع", "شروع", "پایان", "دقیقه لازم"],
+		(org.office.name, "ثابت", "08:00", "16:00", None),
+		("شناور", "شناور", "07:00", "19:00", None),
+		("درست", "ثابت", "08:00", "16:00", None),
+	)
+	mapping = {"name": 1, "shift_type": 2, "start_time": 3, "end_time": 4, "required_minutes": 5}
+	result = excel.run(ctx(org), "shifts", content, mapping=mapping, dry_run=True)
+	assert [e.row for e in result.errors] == [2, 3] and result.checked == 3

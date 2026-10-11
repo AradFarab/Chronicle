@@ -23,6 +23,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from hozur.calendar import service as calendar_service
@@ -1207,9 +1208,15 @@ def run(
 				inner.commit()
 				cache.clear()  # what this row created can be used by the rows below it
 				result.created += 1
-			except HozurError as e:
+			except (HozurError, IntegrityError) as e:
 				inner.rollback()
-				problems = [e.translated(language)]
+				problems = [
+					e.translated(language)
+					if isinstance(e, HozurError)
+					else translate(_("A value is not valid ({0})"), language).format(
+						getattr(getattr(e.orig, "diag", None), "constraint_name", "")
+					)
+				]
 				result.errors.append(RowError(row_number, problems[0]))
 			result.checked += 1
 			if len(result.rows) < PREVIEW_ROWS or problems:

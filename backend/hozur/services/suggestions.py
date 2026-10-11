@@ -38,9 +38,15 @@ def proposals(
 		and unapproved_in_windows > 0
 		and not (flags.hard_harmful or flags.juvenile)  # Articles 61 and 84: no overtime at all
 	):
-		start, end = result.overtime_intervals[0][0], result.overtime_intervals[-1][1]
-		minutes = min(unapproved_in_windows, sum(b - a for a, b in result.overtime_intervals))
-		out.append(_item(OVERTIME_TYPE, f"overtime:{start}-{end}", start, end, minutes))
+		# One proposal per stretch of extra work, so the request's from-to is exactly the time
+		# worked; what is already approved is taken off the latest stretches first.
+		remaining = unapproved_in_windows
+		for start, end in reversed(result.overtime_intervals):
+			if remaining <= 0:
+				break
+			take = min(remaining, end - start)
+			out.insert(0, _item(OVERTIME_TYPE, f"overtime:{end - take}-{end}", end - take, end, take))
+			remaining -= take
 	if shift is not None and result.status in (engine.PRESENT, engine.INCOMPLETE):
 		if result.late_minutes and result.first_in is not None:
 			anchor = shift.latest_start if shift.flexible and shift.latest_start is not None else shift.start

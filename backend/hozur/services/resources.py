@@ -209,8 +209,9 @@ def _set_children(ctx: Context, resource: Resource, obj: Any, values: dict[str, 
 			c = child()
 			_apply(child, c, item, fields)
 			rows.append(c)
-		getattr(obj, name).clear()
-		ctx.session.flush()  # delete the old rows before inserting rows with the same keys
+		if getattr(obj, name):
+			getattr(obj, name).clear()
+			flush(ctx.session)  # delete the old rows before inserting rows with the same keys
 		getattr(obj, name).extend(rows)
 
 
