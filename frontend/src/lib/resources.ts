@@ -22,7 +22,9 @@ export type FieldType =
   | "ref"
   | "children"
   | "params"
+  | "color"
   | "badge" // a read-only flag shown as a badge (never sent back)
+  | "editor" // a custom editor (`editor`) that edits the record keys listed in `keys`
 
 export interface FieldDef {
   key: string
@@ -36,7 +38,10 @@ export interface FieldDef {
   children?: FieldDef[]
   show?: (values: Record<string, unknown>) => boolean
   dir?: "ltr"
-  helper?: "rotation" // a builder shown above the child rows (the quick rotation of a work pattern)
+  // type "editor": which component edits the record (see EDITORS in components/ResourceForm.vue)
+  // and the keys of the record it owns, which are sent with the form
+  editor?: "shift-timeline" | "pattern-grid"
+  keys?: string[]
 }
 
 export interface ResourceDef {
@@ -48,6 +53,8 @@ export interface ResourceDef {
   reasonOnChange?: boolean
   canDelete?: boolean
   defaults?: Record<string, unknown>
+  size?: "2xl" | "3xl" | "4xl" | "5xl" // the form dialog (default 2xl)
+  columns?: 2 | 3 // short fields side by side on wider screens
 }
 
 /** The text shown for a row of a resource (in lists of options and references). */
@@ -142,7 +149,16 @@ export const RESOURCES: ResourceDef[] = [
     singular: __("Shift"),
     icon: "lucide-clock",
     canDelete: true,
-    defaults: { shift_type: "fixed", break_minutes: 0, grace_late_minutes: 0, grace_early_minutes: 0, overtime_after_minutes: 0 },
+    size: "5xl",
+    columns: 3,
+    defaults: {
+      shift_type: "fixed",
+      segments: [],
+      break_minutes: 0,
+      grace_late_minutes: 0,
+      grace_early_minutes: 0,
+      overtime_after_minutes: 0,
+    },
     fields: [
       { key: "name", label: __("Name"), type: "text", required: true, list: true },
       {
@@ -156,8 +172,17 @@ export const RESOURCES: ResourceDef[] = [
           ["flexible", __("Flexible")],
         ]),
       },
-      { key: "start_time", label: __("Start"), type: "time", required: true, list: true },
-      { key: "end_time", label: __("End"), type: "time", required: true, list: true },
+      { key: "color", label: __("Colour"), type: "color" },
+      {
+        key: "drawing",
+        label: __("Working hours, breaks and overtime windows"),
+        type: "editor",
+        editor: "shift-timeline",
+        keys: ["start_time", "end_time", "segments"],
+      },
+      // drawn on the timeline above; listed as columns
+      { key: "start_time", label: __("Start"), type: "time", list: true, show: () => false },
+      { key: "end_time", label: __("End"), type: "time", list: true, show: () => false },
       {
         key: "latest_start_time",
         label: __("Latest start"),
@@ -168,15 +193,34 @@ export const RESOURCES: ResourceDef[] = [
         key: "required_minutes",
         label: __("Required minutes"),
         type: "number",
+        required: true,
         show: (v) => v.shift_type === "flexible",
       },
-      { key: "break_start_time", label: __("Break start"), type: "time" },
-      { key: "break_end_time", label: __("Break end"), type: "time" },
-      { key: "break_minutes", label: __("Break minutes without punching"), type: "number" },
-      { key: "grace_late_minutes", label: __("Grace for late arrival (minutes)"), type: "number" },
-      { key: "grace_early_minutes", label: __("Grace for early leave (minutes)"), type: "number" },
-      { key: "overtime_after_minutes", label: __("Extra work counts after (minutes)"), type: "number" },
-      { key: "color", label: __("Colour"), type: "text", dir: "ltr" },
+      {
+        key: "break_minutes",
+        label: __("Break minutes without punching"),
+        type: "number",
+        help: __("Deducted when no break is drawn"),
+        show: (v) => v.shift_type === "flexible",
+      },
+      {
+        key: "grace_late_minutes",
+        label: __("Grace for late arrival (minutes)"),
+        type: "number",
+        help: __("Up to this late is forgiven; beyond it the whole time counts"),
+      },
+      {
+        key: "grace_early_minutes",
+        label: __("Grace for early leave (minutes)"),
+        type: "number",
+        help: __("Up to this early is forgiven; beyond it the whole time counts"),
+      },
+      {
+        key: "overtime_after_minutes",
+        label: __("Extra work counts after (minutes)"),
+        type: "number",
+        help: __("Staying up to this long after the end is ignored; beyond it all of it is extra work"),
+      },
     ],
   },
   {
@@ -185,6 +229,8 @@ export const RESOURCES: ResourceDef[] = [
     singular: __("Work pattern"),
     icon: "lucide-calendar-range",
     canDelete: true,
+    size: "5xl",
+    columns: 2,
     defaults: { pattern_type: "weekly", weekly_rest_day: 6, days: [] },
     fields: [
       { key: "name", label: __("Name"), type: "text", required: true, list: true },
@@ -212,28 +258,7 @@ export const RESOURCES: ResourceDef[] = [
         type: "jdate",
         show: (v) => v.pattern_type === "rotating",
       },
-      {
-        key: "days",
-        label: __("Days"),
-        type: "children",
-        helper: "rotation",
-        children: [
-          {
-            key: "weekday",
-            label: __("Weekday"),
-            type: "select",
-            options: weekdayOptions,
-            show: (v) => v.pattern_type !== "rotating",
-          },
-          {
-            key: "cycle_day",
-            label: __("Day of the cycle"),
-            type: "number",
-            show: (v) => v.pattern_type === "rotating",
-          },
-          { key: "shift_id", label: __("Shift (empty = day off)"), type: "ref", ref: "shifts" },
-        ],
-      },
+      { key: "days", label: __("Days"), type: "editor", editor: "pattern-grid", keys: ["days"] },
       { key: "description", label: __("Description"), type: "textarea" },
       { key: "change_reason", label: __("Reason for the change"), type: "textarea" },
     ],

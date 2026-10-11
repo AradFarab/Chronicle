@@ -81,7 +81,7 @@ function cell(field: FieldDef, row: Record<string, unknown>): string {
 	if (value === null || value === undefined || value === "") return ""
 	if (field.type === "bool" || field.type === "badge") return value ? "✓" : ""
 	if (field.type === "jdate") return display(String(value))
-	if (field.type === "ref") return refLabel(field.ref!, value)
+	if (field.type === "ref") return fa(refLabel(field.ref!, value))
 	if (field.type === "select") {
 		const option = field.options?.().find((o) => o.value === value)
 		return option ? option.label : String(value)

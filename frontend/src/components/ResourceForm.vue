@@ -1,14 +1,21 @@
 <template>
-	<Dialog v-model:open="open" :title="title" size="2xl">
-		<form class="flex flex-col gap-4" @submit.prevent="save">
-			<template v-for="field in visibleFields" :key="field.key">
-				<!-- child rows (days of a pattern, steps of a process) -->
-				<div v-if="field.type === 'children'" class="flex flex-col gap-2">
+	<Dialog v-model:open="open" :title="title" :size="def.size ?? '2xl'">
+		<form class="grid grid-cols-1 gap-4" :class="COLUMNS[def.columns ?? 1]" @submit.prevent="save">
+			<div v-for="field in visibleFields" :key="field.key" class="min-w-0" :class="isWide(field) ? 'col-span-full' : ''">
+				<!-- a custom editor of part of the record (the shift timeline, the work-pattern grid) -->
+				<div v-if="field.type === 'editor'" class="flex flex-col gap-2">
 					<p class="text-sm font-medium">{{ field.label }}</p>
-					<RotationBuilder
-						v-if="field.helper === 'rotation' && values.pattern_type === 'rotating'"
-						@fill="(rows) => (values[field.key] = rows)"
+					<p v-if="field.help" class="text-xs text-ink-gray-5">{{ field.help }}</p>
+					<component
+						:is="EDITORS[field.editor!]"
+						:ref="(el: unknown) => (editors[field.key] = el as EditorHandle | null)"
+						:model-value="values"
+						@update:model-value="(patch: Record<string, unknown>) => Object.assign(values, patch)"
 					/>
+				</div>
+				<!-- child rows (steps of a process) -->
+				<div v-else-if="field.type === 'children'" class="flex flex-col gap-2">
+					<p class="text-sm font-medium">{{ field.label }}</p>
 					<div
 						v-for="(child, i) in (values[field.key] as Record<string, unknown>[])"
 						:key="i"
@@ -44,14 +51,15 @@
 					</div>
 				</div>
 				<FieldInput v-else v-model="values[field.key]" :field="field" />
-			</template>
+			</div>
 			<Textarea
 				v-if="def.reasonOnChange && row"
 				v-model="reason"
+				class="col-span-full"
 				:label="__('Reason for the change') + ' *'"
 				:rows="2"
 			/>
-			<ErrorMessage :message="error" />
+			<ErrorMessage class="col-span-full" :message="error" />
 		</form>
 		<template #actions>
 			<div class="flex gap-2">
@@ -70,14 +78,15 @@
 
 <script setup lang="ts">
 import { Button, Dialog, ErrorMessage, Textarea, TextInput, toast } from "frappe-ui"
-import { computed, reactive, ref, watch } from "vue"
+import { computed, reactive, ref, watch, type Component } from "vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
 import { invalidateRef } from "@/lib/refs"
 import { PARAMETER_LABELS, type FieldDef, type ResourceDef } from "@/lib/resources"
 import FieldInput from "./FieldInput.vue"
-import RotationBuilder from "./RotationBuilder.vue"
+import PatternGrid from "./PatternGrid.vue"
+import ShiftTimeline from "./ShiftTimeline.vue"
 
 interface Parameter {
 	name: string
@@ -86,6 +95,25 @@ interface Parameter {
 	legal_check: boolean
 	legal_value: number
 }
+
+/**
+ * Custom editors (fields of type "editor"). One gets the whole record as `modelValue`, emits
+ * `update:modelValue` with the keys it changed, and may expose `beforeSave()`: it runs before the
+ * form is sent, may throw an Error whose message the form shows, and may return more keys to send
+ * (the work-pattern grid first creates the shifts drawn on it).
+ */
+const EDITORS: Record<NonNullable<FieldDef["editor"]>, Component> = {
+	"shift-timeline": ShiftTimeline,
+	"pattern-grid": PatternGrid,
+}
+
+interface EditorHandle {
+	beforeSave?: () => Record<string, unknown> | void | Promise<Record<string, unknown> | void>
+}
+
+const COLUMNS = { 1: "", 2: "sm:grid-cols-2", 3: "sm:grid-cols-2 md:grid-cols-3" }
+const WIDE: FieldDef["type"][] = ["editor", "children", "params", "textarea"]
+const isWide = (field: FieldDef) => WIDE.includes(field.type)
 
 // `initial` pre-fills a new record (e.g. the parent of a new designation)
 const props = defineProps<{
@@ -103,6 +131,7 @@ const parameters = ref<Parameter[]>([])
 const reason = ref("")
 const error = ref("")
 const busy = ref(false)
+const editors: Record<string, EditorHandle | null> = {}
 
 const title = computed(() => (props.row ? props.def.singular : __("New {0}", [props.def.singular])))
 const visibleFields = computed(() => props.def.fields.filter((f) => !f.show || f.show(values)))
@@ -132,7 +161,10 @@ watch(
 		reason.value = ""
 		for (const key of Object.keys(values)) delete values[key]
 		Object.assign(values, JSON.parse(JSON.stringify(props.row ?? { ...props.def.defaults, ...props.initial })))
-		for (const f of props.def.fields) if (f.type === "children" && !values[f.key]) values[f.key] = []
+		for (const f of props.def.fields) {
+			if (f.type === "children" && !values[f.key]) values[f.key] = []
+			for (const key of f.keys ?? []) if (values[key] === undefined) values[key] = null
+		}
 		if (props.def.fields.some((f) => f.type === "params")) {
 			parameters.value = await api.get<Parameter[]>("/admin/rule-parameters")
 			for (const key of Object.keys(params)) delete params[key]
@@ -147,6 +179,10 @@ function payload(): Record<string, unknown> {
 	const body: Record<string, unknown> = {}
 	for (const f of props.def.fields) {
 		if (f.type === "badge") continue
+		if (f.type === "editor") {
+			for (const key of f.keys ?? []) body[key] = values[key] ?? null
+			continue
+		}
 		if (f.show && !f.show(values) && f.type !== "children") continue
 		if (f.type === "params") body[f.key] = { ...params }
 		else if (f.type === "children")
@@ -165,6 +201,11 @@ async function save() {
 	busy.value = true
 	error.value = ""
 	try {
+		for (const f of visibleFields.value) {
+			if (f.type !== "editor") continue
+			const patch = await editors[f.key]?.beforeSave?.()
+			if (patch) Object.assign(values, patch)
+		}
 		if (props.row) await api.patch(`/admin/${props.def.name}/${props.row.id}`, payload())
 		else await api.post(`/admin/${props.def.name}`, payload())
 		invalidateRef(props.def.name)

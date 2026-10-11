@@ -38,6 +38,26 @@
 		:placeholder="__('Choose')"
 		@update:model-value="set"
 	/>
+	<div v-else-if="field.type === 'color'">
+		<label class="mb-1.5 block text-xs text-ink-gray-5">{{ label }}</label>
+		<div class="flex items-center gap-2">
+			<input
+				type="color"
+				class="h-8 w-10 shrink-0 cursor-pointer rounded-3 border border-outline-gray-2 bg-surface-base p-0.5"
+				:value="hexColor"
+				:aria-label="field.label"
+				@input="set(($event.target as HTMLInputElement).value)"
+			/>
+			<TextInput
+				class="min-w-0 flex-1"
+				:model-value="(modelValue as string | null) ?? ''"
+				dir="ltr"
+				placeholder="#0d9488"
+				@update:model-value="(v: string) => set(v || null)"
+			/>
+		</div>
+		<p v-if="field.help" class="mt-1.5 text-xs text-ink-gray-5">{{ field.help }}</p>
+	</div>
 	<Textarea
 		v-else-if="field.type === 'textarea'"
 		:model-value="(modelValue as string | null) ?? ''"
@@ -77,6 +97,8 @@ const props = defineProps<{ field: FieldDef; modelValue: unknown }>()
 const emit = defineEmits<{ "update:modelValue": [value: unknown] }>()
 
 const label = computed(() => (props.field.required ? `${props.field.label} *` : props.field.label))
+// the colour picker only takes #rrggbb
+const hexColor = computed(() => (/^#[0-9a-f]{6}$/i.test(String(props.modelValue ?? "")) ? String(props.modelValue) : "#0d9488"))
 
 function set(value: unknown) {
 	emit("update:modelValue", value)
