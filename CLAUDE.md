@@ -81,7 +81,8 @@ backend/
     calendar/              # holiday sources (time.ir, bundled, file) and the yearly refresh
     devices/               # adapter interface + adapters (zkteco.py, file_import.py)
     services/              # business logic: resources (config tables), devices (ingestion), attendance,
-                           # requests, approvals, leave, periods, reports, users, audit, jobs
+                           # requests, approvals, suggestions, leave, periods, reports, users, audit,
+                           # jobs, excel + cleaning (Excel import with column mapping), backup
     worker.py              # `hozur worker`: device polling, job queue, nightly work
     reports/               # field catalog and exporters (xlsx, csv/txt, pdf); the builder is services/reports.py
     api/                   # FastAPI routers used by the PWA
@@ -95,7 +96,7 @@ docs/
 ## Development environment
 
 - `docker compose -f docker/dev.yml up -d` starts PostgreSQL 17 with the databases `hozur` and `hozur_test` (user/password `hozur`).
-- Backend: `cd backend && python -m venv .venv && .venv/bin/pip install -e '.[dev]'`, then `hozur db install` (migrations + reference data), `hozur create-user admin --role admin`, `hozur serve --reload` (API on :8000) and `hozur worker` (devices, jobs, nightly work).
+- Backend: `cd backend && python -m venv .venv && .venv/bin/pip install -e '.[dev]'`, then `hozur db install` (migrations + reference data), `hozur create-user admin --role admin`, `hozur serve --reload` (API on :8000) and `hozur worker` (devices, jobs, nightly work and the nightly backup). Backups: `hozur backup create|list|restore`.
 - Frontend: `cd frontend && yarn && yarn dev` (PWA on :8080, `/api` proxied to :8000).
 - Tests: `pytest` in `backend/` (DB tests use `hozur_test`; engine and jalali tests run without it). Frontend: `yarn typecheck && yarn test`. Translations: `python3 tools/i18n.py --check`.
 - Production: `Dockerfile` + `docker/compose.yml` (PostgreSQL, app, worker) on the company's own server.
@@ -129,3 +130,6 @@ docs/
 | واحد | Department (`department`): a flat tag on people for reports |
 | کد تفصیلی | Detail code (`employee.detail_code`): the accounting detail code |
 | مدیر سیستم | System admin (role `admin`; there is no separate operator) |
+| استراحت / بازهٔ مجاز اضافه‌کار | Break / overtime window (`shift_segment.kind` = `break` / `overtime`) |
+| درخواست پیشنهادی | Suggested request (`request_suggestion`): proposed by the calculation, sent or dismissed by the employee |
+| پشتیبان | Backup (`hozur backup`, `services/backup.py`) |

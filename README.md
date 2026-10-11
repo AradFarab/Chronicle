@@ -42,11 +42,16 @@ cd ../frontend && yarn && yarn dev              # PWA on http://localhost:8080
 ```bash
 cp docker/.env.example docker/.env               # set POSTGRES_PASSWORD and HOZUR_SECRET_KEY
 docker compose -f docker/compose.yml --env-file docker/.env up -d --build
-docker compose -f docker/compose.yml exec app hozur create-user admin --role admin
+docker compose -f docker/compose.yml --env-file docker/.env exec app hozur create-user admin --role admin
 ```
 
 The app listens on port 8000; serve it over HTTPS (the company's reverse proxy) so the PWA can
-be installed on phones. Back up the `db` and `files` volumes.
+be installed on phones.
+
+Backups: the worker takes one every night (Manage → Backups sets the hour and how many to keep)
+into `/data/backups` of the `files` volume; download copies from the same page and keep them
+somewhere else. To restore, stop the worker and run
+`docker compose -f docker/compose.yml --env-file docker/.env exec app hozur backup restore <name>`.
 
 ## Contributing
 
