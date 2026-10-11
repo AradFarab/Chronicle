@@ -89,7 +89,7 @@ def test_importing_work_locations_and_designations_in_order(org):
 		("انبار", province, None, None, "خیر"),
 	)
 	result = excel.run(ctx(org), "work-locations", content)
-	assert result.as_dict() == {"imported": True, "created": 2, "errors": []}
+	assert (result.imported, result.created, result.errors) == (True, 2, []), result.errors
 	assert org.db.scalar(select(WorkLocation.is_active).where(WorkLocation.name == "انبار")) is False
 	# a child may refer to a parent created earlier in the same sheet
 	content = workbook(
@@ -130,7 +130,7 @@ def test_importing_employees_creates_their_logins_and_designations(org):
 		},
 	)
 	result = excel.run(ctx(org), "employees", content)
-	assert result.as_dict() == {"imported": True, "created": 2, "errors": []}
+	assert (result.imported, result.created, result.errors) == (True, 2, []), result.errors
 	ali = org.db.scalar(select(Employee).where(Employee.code == "2001"))
 	assert ali.start_date == "1405/01/15" and ali.detail_code == "30001"  # Persian digits accepted
 	from hozur.db.models import AppUser
@@ -194,9 +194,12 @@ def test_a_file_that_is_not_excel_or_misses_columns_is_refused(org):
 		excel.run(ctx(org), "departments", workbook(["something else"], ("x",)))
 
 
-def test_real_excel_dates_are_refused_with_a_hint(org):
+def test_real_excel_dates_are_converted_once_and_the_note_says_so(org):
+	"""A real Excel date is Gregorian; it is read as Jalali at import and shown in the preview."""
 	import datetime
 
 	content = workbook(labels("holidays"), (datetime.date(2026, 10, 12), "x", "تعطیلی شرکت"))
-	result = excel.run(ctx(org), "holidays", content)
-	assert not result.imported and [e.row for e in result.errors] == [2]
+	result = excel.run(ctx(org), "holidays", content, dry_run=True)
+	assert not result.imported and not result.errors and result.checked == 1
+	assert result.rows[0].values["jdate"] == "1405/07/20"
+	assert any("2026-10-12" in n for n in result.rows[0].notes)

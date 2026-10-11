@@ -16,7 +16,9 @@ from sqlalchemy.orm import Session
 
 from hozur.db.models import Employee, Shift, ShiftOverride, WorkPattern, WorkPatternAssignment
 from hozur.db.models.schedules import (
+	BREAK,
 	FLEXIBLE,
+	OVERTIME_WINDOW,
 	ROTATING,
 	TARGET_COMPANY,
 	TARGET_DEPARTMENT,
@@ -49,23 +51,19 @@ def shift_spec(s: Shift) -> engine.Shift:
 	start, end = minutes(s.start_time), minutes(s.end_time)
 	if end <= start:
 		end += 1440
-	b_start, b_end = minutes(s.break_start_time), minutes(s.break_end_time)
-	if b_start is not None and b_end is not None:
-		if b_start < start:
-			b_start += 1440
-		if b_end <= b_start:
-			b_end += 1440
+	breaks = tuple((g.start_minute, g.end_minute) for g in s.segments if g.kind == BREAK)
+	windows = tuple((g.start_minute, g.end_minute) for g in s.segments if g.kind == OVERTIME_WINDOW)
 	flexible = s.shift_type == FLEXIBLE
 	return engine.Shift(
 		name=s.name,
 		start=start,
 		end=end,
-		break_start=b_start,
-		break_end=b_end,
+		breaks=breaks,
 		break_minutes=s.break_minutes or 0,
 		grace_late=s.grace_late_minutes or 0,
 		grace_early=s.grace_early_minutes or 0,
 		overtime_after=s.overtime_after_minutes or 0,
+		overtime_windows=windows,
 		flexible=flexible,
 		latest_start=minutes(s.latest_start_time) if flexible else None,
 		required_minutes=s.required_minutes if flexible else None,

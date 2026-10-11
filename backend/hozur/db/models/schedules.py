@@ -29,13 +29,15 @@ TARGET_EMPLOYEE, TARGET_DESIGNATION, TARGET_DEPARTMENT, TARGET_COMPANY = (
 	"company",
 )
 ASSIGNMENT_TARGETS = (TARGET_EMPLOYEE, TARGET_DESIGNATION, TARGET_DEPARTMENT, TARGET_COMPANY)
+BREAK, OVERTIME_WINDOW = "break", "overtime"
+SEGMENT_KINDS = (BREAK, OVERTIME_WINDOW)
+TWO_DAYS = 2880  # segment minutes run from the shift day's 00:00 into the next day
 
 
 class Shift(IdMixin, TimestampMixin, Base):
 	__tablename__ = "shift"
 	__table_args__ = (
 		enum_check("shift_type", (FIXED, FLEXIBLE)),
-		CheckConstraint("(break_start_time IS NULL) = (break_end_time IS NULL)", name="break_window_pair"),
 		CheckConstraint(
 			"grace_late_minutes >= 0 AND grace_early_minutes >= 0 AND overtime_after_minutes >= 0 "
 			"AND break_minutes >= 0 AND (required_minutes IS NULL OR required_minutes > 0)",
@@ -53,16 +55,41 @@ class Shift(IdMixin, TimestampMixin, Base):
 	end_time: Mapped[time] = mapped_column(Time)  # earlier than start = ends after midnight
 	latest_start_time: Mapped[time | None] = mapped_column(Time)  # flexible only
 	required_minutes: Mapped[int | None] = mapped_column(Integer)  # flexible only
-	break_start_time: Mapped[time | None] = mapped_column(Time)
-	break_end_time: Mapped[time | None] = mapped_column(Time)
 	break_minutes: Mapped[int] = mapped_column(Integer, server_default="0")  # break without a window
+	# Tolerances: up to this late / early is forgiven; beyond it the whole time counts.
 	grace_late_minutes: Mapped[int] = mapped_column(Integer, server_default="0")
 	grace_early_minutes: Mapped[int] = mapped_column(Integer, server_default="0")
+	# Work after the end up to this long is ignored; beyond it the whole time is extra work.
 	overtime_after_minutes: Mapped[int] = mapped_column(Integer, server_default="0")
+
+	segments: Mapped[list[ShiftSegment]] = relationship(
+		cascade="all, delete-orphan", order_by="ShiftSegment.start_minute", lazy="selectin"
+	)
 
 	@property
 	def crosses_midnight(self) -> bool:
 		return self.end_time <= self.start_time
+
+
+class ShiftSegment(IdMixin, Base):
+	"""A timed part of a shift drawn in the PWA: a break (lunch, prayer, tea; never working time,
+	Article 51) or a window in which extra work may become overtime (still only with the
+	employee's request and approval, Article 59). Minutes count from the shift day's 00:00, so
+	02:00 the next morning is 1560."""
+
+	__tablename__ = "shift_segment"
+	__table_args__ = (
+		enum_check("kind", SEGMENT_KINDS),
+		CheckConstraint(
+			f"start_minute >= 0 AND end_minute > start_minute AND end_minute <= {TWO_DAYS}",
+			name="minute_range",
+		),
+	)
+
+	shift_id: Mapped[int] = mapped_column(ForeignKey("shift.id", ondelete="CASCADE"), index=True)
+	kind: Mapped[str] = mapped_column(String(20))
+	start_minute: Mapped[int] = mapped_column(Integer)
+	end_minute: Mapped[int] = mapped_column(Integer)
 
 
 class WorkPattern(IdMixin, TimestampMixin, Base):

@@ -16,7 +16,6 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date, datetime, time
-from decimal import Decimal
 from typing import Any
 
 from openpyxl import Workbook, load_workbook
@@ -43,20 +42,14 @@ from hozur.engine.rules import PARAMETERS, baseline_rule_set
 from hozur.i18n import _, translate
 from hozur.jalali.dates import (
 	WEEKDAY_NAMES,
-	InvalidJalaliDate,
-	normalize_jdate,
-	normalize_time,
-	to_ascii_digits,
 )
-from hozur.services import devices, employees, resources
+from hozur.services import cleaning, devices, employees, resources
 from hozur.services.errors import HozurError, NotFound, ValidationError
 
 MAX_ROWS = 5000
 FORMATTED_ROWS = 1000  # rows of the sample sheet that carry formats and drop-downs
 
 TEXT, NUMBER, BOOL, JDATE, TIME, CHOICE, REF = "text", "number", "bool", "jdate", "time", "choice", "ref"
-YES_WORDS = {"1", "true", "yes", "y", "بله", "آری", "ماری"}
-NO_WORDS = {"0", "false", "no", "n", "خیر", "نه"}
 
 
 @dataclass(frozen=True)
@@ -160,6 +153,42 @@ def _days(ctx: resources.Context, values: dict[str, Any], session: Session) -> d
 			name = values.pop(f"weekday_{i}", None)
 			days.append({"weekday": i, "shift_id": shift_id(name) if name else None})
 	return {**values, "days": days}
+
+
+def _segment_minutes(value: str, start: int, end: int) -> tuple[int, int]:
+	"""A clock time -> minutes from the shift day's 00:00: today or tomorrow, whichever is nearer
+	to the shift (a 01:00 break of a night shift is tomorrow, a 16:00 window before it today)."""
+	h, m = (int(x) for x in value.split(":"))
+	t = h * 60 + m
+
+	def distance(x: int) -> int:
+		return 0 if start <= x <= end else min(abs(x - start), abs(x - end))
+
+	return min((t, t + 1440), key=distance), t
+
+
+def _segments(ctx: resources.Context, values: dict[str, Any], session: Session) -> dict[str, Any]:
+	"""A shift row: breaks and overtime windows written as ``12:30-13:10, 15:00-15:15``."""
+	h1, m1 = (int(x) for x in str(values.get("start_time", "00:00")).split(":")[:2])
+	h2, m2 = (int(x) for x in str(values.get("end_time", "00:00")).split(":")[:2])
+	start, end = h1 * 60 + m1, h2 * 60 + m2
+	end += 1440 if end <= start else 0
+	segments = []
+	for field_key, kind in (("breaks", "break"), ("overtime_windows", "overtime")):
+		text = values.pop(field_key, None)
+		if not text:
+			continue
+		try:
+			ranges = cleaning.time_ranges(text)
+		except ValueError:
+			raise ValidationError(_("Write times like 12:30-13:10, 15:00-15:15 ({0})"), text) from None
+		for a, b in ranges:
+			first, _t = _segment_minutes(a, start, end)
+			last = first + (int(b[:2]) * 60 + int(b[3:]) - first) % 1440
+			if last == first:
+				last += 1440
+			segments.append({"kind": kind, "start_minute": first, "end_minute": last})
+	return {**values, "segments": segments}
 
 
 def _steps(ctx: resources.Context, values: dict[str, Any], session: Session) -> dict[str, Any]:
@@ -395,8 +424,18 @@ SPECS: dict[str, Spec] = {
 				),
 				_c("latest_start_time", _("Latest start"), TIME),
 				_c("required_minutes", _("Required minutes"), NUMBER),
-				_c("break_start_time", _("Break start"), TIME, example="12:30"),
-				_c("break_end_time", _("Break end"), TIME, example="13:10"),
+				_c(
+					"breaks",
+					_("Breaks"),
+					example="12:30-13:10",
+					help=_("Unpaid breaks, e.g. 12:30-13:10, 15:00-15:15"),
+				),
+				_c(
+					"overtime_windows",
+					_("Overtime windows"),
+					example="17:00-19:00",
+					help=_("When extra work may become overtime, e.g. 17:00-19:00"),
+				),
 				_c("break_minutes", _("Break minutes without punching"), NUMBER),
 				_c("grace_late_minutes", _("Grace for late arrival (minutes)"), NUMBER),
 				_c("grace_early_minutes", _("Grace for early leave (minutes)"), NUMBER),
@@ -404,6 +443,7 @@ SPECS: dict[str, Spec] = {
 				_c("color", _("Colour")),
 			),
 			_generic("shifts"),
+			prepare=_segments,
 		),
 		Spec(
 			"work-patterns",
@@ -794,6 +834,14 @@ def template(session: Session, name: str, language: str = "fa") -> bytes:
 
 
 # reading it back --------------------------------------------------------------------------------------
+#
+# A workbook does not have to be the sample: the admin uploads any sheet (or a CSV file), the
+# panel shows its columns with suggested matches, the admin connects each field to a column
+# (or gives one value for every row), and a dry run shows every row as it will be saved:
+# times standardised, dates read, Arabic letters replaced, and each problem by row. Only then
+# is it imported, all or nothing.
+
+PREVIEW_ROWS = 200
 
 
 @dataclass
@@ -803,153 +851,376 @@ class RowError:
 
 
 @dataclass
+class RowPreview:
+	row: int
+	values: dict[str, Any]
+	notes: list[str]
+	errors: list[str]
+
+
+@dataclass
 class Result:
 	created: int = 0
 	errors: list[RowError] = field(default_factory=list)
+	rows: list[RowPreview] = field(default_factory=list)
+	checked: int = 0
+	dry_run: bool = False
 
 	@property
 	def imported(self) -> bool:
-		return not self.errors and self.created > 0
+		return not self.dry_run and not self.errors and self.created > 0
 
 	def as_dict(self) -> dict[str, Any]:
 		return {
 			"imported": self.imported,
+			"dry_run": self.dry_run,
 			"created": self.created,
+			"checked": self.checked,
 			"errors": [{"row": e.row, "message": e.message} for e in self.errors],
+			"rows": [
+				{"row": r.row, "values": r.values, "notes": r.notes, "errors": r.errors} for r in self.rows
+			],
 		}
 
 
-def _text(value: Any) -> str:
-	if value is None:
-		return ""
-	if isinstance(value, float) and value.is_integer():
-		return str(int(value))
-	if isinstance(value, datetime | date | time):
-		raise ValidationError(_("This cell is a real Excel date or time; type it as text, e.g. 1405/07/14"))
-	return to_ascii_digits(str(value)).strip()
+@dataclass
+class Table:
+	"""The cells of the chosen sheet: a header row and the rows under it."""
+
+	sheets: list[str]
+	sheet: str
+	header_row: int
+	headers: list[str]
+	rows: list[tuple[int, list[Any]]]  # (row number in the file, cells)
 
 
-def _convert(col: Col, raw: Any, session: Session, language: str, cache: dict[str, dict[str, int]]) -> Any:
-	if col.kind == TIME and isinstance(raw, time):
-		raw = raw.strftime("%H:%M")
-	elif col.kind == TIME and isinstance(raw, float) and 0 <= raw < 1:  # a time typed as an Excel time
-		minutes = round(raw * 1440)
-		raw = f"{minutes // 60:02d}:{minutes % 60:02d}"
-	text = _text(raw)
-	if text == "":
-		return None
-	if col.kind == TEXT:
-		return text
-	if col.kind == NUMBER:
+def _read_csv(content: bytes) -> list[list[Any]]:
+	import csv
+
+	for encoding in ("utf-8-sig", "cp1256", "latin-1"):
 		try:
-			number = Decimal(text.replace(",", "").replace("٫", "."))
+			decoded = content.decode(encoding)
+			break
+		except UnicodeDecodeError:
+			continue
+	sample = decoded[:4096]
+	try:
+		dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
+	except csv.Error:
+		dialect = csv.excel
+	return [list(r) for r in csv.reader(io.StringIO(decoded), dialect)]
+
+
+def read_table(
+	content: bytes, filename: str = "", sheet: str | None = None, header_row: int | None = None
+) -> Table:
+	"""The cells of a workbook (.xlsx) or a CSV file. The header row is the first row with text in
+	it unless the admin picks another."""
+	if filename.lower().endswith((".csv", ".txt")):
+		sheets, chosen, grid = ["CSV"], "CSV", _read_csv(content)
+	else:
+		try:
+			workbook = load_workbook(io.BytesIO(content), data_only=True, read_only=True)
 		except Exception:
-			raise ValidationError(_("{0} must be a number"), translate(col.label, language)) from None
-		return int(number) if number == number.to_integral_value() else float(number)
-	if col.kind == BOOL:
-		word = text.lower()
-		if word in YES_WORDS or word == translate(_("Yes"), language).lower():
-			return True
-		if word in NO_WORDS or word == translate(_("No"), language).lower():
-			return False
-		raise ValidationError(_("{0}: enter Yes or No"), translate(col.label, language))
-	if col.kind == JDATE:
-		try:
-			return normalize_jdate(text.replace("-", "/"))
-		except InvalidJalaliDate:
-			raise ValidationError(
-				_("{0}: {1} is not a valid Jalali date"), translate(col.label, language), text
-			) from None
-	if col.kind == TIME:
-		clock = normalize_time(text)
-		if clock is None:
-			raise ValidationError(_("{0}: enter the time as HH:MM"), translate(col.label, language))
-		return clock[:5]
-	if col.kind == CHOICE:
-		for code, label in col.choices:
-			if text in (code, label, translate(label, language)):
-				return code
-		raise ValidationError(
-			_("{0}: {1} is not one of the allowed values"), translate(col.label, language), text
+			raise ValidationError(_("The file is not an Excel workbook (.xlsx) or a CSV file")) from None
+		sheets = [ws.title for ws in workbook.worksheets if ws.sheet_state == "visible"] or [
+			workbook.worksheets[0].title
+		]
+		chosen = sheet if sheet in sheets else sheets[0]
+		grid = [list(r) for r in workbook[chosen].iter_rows(values_only=True)]
+		workbook.close()
+	if header_row is None:
+		header_row = next(
+			(i for i, r in enumerate(grid, start=1) if sum(1 for c in r if cleaning.cell_text(c)) >= 1), 1
 		)
+	if header_row < 1 or header_row > max(len(grid), 1):
+		raise ValidationError(_("The header row {0} is outside the sheet"), header_row)
+	headers = [cleaning.cell_text(c) for c in (grid[header_row - 1] if grid else [])]
+	while headers and not headers[-1]:
+		headers.pop()
+	rows = [
+		(number, cells)
+		for number, cells in enumerate(grid[header_row:], start=header_row + 1)
+		if any(cleaning.cell_text(c) for c in cells)
+	]
+	return Table(sheets, chosen, header_row, headers, rows)
+
+
+def _labels(col: Col, language: str) -> list[str]:
+	return [translate(col.label, language), col.label, col.key, *ALIASES.get(col.key, ())]
+
+
+# other names people give these columns in their own sheets
+ALIASES: dict[str, tuple[str, ...]] = {
+	"code": ("کد پرسنلی", "شماره پرسنلی", "کد کارمند", "personnel no", "emp code", "employee code"),
+	"first_name": ("نام", "first name"),
+	"last_name": ("نام خانوادگی", "فامیل", "family", "surname"),
+	"national_id": ("کد ملی", "شماره ملی", "national code"),
+	"detail_code": ("کد تفصیلی", "تفصیلی"),
+	"mobile": ("موبایل", "تلفن همراه", "شماره همراه", "mobile no"),
+	"employee_id": ("کد پرسنلی", "شماره پرسنلی", "کارمند", "personnel code"),
+	"start_time": ("ساعت ورود", "شروع", "ورود", "from"),
+	"end_time": ("ساعت خروج", "پایان", "خروج", "to"),
+	"jdate": ("تاریخ", "date", "روز"),
+	"valid_from": ("از تاریخ", "تاریخ شروع", "from date"),
+	"valid_to": ("تا تاریخ", "تاریخ پایان", "to date"),
+	"start_date": ("تاریخ استخدام", "تاریخ شروع کار"),
+}
+
+
+def suggest(s: Spec, headers: list[str], language: str) -> dict[str, int | None]:
+	"""Each field's best-matching column (1-based), or None. A column is used once."""
+	scored = []
+	for col in s.columns:
+		for index, header in enumerate(headers, start=1):
+			if not header:
+				continue
+			score = max(
+				cleaning.similarity(header.removesuffix("*"), label) for label in _labels(col, language)
+			)
+			if score >= 0.72:
+				scored.append((score, -s.columns.index(col), index, col.key))
+	result: dict[str, int | None] = {c.key: None for c in s.columns}
+	used: set[int] = set()
+	for _score, _order, index, field_key in sorted(scored, reverse=True):
+		if result[field_key] is None and index not in used:
+			result[field_key] = index
+			used.add(index)
+	return result
+
+
+def _samples(table: Table, index: int, count: int = 4) -> list[str]:
+	out = []
+	for _number, cells in table.rows:
+		value = cells[index - 1] if index - 1 < len(cells) else None
+		if isinstance(value, datetime | date | time):
+			out.append(value.isoformat())
+		elif cleaning.cell_text(value):
+			out.append(cleaning.cell_text(value))
+		if len(out) >= count:
+			break
+	return out
+
+
+def _column_view(col: Col, language: str) -> dict[str, Any]:
+	return {
+		"key": col.key,
+		"label": translate(col.label, language),
+		"kind": col.kind,
+		"required": col.required,
+		"help": translate(col.help, language) if col.help else "",
+		"example": translate(col.example, language) if col.example else "",
+		"choices": [translate(label, language) for _code, label in col.choices],
+	}
+
+
+def inspect_file(
+	session: Session,
+	name: str,
+	content: bytes,
+	filename: str,
+	language: str,
+	sheet: str | None = None,
+	header_row: int | None = None,
+) -> dict[str, Any]:
+	"""What the column-mapping panel needs: the file's sheets and columns with sample values,
+	the import's fields, and a suggested match for each field."""
+	s = spec(name)
+	table = read_table(content, filename, sheet, header_row)
+	return {
+		"sheets": table.sheets,
+		"sheet": table.sheet,
+		"header_row": table.header_row,
+		"row_count": len(table.rows),
+		"columns": [
+			{"index": i, "header": h, "samples": _samples(table, i)}
+			for i, h in enumerate(table.headers, start=1)
+		],
+		"fields": [_column_view(c, language) for c in s.columns],
+		"suggested": suggest(s, table.headers, language),
+	}
+
+
+def _convert(
+	col: Col, raw: Any, session: Session, language: str, cache: dict[str, dict[str, int]]
+) -> tuple[Any, str | None]:
+	"""A cell -> the field's value and a note when it was standardised."""
+	label = translate(col.label, language)
+	try:
+		if col.kind == TEXT:
+			return cleaning.text(raw)
+		if col.kind == NUMBER:
+			return cleaning.number(raw)
+		if col.kind == BOOL:
+			value, note = cleaning.boolean(raw)
+			if value is None and cleaning.plain(raw):
+				raise ValueError(raw)
+			return value, note
+		if col.kind == JDATE:
+			return cleaning.jdate(raw)
+		if col.kind == TIME:
+			return cleaning.clock(raw)
+	except ValueError:
+		message = {
+			NUMBER: _("{0} must be a number"),
+			BOOL: _("{0}: enter Yes or No"),
+			JDATE: _("{0}: {1} is not a valid Jalali date"),
+			TIME: _("{0}: enter the time as HH:MM"),
+		}.get(col.kind, _("{0}: the value {1} is not valid"))
+		raise ValidationError(message, label, cleaning.cell_text(raw)) from None
+	text = cleaning.cell_text(raw)
+	if text == "":
+		return None, None
+	if col.kind == CHOICE:
+		wanted = cleaning.key(text)
+		for code, choice in col.choices:
+			if wanted in (
+				cleaning.key(code),
+				cleaning.key(choice),
+				cleaning.key(translate(choice, language)),
+			):
+				return code, None
+		raise ValidationError(_("{0}: {1} is not one of the allowed values"), label, text)
 	if col.kind == REF:
 		if col.ref not in cache:
-			cache[col.ref] = _options(session, col.ref)
-		if text not in cache[col.ref]:
-			raise ValidationError(_("{0}: {1} does not exist"), translate(col.label, language), text)
-		return cache[col.ref][text]
-	return text
+			cache[col.ref] = {cleaning.key(k): v for k, v in _options(session, col.ref).items()}
+		found = cache[col.ref].get(cleaning.key(text))
+		if found is None:
+			raise ValidationError(_("{0}: {1} does not exist"), label, text)
+		return found, None
+	return text, None
 
 
-def _header_map(sheet, s: Spec, language: str) -> dict[int, Col]:
+def _display(col: Col, value: Any, raw: Any, language: str) -> Any:
+	if value is None:
+		return None
+	if col.kind == CHOICE:
+		return next((translate(label, language) for code, label in col.choices if code == value), value)
+	if col.kind == REF:
+		return cleaning.cell_text(raw)
+	if col.kind == BOOL:
+		return translate(_("Yes") if value else _("No"), language)
+	return value
+
+
+def _header_map(table: Table, s: Spec, language: str) -> dict[str, int]:
+	"""The sample's own headers: each field to the column with its exact label."""
 	by_name: dict[str, Col] = {}
 	for col in s.columns:
 		for name in (translate(col.label, language), col.label, col.key):
-			by_name[name.strip().lower()] = col
-	mapping: dict[int, Col] = {}
-	for index, cell in enumerate(sheet[1], start=1):
-		label = _text(cell.value).removesuffix("*").strip().lower()
-		if label in by_name:
-			mapping[index] = by_name[label]
-	missing = [translate(c.label, language) for c in s.columns if c.required and c not in mapping.values()]
-	if missing:
-		raise ValidationError(_("The sheet has no column {0}"), "، ".join(missing))
+			by_name[cleaning.key(name)] = col
+	mapping: dict[str, int] = {}
+	for index, header in enumerate(table.headers, start=1):
+		col = by_name.get(cleaning.key(header.removesuffix("*")))
+		if col is not None and col.key not in mapping:
+			mapping[col.key] = index
 	return mapping
 
 
-def run(ctx: resources.Context, name: str, content: bytes) -> Result:
-	"""Import a filled workbook. Nothing is saved unless every row is valid."""
+Mapping = dict[str, Any]  # field key -> column index (1-based) or {"value": "..."} for every row
+
+
+def _check_mapping(s: Spec, mapping: Mapping, table: Table, language: str) -> dict[str, Any]:
+	keys = {c.key for c in s.columns}
+	clean: dict[str, Any] = {}
+	for field_key, source in (mapping or {}).items():
+		if field_key not in keys or source in (None, "", 0):
+			continue
+		if isinstance(source, dict):
+			if cleaning.plain(source.get("value")):
+				clean[field_key] = {"value": source.get("value")}
+			continue
+		try:
+			index = int(source)
+		except (TypeError, ValueError):
+			raise ValidationError(_("The column {0} is not in the file"), source) from None
+		if not 1 <= index <= max(len(table.headers), 1):
+			raise ValidationError(_("The column {0} is not in the file"), index)
+		clean[field_key] = index
+	missing = [translate(c.label, language) for c in s.columns if c.required and c.key not in clean]
+	if missing:
+		raise ValidationError(_("Connect a column to {0}"), "، ".join(missing))
+	return clean
+
+
+def run(
+	ctx: resources.Context,
+	name: str,
+	content: bytes,
+	*,
+	filename: str = "",
+	mapping: Mapping | None = None,
+	sheet: str | None = None,
+	header_row: int | None = None,
+	dry_run: bool = False,
+) -> Result:
+	"""Import a sheet. Nothing is saved unless every row is valid; a dry run saves nothing but
+	goes through the same checks and returns every row as it would be saved."""
 	s = spec(name)
 	language = ctx.actor.language
-	try:
-		workbook = load_workbook(io.BytesIO(content), data_only=True)
-	except Exception:
-		raise ValidationError(_("The file is not an Excel workbook (.xlsx)")) from None
-	sheet = workbook.worksheets[0]
-	mapping = _header_map(sheet, s, language)
-	result = Result()
+	table = read_table(content, filename, sheet, header_row)
+	if mapping is None:
+		mapping = _header_map(table, s, language)
+		missing = [translate(c.label, language) for c in s.columns if c.required and c.key not in mapping]
+		if missing:
+			raise ValidationError(_("The sheet has no column {0}"), "، ".join(missing))
+	sources = _check_mapping(s, mapping, table, language)
+	columns = {c.key: c for c in s.columns}
+	if len(table.rows) > MAX_ROWS:
+		raise ValidationError(_("The sheet has more than {0} rows"), MAX_ROWS)
+	result = Result(dry_run=dry_run)
 	cache: dict[str, dict[str, int]] = {}
 	outer = ctx.session.begin_nested()
 	try:
-		for row_number, cells in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
-			if not any(c not in (None, "") for c in cells):
-				continue
-			if result.created + len(result.errors) >= MAX_ROWS:
-				raise ValidationError(_("The sheet has more than {0} rows"), MAX_ROWS)
+		for row_number, cells in table.rows:
 			inner = ctx.session.begin_nested()
+			values: dict[str, Any] = {}
+			shown: dict[str, Any] = {}
+			notes: list[str] = []
+			problems: list[str] = []
+			for field_key, source in sources.items():
+				col = columns[field_key]
+				if isinstance(source, dict):
+					raw = source["value"]
+				else:
+					raw = cells[source - 1] if source - 1 < len(cells) else None
+				try:
+					value, note = _convert(col, raw, ctx.session, language, cache)
+				except HozurError as e:
+					problems.append(e.translated(language))
+					continue
+				if note:
+					notes.append(f"{translate(col.label, language)}: {note}")
+				if value is None and col.required:
+					problems.append(
+						translate(_("{0} is required"), language).format(translate(col.label, language))
+					)
+				if value is not None:
+					values[field_key] = value
+					shown[field_key] = _display(col, value, raw, language)
 			try:
-				values: dict[str, Any] = {}
-				problems: list[str] = []
-				for index, col in mapping.items():
-					raw = cells[index - 1] if index - 1 < len(cells) else None
-					try:
-						value = _convert(col, raw, ctx.session, language, cache)
-					except HozurError as e:
-						problems.append(e.translated(language))
-						continue
-					if value is None and col.required:
-						problems.append(
-							translate(_("{0} is required"), language).format(translate(col.label, language))
-						)
-					if value is not None:
-						values[col.key] = value
 				if problems:
 					raise ValidationError("; ".join(problems).replace("{", "{{").replace("}", "}}"))
 				if s.prepare:
 					values = s.prepare(ctx, values, ctx.session)
 				s.save(ctx, values)
 				inner.commit()
-				cache.pop(s.name, None)  # what this row created can be used by the rows below it
+				cache.clear()  # what this row created can be used by the rows below it
 				result.created += 1
 			except HozurError as e:
 				inner.rollback()
-				result.errors.append(RowError(row_number, e.translated(language)))
+				problems = [e.translated(language)]
+				result.errors.append(RowError(row_number, problems[0]))
+			result.checked += 1
+			if len(result.rows) < PREVIEW_ROWS or problems:
+				result.rows.append(RowPreview(row_number, shown, notes, problems))
 	except Exception:
 		outer.rollback()
 		raise
-	if result.errors:
+	if result.errors or dry_run:
 		outer.rollback()
-		result.created = 0
+		if result.errors:
+			result.created = 0
 	else:
 		outer.commit()
 	return result

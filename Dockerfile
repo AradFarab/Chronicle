@@ -10,9 +10,9 @@ COPY frontend/ ./
 RUN yarn build
 
 FROM python:3.13-slim
-# Pango and HarfBuzz for WeasyPrint (Persian PDF reports)
+# Pango and HarfBuzz for WeasyPrint (Persian PDF reports); pg_dump / pg_restore for backups
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core \
+	&& apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core postgresql-client \
 	&& rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --uid 1000 hozur
 WORKDIR /app

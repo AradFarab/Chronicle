@@ -18,6 +18,7 @@ from hozur.db.models import (
 	Employee,
 	Organization,
 	Shift,
+	ShiftSegment,
 	UserRole,
 	WorkPattern,
 	WorkPatternAssignment,
@@ -87,8 +88,7 @@ def build_org(db):
 		name="T-Office",
 		start_time=time(8),
 		end_time=time(16, 30),
-		break_start_time=time(12, 30),
-		break_end_time=time(13, 10),
+		segments=[ShiftSegment(kind="break", start_minute=12 * 60 + 30, end_minute=13 * 60 + 10)],
 		grace_late_minutes=5,
 		grace_early_minutes=5,
 	)

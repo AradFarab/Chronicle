@@ -290,3 +290,39 @@ class ApprovalDelegation(IdMixin, TimestampMixin, Base):
 	valid_from: Mapped[str] = mapped_column(JDate)
 	valid_to: Mapped[str | None] = mapped_column(JDate)
 	note: Mapped[str | None] = mapped_column(Text)
+
+
+OPEN, SENT, DISMISSED = "open", "sent", "dismissed"
+SUGGESTION_STATUSES = (OPEN, SENT, DISMISSED)
+SUGGESTION_TYPES = (OVERTIME_TYPE, HOURLY_LEAVE, CORRECTION_TYPE)
+
+
+class RequestSuggestion(IdMixin, TimestampMixin, Base):
+	"""A request the calculation proposes from the day's punches and work pattern (extra work
+	-> overtime, late arrival / early leave -> hourly leave, a missing punch -> correction).
+	The employee sends it as a real request (their own consent for overtime, Article 59) or
+	dismisses it; the system never submits it on its own. `key` identifies the proposal so a
+	recalculation keeps a dismissed or sent one instead of proposing it again."""
+
+	__tablename__ = "request_suggestion"
+	__table_args__ = (
+		enum_check("request_type", SUGGESTION_TYPES),
+		enum_check("status", SUGGESTION_STATUSES),
+		CheckConstraint("minutes >= 0", name="minutes_non_negative"),
+		CheckConstraint(
+			"from_minute IS NULL OR (to_minute IS NOT NULL AND to_minute > from_minute)",
+			name="minute_range",
+		),
+		UniqueConstraint("employee_id", "jdate", "key"),
+		Index("ix_request_suggestion_employee_id_status", "employee_id", "status"),
+	)
+
+	employee_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("employee.id", ondelete="CASCADE"))
+	jdate: Mapped[str] = mapped_column(JDate)
+	request_type: Mapped[str] = mapped_column(String(30))
+	key: Mapped[str] = mapped_column(String(60))
+	from_minute: Mapped[int | None] = mapped_column(Integer)  # from the day's 00:00, may pass 1440
+	to_minute: Mapped[int | None] = mapped_column(Integer)
+	minutes: Mapped[int] = mapped_column(Integer)
+	status: Mapped[str] = mapped_column(String(20), server_default=OPEN)
+	request_id: Mapped[int | None] = mapped_column(ForeignKey("request.id", ondelete="SET NULL"))

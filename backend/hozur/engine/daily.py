@@ -50,6 +50,8 @@ W_NO_OVERTIME_HARD_HARMFUL = "ARTICLE_61_NO_OVERTIME_HARD_HARMFUL"
 W_NO_OVERTIME_JUVENILE = "ARTICLE_84_NO_OVERTIME_JUVENILE"
 W_JUVENILE_NIGHT = "ARTICLE_84_NO_NIGHT_WORK_JUVENILE"
 W_UNAPPROVED_EXTRA = "UNAPPROVED_EXTRA_WORK"
+W_OUTSIDE_OVERTIME_WINDOW = "EXTRA_WORK_OUTSIDE_OVERTIME_WINDOW"
+LATER = 10**6  # an open end for "after the shift" windows
 
 Interval = tuple[int, int]
 
@@ -203,16 +205,10 @@ def calculate_day(
 	if missing:
 		result.warnings.append(W_MISSING_PUNCH)
 
-	break_window = shift.break_window if shift else None
-	work = subtract(intervals, [break_window] if (scheduled and break_window) else [])
+	breaks = shift.break_list if shift else []
+	work = subtract(intervals, breaks if scheduled else [])
 	worked = total(work)
-	if (
-		scheduled
-		and shift.flexible
-		and not break_window
-		and shift.break_minutes
-		and worked > shift.break_minutes
-	):
+	if scheduled and shift.flexible and not breaks and shift.break_minutes and worked > shift.break_minutes:
 		worked -= shift.break_minutes
 	result.worked_minutes = worked
 	if intervals:
@@ -235,6 +231,7 @@ def calculate_day(
 			result.company_holiday_work_minutes = worked
 		elif day.rest_day:
 			result.rest_day_work_minutes = worked  # Article 62
+		result.overtime_intervals = work
 		_allocate_overtime(result, worked, rules, employee, overtime)
 		return result
 
@@ -276,6 +273,7 @@ def calculate_day(
 			result.leave_minutes[absence.type] = required
 			result.leave_days[absence.type] = 1.0
 		result.credited_minutes = required if absence.paid or absence.kind == "mission" else 0
+		result.overtime_intervals = work
 		_allocate_overtime(result, worked, rules, employee, overtime)
 		return result
 
@@ -283,7 +281,7 @@ def calculate_day(
 	excused: list[Interval] = []
 	paid_minutes = unpaid_minutes = 0
 	for a in absences:
-		piece = subtract(clip([(a.start, a.end)], window), work_in + ([break_window] if break_window else []))
+		piece = subtract(clip([(a.start, a.end)], window), work_in + breaks)
 		minutes = total(piece)
 		if not minutes:
 			continue
@@ -302,7 +300,7 @@ def calculate_day(
 				unpaid_minutes += minutes
 	covered = merge(work_in + excused)
 	worked_in = total(work_in)
-	if shift.flexible and not break_window and shift.break_minutes and worked_in > shift.break_minutes:
+	if shift.flexible and not breaks and shift.break_minutes and worked_in > shift.break_minutes:
 		worked_in -= shift.break_minutes
 
 	if not covered:
@@ -310,7 +308,7 @@ def calculate_day(
 		result.absent_day = True
 		result.absence_minutes = required
 		result.nursing_minutes = 0
-		_allocate_overtime(result, worked, rules, employee, overtime)
+		_extra_work(result, shift, work, [], rules, employee, overtime)
 		return result
 
 	# Lateness and early leave: uncovered time at the edges of the schedule.
@@ -343,11 +341,52 @@ def calculate_day(
 	result.credited_minutes = min(required, credited)
 	result.status = INCOMPLETE if missing else PRESENT
 
-	# Work outside the schedule (before the start, after the end plus the overtime buffer).
-	if shift.flexible:
-		extra = (total(work) - total(work_in)) + max(0, worked_in - required)
-	else:
-		counted_outside = subtract(work, [(start, end + shift.overtime_after)])
-		extra = total(counted_outside)
-	_allocate_overtime(result, extra, rules, employee, overtime)
+	surplus = max(0, worked_in - required) if shift.flexible else 0
+	_extra_work(result, shift, subtract(work, [window]), _tail(work_in, surplus), rules, employee, overtime)
 	return result
+
+
+def _tail(intervals: list[Interval], minutes: int) -> list[Interval]:
+	"""The last `minutes` of the intervals (a flexible shift's work beyond the required time)."""
+	out: list[Interval] = []
+	for a, b in reversed(intervals):
+		if minutes <= 0:
+			break
+		take = min(minutes, b - a)
+		out.append((b - take, b))
+		minutes -= take
+	return sorted(out)
+
+
+def _extra_work(
+	result: DailyResult,
+	shift: Shift,
+	outside: list[Interval],
+	surplus: list[Interval],
+	rules: RuleSet,
+	employee: EmployeeFlags,
+	overtime: Sequence[OvertimeApproval],
+) -> None:
+	"""Work outside the schedule on a scheduled day.
+
+	Work after the end that is no longer than the shift's tolerance is ignored; longer, and the
+	whole of it counts. When the shift has overtime windows, only extra work inside them can
+	become overtime (still only with approval); the rest stays unapproved extra work."""
+	after = clip(outside, (shift.end, LATER))
+	if after and total(after) <= shift.overtime_after:
+		outside = subtract(outside, [(shift.end, LATER)])
+	extra = merge(outside + surplus)
+	if shift.overtime_windows:
+		eligible = merge(p for w in shift.overtime_windows for p in clip(extra, w))
+	else:
+		eligible = extra
+	beyond = total(extra) - total(eligible)
+	result.overtime_intervals = eligible
+	_allocate_overtime(result, total(eligible), rules, employee, overtime)
+	if beyond:
+		result.extra_minutes += beyond
+		result.unapproved_extra_minutes += beyond
+		result.outside_window_minutes = beyond
+		result.warnings.append(W_OUTSIDE_OVERTIME_WINDOW)
+		if W_UNAPPROVED_EXTRA not in result.warnings:
+			result.warnings.append(W_UNAPPROVED_EXTRA)

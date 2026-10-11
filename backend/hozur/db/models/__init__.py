@@ -33,9 +33,17 @@ from hozur.db.models.requests import (
 	Request,
 	RequestApproval,
 	RequestApprovalApprover,
+	RequestSuggestion,
 )
 from hozur.db.models.rules import LaborRuleSet
-from hozur.db.models.schedules import Shift, ShiftOverride, WorkPattern, WorkPatternAssignment, WorkPatternDay
+from hozur.db.models.schedules import (
+	Shift,
+	ShiftOverride,
+	ShiftSegment,
+	WorkPattern,
+	WorkPatternAssignment,
+	WorkPatternDay,
+)
 from hozur.db.models.system import AppSetting, AuditEntry, Job, ReportTemplate, StoredFile
 
 __all__ = [
@@ -75,8 +83,10 @@ __all__ = [
 	"Request",
 	"RequestApproval",
 	"RequestApprovalApprover",
+	"RequestSuggestion",
 	"Shift",
 	"ShiftOverride",
+	"ShiftSegment",
 	"StoredFile",
 	"UserRole",
 	"UserSession",

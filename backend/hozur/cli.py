@@ -1,4 +1,4 @@
-"""Command line: `hozur db install`, `hozur create-user`, `hozur serve`, `hozur worker`."""
+"""Command line: `hozur db install`, `hozur create-user`, `hozur backup`, `hozur serve`, `hozur worker`."""
 
 from __future__ import annotations
 
@@ -41,6 +41,34 @@ def _create_user(args) -> None:
 		print(f"user {user.username} created with roles {', '.join(sorted(user.role_names))}")
 
 
+def _backup(args) -> None:
+	from hozur.db.session import session_scope
+	from hozur.services import backup
+
+	if args.backup_command == "create":
+		with session_scope() as session:
+			made = backup.create(session)
+		print(f"backup written: {backup.folder() / made.name}")
+	elif args.backup_command == "list":
+		for b in backup.list_backups():
+			info = b.as_dict()
+			print(f"{info['name']}  {info['jdate']} {info['time']}  {b.size // 1024} KB")
+	elif args.backup_command == "restore":
+		from pathlib import Path
+
+		path = Path(args.file)
+		if not path.is_file():
+			path = backup.folder() / args.file
+		if not args.yes:
+			answer = input(
+				f"This replaces the whole database and the uploaded files with {path.name}. Type yes: "
+			)
+			if answer.strip().lower() != "yes":
+				sys.exit("cancelled")
+		manifest = backup.restore(path)
+		print(f"restored {path.name} (schema {manifest.get('schema_revision')}); run `hozur db upgrade` next")
+
+
 def _serve(args) -> None:
 	import uvicorn
 
@@ -70,6 +98,17 @@ def main(argv: list[str] | None = None) -> None:
 	user.add_argument("--password", help="prompted when omitted")
 	user.add_argument("--role", action="append", default=[], help="admin (system admin) or employee")
 	user.set_defaults(func=_create_user)
+
+	backups = sub.add_parser("backup", help="database and file backups")
+	backup_sub = backups.add_subparsers(dest="backup_command", required=True)
+	backup_sub.add_parser("create", help="take a backup now")
+	backup_sub.add_parser("list", help="list the backups on this server")
+	restore = backup_sub.add_parser(
+		"restore", help="replace everything with a backup (stop the server first)"
+	)
+	restore.add_argument("file", help="a backup .zip, or its name in the backups folder")
+	restore.add_argument("--yes", action="store_true", help="do not ask for confirmation")
+	backups.set_defaults(func=_backup)
 
 	serve = sub.add_parser("serve", help="run the web server")
 	serve.add_argument("--host", default="127.0.0.1")

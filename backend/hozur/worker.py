@@ -20,12 +20,13 @@ from sqlalchemy.orm import Session, sessionmaker
 from hozur.clock import now, today_jalali
 from hozur.db.models import AttendanceDevice, Job
 from hozur.jalali.dates import add_days, iter_days
-from hozur.services import attendance, devices, jobs, leave
+from hozur.services import attendance, backup, devices, jobs, leave
 
 log = logging.getLogger("hozur.worker")
 
 TICK_SECONDS = 15
 NIGHTLY = "nightly"
+BACKUP = "backup"
 RETRY_AFTER = (timedelta(minutes=1), timedelta(minutes=5), timedelta(minutes=30))
 
 
@@ -61,9 +62,16 @@ def _nightly(session: Session, payload: dict[str, Any], today: str) -> dict:
 	return out
 
 
+def _backup(session: Session, payload: dict[str, Any], today: str) -> dict:
+	"""The automatic nightly backup, then only the newest automatic ones are kept."""
+	made = backup.create(session, automatic=True)
+	return {"backup": made.name, "removed": backup.prune(backup.schedule(session)["keep"])}
+
+
 HANDLERS: dict[str, Callable[[Session, dict[str, Any], str], Any]] = {
 	jobs.RECALCULATE: _recalculate,
 	NIGHTLY: _nightly,
+	BACKUP: _backup,
 }
 
 
@@ -140,6 +148,19 @@ def schedule_nightly(factory: sessionmaker[Session], today: str | None = None) -
 		return True
 
 
+def schedule_backup(factory: sessionmaker[Session], today: str | None = None) -> bool:
+	"""Queue the automatic backup once per Jalali day, after the hour set by the system admin."""
+	today = today or today_jalali()
+	key = f"{BACKUP}:{today}"
+	with factory() as session, session.begin():
+		if not backup.tools_available() or not backup.due(session, today, now().hour):
+			return False
+		if session.scalar(select(Job.id).where(Job.dedup_key == key).limit(1)):
+			return False
+		session.add(Job(kind=BACKUP, payload={"jdate": today}, dedup_key=key, max_attempts=2))
+		return True
+
+
 def poll_devices(factory: sessionmaker[Session]) -> int:
 	"""Sync every enabled network device whose polling interval has passed. Each device has
 	its own transaction, so one unreachable device never holds up the others."""
@@ -161,6 +182,10 @@ def poll_devices(factory: sessionmaker[Session]) -> int:
 
 def tick(factory: sessionmaker[Session]) -> None:
 	schedule_nightly(factory)
+	try:
+		schedule_backup(factory)
+	except Exception:
+		log.exception("could not schedule the backup")
 	poll_devices(factory)
 	run_queue(factory)
 

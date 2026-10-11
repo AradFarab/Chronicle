@@ -46,7 +46,7 @@ from hozur.engine.periodic import absence_streaks
 from hozur.engine.rules import RuleSet
 from hozur.jalali.calendar import resolve_day
 from hozur.jalali.dates import add_days, iter_days, parse_jdate
-from hozur.services import audit, settings
+from hozur.services import audit, settings, suggestions
 from hozur.services.access import designations_on
 from hozur.services.periods import closed_months
 from hozur.services.punches import effective_punches
@@ -271,12 +271,13 @@ class Calculator:
 		)
 		punches = self._punches(emp.id, jdate, window)
 		rule_set_id, rules = self._rule_set(jdate)
+		flags = self._flags(emp, jdate, schedule, rules)
 		result = calculate_day(
 			Day(jdate=jdate, weekday=day.weekday, day_type=day.day_type, rest_day=schedule.rest_day),
 			schedule.shift,
 			punches,
 			rules,
-			self._flags(emp, jdate, schedule, rules),
+			flags,
 			self._absences(emp.id, jdate),
 			self._overtime(emp.id, jdate),
 		)
@@ -306,6 +307,7 @@ class Calculator:
 			int(t): (m, Decimal(str(round(result.leave_days.get(t, 0), 4))))
 			for t, m in sorted(result.leave_minutes.items())
 		}
+		self.proposals = suggestions.proposals(result, schedule.shift, flags)
 		return result, values, leaves
 
 	def calculate(self, employee_id: int, jdate: str, reason: str, outcome: Outcome | None = None) -> None:
@@ -321,6 +323,8 @@ class Calculator:
 			)
 		)
 		if emp is None or not employed_on(emp, jdate):
+			if emp is not None:
+				suggestions.clear(self.session, employee_id, jdate)
 			if row is not None:
 				audit.log(
 					self.session,
@@ -335,6 +339,7 @@ class Calculator:
 				outcome.removed += 1
 			return
 		_result, values, leaves = self.run(emp, jdate)
+		suggestions.refresh(self.session, employee_id, jdate, self.proposals)
 		if row is None:
 			row = DailyAttendance(employee_id=employee_id, jdate=jdate, **values)
 			row.leaves = [

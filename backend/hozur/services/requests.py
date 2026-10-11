@@ -323,6 +323,10 @@ def submit(session: Session, actor: access.Actor, kind: str, values: dict, today
 	audit.log(
 		session, "request", request.id, "submit", actor.user_id, request.reason, after=_audit_view(request)
 	)
+	if values.get("suggestion_id"):
+		from hozur.services import suggestions
+
+		suggestions.mark_sent(session, actor, int(values["suggestion_id"]), request)
 	if request.status == APPROVED:
 		_on_approved(session, actor, request)
 	return request

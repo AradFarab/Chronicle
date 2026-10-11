@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+import json
 from typing import Annotated
 from urllib.parse import quote
 
-from fastapi import APIRouter, File, Response, UploadFile
+from fastapi import APIRouter, File, Form, Response, UploadFile
 
 from hozur.api.deps import DB, Admin, Today
 from hozur.i18n import _, translate
 from hozur.services import excel, resources
+from hozur.services.errors import ValidationError
 
 router = APIRouter(prefix="/api/import", tags=["import"])
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -32,8 +34,48 @@ def sample(name: str, actor: Admin, db: DB) -> Response:
 	)
 
 
+@router.post("/{name}/inspect")
+async def inspect(
+	name: str,
+	file: Annotated[UploadFile, File()],
+	actor: Admin,
+	db: DB,
+	sheet: Annotated[str | None, Form()] = None,
+	header_row: Annotated[int | None, Form()] = None,
+) -> dict:
+	"""The column-mapping panel: the file's sheets and columns, the fields, suggested matches."""
+	return excel.inspect_file(
+		db, name, await file.read(), file.filename or "", actor.language, sheet or None, header_row
+	)
+
+
 @router.post("/{name}")
-async def upload(name: str, file: Annotated[UploadFile, File()], actor: Admin, db: DB, today: Today) -> dict:
-	"""All or nothing: if any row is wrong, nothing is saved and every wrong row is listed."""
+async def upload(
+	name: str,
+	file: Annotated[UploadFile, File()],
+	actor: Admin,
+	db: DB,
+	today: Today,
+	mapping: Annotated[str | None, Form()] = None,
+	sheet: Annotated[str | None, Form()] = None,
+	header_row: Annotated[int | None, Form()] = None,
+	dry_run: Annotated[bool, Form()] = False,
+) -> dict:
+	"""All or nothing: if any row is wrong, nothing is saved and every wrong row is listed.
+	`mapping` (JSON: field -> column number or {"value": ...}) connects the file's own columns;
+	without it the sample's headers are used. `dry_run` checks and previews without saving."""
+	try:
+		fields = json.loads(mapping) if mapping else None
+	except json.JSONDecodeError:
+		raise ValidationError(_("The column mapping is not valid")) from None
 	ctx = resources.Context(db, actor, today)
-	return excel.run(ctx, name, await file.read()).as_dict()
+	return excel.run(
+		ctx,
+		name,
+		await file.read(),
+		filename=file.filename or "",
+		mapping=fields,
+		sheet=sheet or None,
+		header_row=header_row,
+		dry_run=dry_run,
+	).as_dict()

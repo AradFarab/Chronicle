@@ -75,10 +75,31 @@ def test_bad_values_are_reported_by_field(client_for):
 			"name": "S",
 			"start_time": "08:00",
 			"end_time": "16:00",
-			"break_start_time": "17:00",
-			"break_end_time": "17:30",
+			"segments": [{"kind": "break", "start_minute": 17 * 60, "end_minute": 17 * 60 + 30}],
 		},
 	)
+	assert r.status_code == 422
+
+
+def test_shift_with_breaks_and_overtime_window(client_for):
+	op = client_for("op")
+	segments = [
+		{"kind": "break", "start_minute": 12 * 60, "end_minute": 12 * 60 + 45},
+		{"kind": "break", "start_minute": 15 * 60, "end_minute": 15 * 60 + 15},
+		{"kind": "overtime", "start_minute": 17 * 60, "end_minute": 19 * 60},
+	]
+	r = op.post(
+		"/api/admin/shifts",
+		json={"name": "۹ تا ۵", "start_time": "08:00", "end_time": "17:00", "segments": segments},
+	)
+	assert r.status_code == 200, r.text
+	assert [(g["kind"], g["start_minute"]) for g in r.json()["segments"]] == [
+		("break", 720),
+		("break", 900),
+		("overtime", 1020),
+	]
+	inside = [{"kind": "overtime", "start_minute": 16 * 60, "end_minute": 18 * 60}]
+	r = op.patch(f"/api/admin/shifts/{r.json()['id']}", json={"segments": inside})
 	assert r.status_code == 422
 
 
@@ -428,3 +449,69 @@ def test_a_manager_can_list_everyone_to_pick_a_delegate(client_for, org):
 	people = client_for("mgr").get("/api/people/active").json()
 	assert {p["code"] for p in people} >= {"T-CEO", "T-MGR", "T-EMP", "T-OTHER"}  # not only their team
 	assert client_for("emp").get("/api/people/active").status_code == 403
+
+
+def test_one_pattern_for_many_people_at_once(client_for, org):
+	op = client_for("op")
+	people = [org.employee.id, org.other.id, org.manager.id]
+	r = op.post(
+		"/api/admin/work-pattern-assignments/bulk",
+		json={"employee_ids": people, "work_pattern_id": org.week.id, "valid_from": "1405/07/01"},
+	)
+	assert r.status_code == 200, r.text
+	assert sorted(a["employee_id"] for a in r.json()) == sorted(people)
+	assert all(a["target_type"] == "employee" for a in r.json())
+	# all or nothing: one unknown person and nobody is assigned
+	before = len(op.get("/api/admin/work-pattern-assignments").json())
+	r = op.post(
+		"/api/admin/work-pattern-assignments/bulk",
+		json={
+			"employee_ids": [org.employee.id, 999999],
+			"work_pattern_id": org.week.id,
+			"valid_from": "1405/07/05",
+		},
+	)
+	assert r.status_code == 422
+	assert len(op.get("/api/admin/work-pattern-assignments").json()) == before
+	assert (
+		client_for("emp")
+		.post(
+			"/api/admin/work-pattern-assignments/bulk",
+			json={"employee_ids": people, "work_pattern_id": org.week.id, "valid_from": "1405/07/01"},
+		)
+		.status_code
+		== 403
+	)
+
+
+def test_backups_are_taken_listed_downloaded_and_pruned(client_for, tmp_path, monkeypatch):
+	import io
+	import zipfile
+
+	from hozur.config import get_settings
+	from hozur.services import backup
+	from tests.conftest import TEST_DATABASE_URL
+
+	if not backup.tools_available():
+		pytest.skip("pg_dump is not installed")
+	monkeypatch.setattr(get_settings(), "data_dir", tmp_path)
+	monkeypatch.setattr(get_settings(), "database_url", TEST_DATABASE_URL)
+	op = client_for("op")
+	assert client_for("emp").get("/api/admin/backups").status_code == 403
+	r = op.post("/api/admin/backups")
+	if r.status_code == 422 and "version mismatch" in r.text:
+		pytest.skip("pg_dump is older than the database server")
+	assert r.status_code == 200, r.text
+	name = r.json()["name"]
+	assert name.startswith("hozur-manual-14") and r.json()["jdate"].startswith("14")
+	listing = op.get("/api/admin/backups").json()
+	assert [b["name"] for b in listing["backups"]] == [name] and listing["schedule"]["keep"] == 14
+	download = op.get(f"/api/admin/backups/{name}")
+	assert download.status_code == 200
+	with zipfile.ZipFile(io.BytesIO(download.content)) as z:
+		assert {"database.dump", "manifest.json"} <= set(z.namelist())
+	assert op.get("/api/admin/backups/..%2F..%2Fetc%2Fpasswd").status_code == 404
+	assert op.put("/api/admin/backups/schedule", json={"hour": 30}).status_code == 422
+	assert op.put("/api/admin/backups/schedule", json={"hour": 3, "keep": 2}).json()["keep"] == 2
+	assert op.delete(f"/api/admin/backups/{name}").json() == {"ok": True}
+	assert op.get("/api/admin/backups").json()["backups"] == []

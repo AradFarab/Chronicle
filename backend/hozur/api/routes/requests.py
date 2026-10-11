@@ -11,7 +11,7 @@ from sqlalchemy import select
 from hozur.api.deps import DB, Actor, Today
 from hozur.api.views import request_view
 from hozur.db.models import LeaveType
-from hozur.services import access, leave, requests
+from hozur.services import access, leave, requests, suggestions
 
 router = APIRouter(prefix="/api", tags=["requests"])
 Kind = Literal["leave", "mission", "overtime", "correction"]
@@ -98,3 +98,14 @@ def leave_balance(actor: Actor, db: DB, today: Today, employee_id: int | None = 
 	if earned is None:
 		return {"leave_type_id": None, "balance": None}
 	return {"leave_type_id": earned.id, "balance": float(leave.balance(db, employee_id, earned.id))}
+
+
+@router.get("/suggestions")
+def list_suggestions(actor: Actor, db: DB, employee_id: int | None = None) -> list[dict]:
+	"""Requests the calculation proposes from the punches and the work pattern."""
+	return [suggestions.view(s) for s in suggestions.open_for(db, actor, employee_id)]
+
+
+@router.post("/suggestions/{suggestion_id}/dismiss")
+def dismiss_suggestion(suggestion_id: int, actor: Actor, db: DB) -> dict:
+	return suggestions.view(suggestions.dismiss(db, actor, suggestion_id))

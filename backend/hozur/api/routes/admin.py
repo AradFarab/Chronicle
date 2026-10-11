@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Query
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy import select
 
@@ -14,7 +15,7 @@ from hozur.api.views import jalali_moment
 from hozur.db.models import ApprovalDefault, AppUser, AuditEntry, Employee, Organization
 from hozur.db.models.requests import ADMIN_ENTRY, REQUEST_TYPES
 from hozur.i18n import _
-from hozur.services import audit, resources, settings, users
+from hozur.services import audit, backup, resources, settings, users
 from hozur.services.errors import NotFound, ValidationError
 from hozur.setup.data import SETTINGS
 
@@ -232,6 +233,61 @@ def audit_trail(
 		}
 		for e in db.scalars(query)
 	]
+
+
+# backups ----------------------------------------------------------------------------------------
+
+
+@router.get("/backups")
+def list_backups(actor: Admin, db: DB) -> dict:
+	return {
+		"backups": [b.as_dict() for b in backup.list_backups()],
+		"schedule": backup.schedule(db),
+		"available": backup.tools_available(),
+		"folder": str(backup.folder()),
+	}
+
+
+@router.post("/backups")
+def create_backup(actor: Admin, db: DB) -> dict:
+	made = backup.create(db, automatic=False, user_id=actor.user_id)
+	audit.log(db, "backup", made.name, "insert", actor.user_id, "backup taken")
+	return made.as_dict()
+
+
+@router.put("/backups/schedule")
+def set_backup_schedule(values: dict[str, Any], actor: Admin, db: DB) -> dict:
+	return backup.set_schedule(db, values, actor.user_id)
+
+
+@router.get("/backups/{name}")
+def download_backup(name: str, actor: Admin) -> FileResponse:
+	return FileResponse(backup.path_of(name), media_type="application/zip", filename=name)
+
+
+@router.delete("/backups/{name}")
+def delete_backup(name: str, actor: Admin, db: DB) -> dict:
+	backup.delete(name)
+	audit.log(db, "backup", name, "delete", actor.user_id, "backup deleted")
+	return {"ok": True}
+
+
+class BulkAssignment(BaseModel):
+	employee_ids: list[int]
+	work_pattern_id: int
+	valid_from: str
+	valid_to: str | None = None
+	cycle_offset_days: int | None = None
+	note: str | None = None
+
+
+@router.post("/work-pattern-assignments/bulk")
+def assign_pattern_to_many(body: BulkAssignment, actor: Actor, db: DB, today: Today) -> list[dict]:
+	"""Give one work pattern to several people at once."""
+	resource = resources.resource("work-pattern-assignments")
+	values = body.model_dump(exclude={"employee_ids"})
+	saved = resources.assign_pattern(_ctx(db, actor, today), body.employee_ids, values)
+	return [resources.view(resource, r) for r in saved]
 
 
 # generic tables (keep last: the path parameter matches any name) ------------------------------------

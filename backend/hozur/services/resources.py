@@ -13,6 +13,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import time
 from decimal import Decimal, InvalidOperation
+from itertools import pairwise
 from typing import Any
 
 from sqlalchemy import Boolean, Integer, Numeric, String, Text, Time, inspect, select
@@ -34,12 +35,13 @@ from hozur.db.models import (
 	ReportTemplate,
 	Shift,
 	ShiftOverride,
+	ShiftSegment,
 	WorkLocation,
 	WorkPattern,
 	WorkPatternAssignment,
 	WorkPatternDay,
 )
-from hozur.db.models.schedules import FLEXIBLE, ROTATING, TARGET_EMPLOYEE
+from hozur.db.models.schedules import BREAK, FLEXIBLE, OVERTIME_WINDOW, ROTATING, TARGET_EMPLOYEE, TWO_DAYS
 from hozur.db.types import JDate
 from hozur.i18n import _
 from hozur.jalali.dates import InvalidJalaliDate, add_days, normalize_jdate, normalize_time
@@ -317,16 +319,23 @@ def _shift(ctx: Context, s: Shift, before) -> None:
 		raise ValidationError(_("A flexible shift needs the required minutes"))
 	if s.start_time is None or s.end_time is None:
 		raise ValidationError(_("Enter the start and end time"))
-	if (s.break_start_time is None) != (s.break_end_time is None):
-		raise ValidationError(_("Enter both the start and the end of the break"))
-	if s.break_start_time is not None:
-		start, end = _minutes(s.start_time), _minutes(s.end_time)
-		end += 1440 if end <= start else 0
-		b_start, b_end = _minutes(s.break_start_time), _minutes(s.break_end_time)
-		b_start += 1440 if b_start < start else 0
-		b_end += 1440 if b_end <= b_start else 0
-		if not (start <= b_start < b_end <= end):
-			raise ValidationError(_("The break must be inside the shift"))
+	start, end = _minutes(s.start_time), _minutes(s.end_time)
+	end += 1440 if end <= start else 0
+	kinds = {BREAK: [], OVERTIME_WINDOW: []}
+	for g in s.segments:
+		if g.kind not in kinds or g.start_minute is None or g.end_minute is None:
+			raise ValidationError(_("Each part of the shift needs a kind, a start and an end"))
+		if not 0 <= g.start_minute < g.end_minute <= TWO_DAYS:
+			raise ValidationError(_("A part of the shift must end after it starts"))
+		kinds[g.kind].append((g.start_minute, g.end_minute))
+	for kind, label in ((BREAK, _("Breaks")), (OVERTIME_WINDOW, _("Overtime windows"))):
+		ordered = sorted(kinds[kind])
+		if any(b_start < a_end for (_a, a_end), (b_start, _b) in pairwise(ordered)):
+			raise ValidationError(_("{0} overlap each other"), label)
+	if any(not (start <= a and b <= end) for a, b in kinds[BREAK]):
+		raise ValidationError(_("The break must be inside the shift"))
+	if s.shift_type != FLEXIBLE and any(a < end and b > start for a, b in kinds[OVERTIME_WINDOW]):
+		raise ValidationError(_("An overtime window must be before the start or after the end of the shift"))
 
 
 def _minutes(t: time) -> int:
@@ -510,8 +519,6 @@ RESOURCES: dict[str, Resource] = {
 				"end_time",
 				"latest_start_time",
 				"required_minutes",
-				"break_start_time",
-				"break_end_time",
 				"break_minutes",
 				"grace_late_minutes",
 				"grace_early_minutes",
@@ -519,6 +526,7 @@ RESOURCES: dict[str, Resource] = {
 			),
 			read=EVERYONE,
 			order_by=("name",),
+			children={"segments": (ShiftSegment, ("kind", "start_minute", "end_minute"))},
 			validate=_shift,
 			changed=_schedule_changed,
 		),
@@ -632,6 +640,26 @@ def resource(name: str) -> Resource:
 
 
 # approval defaults: one row per request type (primary key), so not a generic resource ------------
+
+
+def assign_pattern(ctx: Context, employee_ids: list[int], values: dict[str, Any]) -> list[Any]:
+	"""One work pattern for many people at once: one assignment per person, all or nothing.
+	The newest assignment wins from its start date, so earlier ones need no editing."""
+	people = list(dict.fromkeys(int(i) for i in employee_ids or []))
+	if not people:
+		raise ValidationError(_("Choose at least one person"))
+	resource = RESOURCES["work-pattern-assignments"]
+	fields = {
+		k: values.get(k) for k in ("work_pattern_id", "valid_from", "valid_to", "cycle_offset_days", "note")
+	}
+	saved = []
+	with ctx.session.begin_nested():
+		for employee_id in people:
+			if ctx.session.get(Employee, employee_id) is None:
+				raise ValidationError(_("The employee {0} does not exist"), employee_id)
+			row = {**fields, "target_type": TARGET_EMPLOYEE, "employee_id": employee_id}
+			saved.append(save(ctx, resource, {k: v for k, v in row.items() if v is not None}))
+	return saved
 
 
 def set_approval_default(ctx: Context, request_type: str, process_id: int) -> ApprovalDefault:

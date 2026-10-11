@@ -83,11 +83,64 @@ def test_unpaid_leave_is_excused_but_not_credited(rules):
 
 
 def test_overtime_buffer_after_the_shift(rules):
+	"""Leaving up to 15 minutes after the end is not extra work; beyond it, all of it is (the
+	product owner's choice, 1405/07/19)."""
 	buffered = Shift("Buffered", start=hm("08:00"), end=hm("15:20"), overtime_after=15)
 	r = calculate_day(workday(), buffered, punches("08:00", "15:30"), rules)
+	assert r.extra_minutes == 0 and not r.overtime_intervals
+	r = calculate_day(workday(), buffered, punches("08:00", "15:35"), rules)
 	assert r.extra_minutes == 0
 	r = calculate_day(workday(), buffered, punches("08:00", "16:00"), rules)
-	assert r.extra_minutes == 25
+	assert r.extra_minutes == 40 and r.overtime_intervals == [(hm("15:20"), hm("16:00"))]
+
+
+def test_grace_forgives_up_to_the_tolerance_then_counts_everything(rules):
+	"""9:00-17:00 with 15 minutes of tolerance each way: 9:10 in and 17:10 out is a clean day;
+	9:20 in is 20 minutes late, 17:20 out is 20 minutes of extra work."""
+	nine_five = Shift(
+		"9-5", start=hm("09:00"), end=hm("17:00"), grace_late=15, grace_early=15, overtime_after=15
+	)
+	r = calculate_day(workday(), nine_five, punches("09:10", "17:10"), rules)
+	assert (r.late_minutes, r.extra_minutes, r.credited_minutes) == (0, 0, 480)
+	r = calculate_day(workday(), nine_five, punches("09:20", "17:20"), rules)
+	assert (r.late_minutes, r.extra_minutes) == (20, 20)
+	r = calculate_day(workday(), nine_five, punches("09:00", "16:50"), rules)
+	assert r.early_leave_minutes == 0 and r.credited_minutes == 480
+
+
+def test_madde_51_several_breaks_are_not_working_time(rules):
+	"""Lunch and an afternoon tea break, both unpaid (Article 51)."""
+	shift = Shift(
+		"Two breaks",
+		start=hm("08:00"),
+		end=hm("17:00"),
+		breaks=((hm("12:00"), hm("12:45")), (hm("15:00"), hm("15:15"))),
+	)
+	assert shift.scheduled_minutes == 540 - 60
+	r = calculate_day(workday(), shift, punches("08:00", "17:00"), rules)
+	assert r.worked_minutes == 480 and r.credited_minutes == 480 and r.absence_minutes == 0
+
+
+def test_madde_59_extra_work_outside_the_overtime_window_stays_unapproved(rules):
+	"""Overtime may only come from 17:00-19:00; work until 20:00 with 3 h approved gives
+	2 h of overtime and 1 h of unapproved extra work."""
+	from hozur.engine.model import OvertimeApproval
+
+	shift = Shift(
+		"With window",
+		start=hm("08:00"),
+		end=hm("17:00"),
+		breaks=((hm("12:00"), hm("13:00")),),
+		overtime_windows=((hm("17:00"), hm("19:00")),),
+	)
+	r = calculate_day(
+		workday(), shift, punches("08:00", "20:00"), rules, overtime=[OvertimeApproval(minutes=180)]
+	)
+	assert r.overtime_intervals == [(hm("17:00"), hm("19:00"))]
+	assert r.total_overtime_minutes == 120
+	assert r.outside_window_minutes == 60 and r.unapproved_extra_minutes == 60
+	assert r.extra_minutes == 180
+	assert "EXTRA_WORK_OUTSIDE_OVERTIME_WINDOW" in r.warnings
 
 
 def test_flexible_shift(rules):
