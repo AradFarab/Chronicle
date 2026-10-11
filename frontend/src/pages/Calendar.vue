@@ -1,14 +1,14 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<div class="flex items-center gap-2">
+		<div class="flex flex-wrap items-center gap-2">
 			<Button :aria-label="__('Back')" icon="lucide-arrow-right" :route="{ name: 'manage' }" />
-			<h1 class="flex-1 text-xl font-semibold">{{ __("Holidays") }}</h1>
+			<h1 class="flex-1 whitespace-nowrap text-xl font-semibold">{{ __("Holidays") }}</h1>
 			<ExcelImport v-if="hasImport('holidays')" name="holidays" @done="load" />
 			<Button icon-left="lucide-refresh-cw" @click="refreshOpen = true">{{ __("Yearly refresh") }}</Button>
 			<Button variant="solid" icon-left="lucide-plus" @click="edit(null)">{{ __("New") }}</Button>
 		</div>
 
-		<div class="flex items-center gap-2">
+		<div class="flex flex-wrap items-center gap-2">
 			<Button icon="lucide-chevron-right" :aria-label="__('Previous year')" @click="year--" />
 			<span class="hz-num w-16 text-center font-semibold">{{ fa(year) }}</span>
 			<Button icon="lucide-chevron-left" :aria-label="__('Next year')" @click="year++" />
@@ -20,40 +20,12 @@
 		</div>
 		<ErrorMessage :message="error" />
 
-		<div class="overflow-x-auto rounded-6 border border-outline-gray-1 bg-surface-base">
-			<table class="w-full text-sm">
-				<thead class="bg-surface-gray-1 text-ink-gray-5">
-					<tr>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Date") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Title") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Type") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Applies to") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Status") }}</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="h in holidays"
-						:key="h.id"
-						class="cursor-pointer border-t border-outline-gray-1 hover:bg-surface-gray-1"
-						@click="edit(h)"
-					>
-						<td class="hz-num whitespace-nowrap px-3 py-2">{{ displayLong(h.jdate) }}</td>
-						<td class="px-3 py-2">{{ h.title }}</td>
-						<td class="px-3 py-2">{{ label(holidayTypeOptions, h.holiday_type) }}</td>
-						<td class="px-3 py-2">{{ label(holidayScopeOptions, h.scope) }}</td>
-						<td class="px-3 py-2">
-							<Badge :theme="h.status === 'confirmed' ? 'green' : 'amber'">{{
-								label(holidayStatusOptions, h.status)
-							}}</Badge>
-						</td>
-					</tr>
-					<tr v-if="!holidays.length">
-						<td colspan="5" class="px-3 py-6 text-center text-ink-gray-5">{{ __("No holidays for this year") }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<DataTable :columns="columns" :rows="holidays" :loading="loading" storage-key="holidays" @row-click="edit">
+			<template #cell-status="{ row, text }">
+				<Badge :theme="row.status === 'confirmed' ? 'green' : 'amber'">{{ text }}</Badge>
+			</template>
+			<template #empty>{{ __("No holidays for this year") }}</template>
+		</DataTable>
 
 		<!-- one holiday -->
 		<Dialog v-model:open="formOpen" :title="current ? __('Holiday') : __('New holiday')">
@@ -145,6 +117,7 @@
 <script setup lang="ts">
 import { Badge, Button, Combobox, Dialog, ErrorMessage, Select, Textarea, TextInput, toast } from "frappe-ui"
 import { computed, onMounted, reactive, ref, watch } from "vue"
+import DataTable from "@/components/DataTable.vue"
 import ExcelImport from "@/components/ExcelImport.vue"
 import JalaliDatePicker from "@/components/JalaliDatePicker.vue"
 import { api } from "@/lib/api"
@@ -161,6 +134,7 @@ import {
 } from "@/lib/labels"
 import { refOptions } from "@/lib/refs"
 import { session } from "@/lib/session"
+import type { TableColumn } from "@/lib/table"
 
 interface Holiday {
 	id: number
@@ -202,6 +176,20 @@ const holidays = ref<Holiday[]>([])
 const years = ref<YearInfo[]>([])
 const error = ref("")
 const busy = ref(false)
+const loading = ref(false)
+
+const columns: TableColumn<Holiday>[] = [
+	{ key: "jdate", label: __("Date"), type: "date", format: (h) => displayLong(h.jdate) },
+	{ key: "title", label: __("Title"), class: "whitespace-nowrap" },
+	{
+		key: "holiday_type",
+		label: __("Type"),
+		value: (h) => label(holidayTypeOptions, h.holiday_type),
+		class: "whitespace-nowrap",
+	},
+	{ key: "scope", label: __("Applies to"), value: (h) => label(holidayScopeOptions, h.scope), class: "whitespace-nowrap" },
+	{ key: "status", label: __("Status"), value: (h) => label(holidayStatusOptions, h.status) },
+]
 
 const yearInfo = computed(() => years.value.find((y) => y.jyear === year.value))
 
@@ -249,6 +237,7 @@ function actionLabel(action: string) {
 
 async function load() {
 	error.value = ""
+	loading.value = true
 	try {
 		;[holidays.value, years.value] = await Promise.all([
 			api.get<Holiday[]>("/calendar/holidays", { year: year.value }),
@@ -256,6 +245,8 @@ async function load() {
 		])
 	} catch (e) {
 		error.value = (e as Error).message
+	} finally {
+		loading.value = false
 	}
 }
 

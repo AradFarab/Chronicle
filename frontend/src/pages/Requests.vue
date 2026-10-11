@@ -15,44 +15,54 @@
 		/>
 
 		<ErrorMessage v-if="error" :message="error" />
-		<p v-if="loading" class="text-center text-sm text-ink-gray-5">{{ __("Loading...") }}</p>
-		<p v-else-if="!rows.length && employee" class="hz-card text-center text-sm text-ink-gray-5">
-			{{ __("No requests yet") }}
-		</p>
-
-		<ul class="space-y-2">
-			<li v-for="r in rows" :key="r.id" class="hz-card !p-3">
-				<div class="flex items-center gap-2">
-					<span class="font-medium">{{ requestTypeLabel(r.request_type) }}</span>
-					<span class="hz-num text-xs text-ink-gray-5" dir="ltr">{{ fa(r.number) }}</span>
-					<span class="flex-1" />
-					<StatusBadge :status="r.status" />
+		<DataTable v-if="employee" :columns="columns" :rows="rows" :loading="loading" storage-key="requests">
+			<template #empty>{{ __("No requests yet") }}</template>
+			<template #cell-number="{ text }"><span dir="ltr">{{ text }}</span></template>
+			<template #cell-status="{ row: r }">
+				<StatusBadge :status="r.status" />
+				<p v-if="rejection(r)" class="mt-1 max-w-64 text-xs text-ink-red-6">{{ rejection(r) }}</p>
+			</template>
+			<template #cell-actions="{ row: r }">
+				<Button v-if="canCancel(r)" size="sm" icon-left="lucide-undo-2" :loading="busy === r.id" @click="cancel(r)">
+					{{ __("Withdraw") }}
+				</Button>
+			</template>
+			<template #card="{ row: r }">
+				<div class="hz-card !p-3">
+					<div class="flex items-center gap-2">
+						<span class="font-medium">{{ requestTypeLabel(r.request_type) }}</span>
+						<span class="hz-num text-xs text-ink-gray-5" dir="ltr">{{ fa(r.number) }}</span>
+						<span class="flex-1" />
+						<StatusBadge :status="r.status" />
+					</div>
+					<p class="hz-num mt-1 text-sm text-ink-gray-6">{{ requestSummary(r, leaveTypes) }}</p>
+					<p v-if="r.status === 'pending' && r.waiting_for.length" class="mt-1 text-xs text-ink-gray-5">
+						{{ __("Waiting for {0}", [r.waiting_for.join("، ")]) }}
+					</p>
+					<p v-if="rejection(r)" class="mt-1 text-xs text-ink-red-6">{{ rejection(r) }}</p>
+					<div v-if="canCancel(r)" class="mt-2">
+						<Button size="sm" icon-left="lucide-undo-2" :loading="busy === r.id" @click="cancel(r)">
+							{{ __("Withdraw") }}
+						</Button>
+					</div>
 				</div>
-				<p class="hz-num mt-1 text-sm text-ink-gray-6">{{ requestSummary(r, leaveTypes) }}</p>
-				<p v-if="r.status === 'pending' && r.waiting_for.length" class="mt-1 text-xs text-ink-gray-5">
-					{{ __("Waiting for {0}", [r.waiting_for.join("، ")]) }}
-				</p>
-				<p v-if="rejection(r)" class="mt-1 text-xs text-ink-red-6">{{ rejection(r) }}</p>
-				<div v-if="canCancel(r)" class="mt-2">
-					<Button size="sm" icon-left="lucide-undo-2" :loading="busy === r.id" @click="cancel(r)">
-						{{ __("Withdraw") }}
-					</Button>
-				</div>
-			</li>
-		</ul>
+			</template>
+		</DataTable>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { Button, ErrorMessage, toast } from "frappe-ui"
 import { onMounted, ref, watch } from "vue"
+import DataTable from "@/components/DataTable.vue"
 import EmployeePicker from "@/components/EmployeePicker.vue"
 import StatusBadge from "@/components/StatusBadge.vue"
 import { api } from "@/lib/api"
-import { requestSummary, requestTypeLabel } from "@/lib/format"
+import { requestSummary, requestTypeLabel, statusLabel } from "@/lib/format"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
 import { session } from "@/lib/session"
+import type { TableColumn } from "@/lib/table"
 import type { LeaveType, RequestView } from "@/lib/types"
 
 const employee = ref<number | null>(session.employee?.id ?? null)
@@ -61,6 +71,21 @@ const leaveTypes = ref<Record<number, string>>({})
 const loading = ref(false)
 const error = ref("")
 const busy = ref<number | null>(null)
+
+const columns: TableColumn<RequestView>[] = [
+	{ key: "number", label: __("Request number"), format: (r) => fa(r.number), class: "hz-num whitespace-nowrap" },
+	{ key: "request_type", label: __("Type"), value: (r) => requestTypeLabel(r.request_type) },
+	{ key: "start_jdate", label: __("From"), type: "date" },
+	{ key: "end_jdate", label: __("Until"), type: "date" },
+	{ key: "summary", label: __("Details"), value: (r) => requestSummary(r, leaveTypes.value), class: "hz-num min-w-48" },
+	{ key: "status", label: __("Status"), value: (r) => statusLabel(r.status) },
+	{
+		key: "waiting_for",
+		label: __("Waiting for"),
+		value: (r) => (r.status === "pending" ? r.waiting_for.join("، ") : ""),
+	},
+	{ key: "actions", label: "", sortable: false, filterable: false },
+]
 
 async function load() {
 	rows.value = []

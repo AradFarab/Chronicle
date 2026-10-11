@@ -65,8 +65,10 @@ async function saveResponse(response: Response, fallbackName: string): Promise<v
     throw new ApiError(data.message || response.statusText, response.status)
   }
   const disposition = response.headers.get("content-disposition") ?? ""
+  // filename*=UTF-8''... (Persian names) or a plain filename="..." (backups)
   const match = /filename\*=UTF-8''([^;]+)/.exec(disposition)
-  const name = match ? decodeURIComponent(match[1]) : fallbackName
+  const plain = /filename="?([^";]+)"?/.exec(disposition)
+  const name = match ? decodeURIComponent(match[1]) : plain ? plain[1] : fallbackName
   const link = document.createElement("a")
   link.href = URL.createObjectURL(await response.blob())
   link.download = name
@@ -85,12 +87,12 @@ export async function download(path: string, body: unknown): Promise<void> {
   await saveResponse(response, "report")
 }
 
-/** GET that returns a file (the sample workbook of an Excel import). */
-export async function downloadGet(path: string, query?: Query): Promise<void> {
+/** GET that returns a file (the sample workbook of an Excel import, a backup). */
+export async function downloadGet(path: string, query?: Query, fallbackName = "sample.xlsx"): Promise<void> {
   const response = await fetch(url(path, query), {
     headers: { "X-Hozur": "1" },
     credentials: "same-origin",
   })
   if (response.status === 401) onUnauthorized()
-  await saveResponse(response, "sample.xlsx")
+  await saveResponse(response, fallbackName)
 }

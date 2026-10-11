@@ -10,34 +10,38 @@
 			<Button icon="lucide-chevron-left" :aria-label="__('Next year')" @click="year++" />
 		</div>
 		<ErrorMessage :message="error" />
-		<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-			<div
-				v-for="p in months"
-				:key="p.jmonth"
-				class="flex items-center gap-3 rounded-6 border border-outline-gray-1 bg-surface-base px-4 py-3"
-			>
-				<span :class="p.status === 'closed' ? 'lucide-lock text-ink-gray-7' : 'lucide-lock-open text-ink-gray-4'" class="size-4" />
-				<span class="flex-1">
-					<span class="block font-medium">{{ MONTHS[p.jmonth - 1] }}</span>
-					<span v-if="p.closed_at" class="hz-num block text-xs text-ink-gray-5">{{ fa(p.closed_at) }}</span>
+		<DataTable :columns="columns" :rows="months" :loading="loading" row-key="jmonth" storage-key="periods">
+			<template #cell-status="{ row: p, text }">
+				<span class="flex items-center gap-2">
+					<span
+						:class="p.status === 'closed' ? 'lucide-lock text-ink-gray-7' : 'lucide-lock-open text-ink-gray-4'"
+						class="size-4"
+					/>
+					{{ text }}
 				</span>
-				<Button v-if="p.status === 'open'" :loading="busy === p.jmonth" @click="close(p)">{{ __("Close") }}</Button>
-				<Button v-else theme="red" variant="subtle" :loading="busy === p.jmonth" @click="reopen(p)">{{
+			</template>
+			<template #cell-actions="{ row: p }">
+				<Button v-if="p.status === 'open'" size="sm" :loading="busy === p.jmonth" @click="close(p)">{{
+					__("Close")
+				}}</Button>
+				<Button v-else size="sm" theme="red" variant="subtle" :loading="busy === p.jmonth" @click="reopen(p)">{{
 					__("Reopen")
 				}}</Button>
-			</div>
-		</div>
+			</template>
+		</DataTable>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { Button, ErrorMessage, toast } from "frappe-ui"
 import { onMounted, ref, watch } from "vue"
+import DataTable from "@/components/DataTable.vue"
 import PageHeader from "@/components/PageHeader.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
 import { fa, MONTHS } from "@/lib/jalali"
 import { session } from "@/lib/session"
+import type { TableColumn } from "@/lib/table"
 
 interface Period {
 	jyear: number
@@ -51,13 +55,25 @@ const year = ref(Number((session.today || "1405").slice(0, 4)))
 const months = ref<Period[]>([])
 const error = ref("")
 const busy = ref<number | null>(null)
+const loading = ref(false)
+
+const columns: TableColumn<Period>[] = [
+	{ key: "jmonth", label: __("Month"), type: "number", format: (p) => MONTHS[p.jmonth - 1], class: "font-medium" },
+	{ key: "status", label: __("Status"), value: (p) => (p.status === "closed" ? __("Closed") : __("Not closed")) },
+	{ key: "closed_at", label: __("Closed on"), type: "date", format: (p) => fa(p.closed_at ?? "") },
+	{ key: "note", label: __("Note"), class: "min-w-48" },
+	{ key: "actions", label: "", sortable: false, filterable: false },
+]
 
 async function load() {
 	error.value = ""
+	loading.value = true
 	try {
 		months.value = await api.get<Period[]>(`/periods/${year.value}`)
 	} catch (e) {
 		error.value = (e as Error).message
+	} finally {
+		loading.value = false
 	}
 }
 

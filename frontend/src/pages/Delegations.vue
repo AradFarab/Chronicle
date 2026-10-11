@@ -11,35 +11,47 @@
 			}}
 		</p>
 		<ErrorMessage :message="error" />
-		<p v-if="!loading && !rows.length" class="hz-card text-center text-sm text-ink-gray-5">
-			{{ __("No delegation yet") }}
-		</p>
-
-		<ul class="flex flex-col gap-2">
-			<li v-for="d in rows" :key="d.id" class="hz-card flex flex-col gap-1 !p-3">
-				<div class="flex flex-wrap items-center gap-2">
-					<span class="font-medium">{{ d.delegator_name }}</span>
-					<span class="lucide-arrow-left size-4 text-ink-gray-5" />
-					<span class="font-medium">{{ d.delegate_name }}</span>
-					<Badge v-if="d.current" theme="green" :label="__('Current')" />
-					<Badge v-else theme="gray" :label="d.valid_from > session.today ? __('Not started') : __('Ended')" />
-					<span class="flex-1" />
-					<Button
-						v-if="canRemove(d)"
-						size="sm"
-						theme="red"
-						icon-left="lucide-trash-2"
-						:loading="busy === d.id"
-						@click="remove(d)"
-						>{{ d.current ? __("End") : __("Delete") }}</Button
-					>
+		<DataTable :columns="columns" :rows="rows" :loading="loading" storage-key="delegations">
+			<template #empty>{{ __("No delegation yet") }}</template>
+			<template #cell-state="{ row: d, text }">
+				<Badge :theme="d.current ? 'green' : 'gray'" :label="text" />
+			</template>
+			<template #cell-actions="{ row: d }">
+				<Button
+					v-if="canRemove(d)"
+					size="sm"
+					theme="red"
+					icon-left="lucide-trash-2"
+					:loading="busy === d.id"
+					@click="remove(d)"
+					>{{ d.current ? __("End") : __("Delete") }}</Button
+				>
+			</template>
+			<template #card="{ row: d }">
+				<div class="hz-card flex flex-col gap-1 !p-3">
+					<div class="flex flex-wrap items-center gap-2">
+						<span class="font-medium">{{ d.delegator_name }}</span>
+						<span class="lucide-arrow-left size-4 text-ink-gray-5" />
+						<span class="font-medium">{{ d.delegate_name }}</span>
+						<Badge :theme="d.current ? 'green' : 'gray'" :label="stateLabel(d)" />
+						<span class="flex-1" />
+						<Button
+							v-if="canRemove(d)"
+							size="sm"
+							theme="red"
+							icon-left="lucide-trash-2"
+							:loading="busy === d.id"
+							@click="remove(d)"
+							>{{ d.current ? __("End") : __("Delete") }}</Button
+						>
+					</div>
+					<p class="hz-num text-sm text-ink-gray-6">
+						{{ d.valid_to ? __("From {0} to {1}", [display(d.valid_from), display(d.valid_to)]) : __("From {0}", [display(d.valid_from)]) }}
+					</p>
+					<p v-if="d.note" class="text-sm text-ink-gray-5">{{ d.note }}</p>
 				</div>
-				<p class="hz-num text-sm text-ink-gray-6">
-					{{ d.valid_to ? __("From {0} to {1}", [display(d.valid_from), display(d.valid_to)]) : __("From {0}", [display(d.valid_from)]) }}
-				</p>
-				<p v-if="d.note" class="text-sm text-ink-gray-5">{{ d.note }}</p>
-			</li>
-		</ul>
+			</template>
+		</DataTable>
 
 		<Dialog v-model:open="open" :title="__('New delegation')">
 			<div class="flex flex-col gap-4">
@@ -72,6 +84,7 @@
 <script setup lang="ts">
 import { Badge, Button, Combobox, Dialog, ErrorMessage, Textarea, toast } from "frappe-ui"
 import { onMounted, reactive, ref } from "vue"
+import DataTable from "@/components/DataTable.vue"
 import EmployeePicker from "@/components/EmployeePicker.vue"
 import JalaliDatePicker from "@/components/JalaliDatePicker.vue"
 import PageHeader from "@/components/PageHeader.vue"
@@ -80,6 +93,7 @@ import { __ } from "@/lib/i18n"
 import { display } from "@/lib/jalali"
 import { refOptions } from "@/lib/refs"
 import { session } from "@/lib/session"
+import type { TableColumn } from "@/lib/table"
 
 interface Delegation {
 	id: number
@@ -106,6 +120,21 @@ const form = reactive({
 	valid_to: null as string | null,
 	note: "",
 })
+
+function stateLabel(d: Delegation) {
+	if (d.current) return __("Current")
+	return d.valid_from > session.today ? __("Not started") : __("Ended")
+}
+
+const columns: TableColumn<Delegation>[] = [
+	{ key: "delegator_name", label: __("Whose approvals") },
+	{ key: "delegate_name", label: __("Handed to") },
+	{ key: "valid_from", label: __("From"), type: "date" },
+	{ key: "valid_to", label: __("Until"), type: "date" },
+	{ key: "state", label: __("State"), value: stateLabel },
+	{ key: "note", label: __("Note"), class: "min-w-48" },
+	{ key: "actions", label: "", sortable: false, filterable: false },
+]
 
 // you can end the delegations you gave; the system admin can end any
 const canRemove = (d: Delegation) => session.is_admin || d.delegator_id === session.employee?.id

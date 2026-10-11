@@ -52,6 +52,33 @@
 					</ul>
 				</section>
 
+				<section v-if="suggestions.length" class="hz-card space-y-3">
+					<div>
+						<h2 class="flex items-center gap-2 font-semibold">
+							<span class="lucide-lightbulb size-4 text-ink-amber-6" />{{ __("Suggested requests") }}
+						</h2>
+						<p class="text-xs text-ink-gray-5">
+							{{ __("From your punches and your shift. Nothing is sent unless you send it.") }}
+						</p>
+					</div>
+					<ul class="divide-y divide-outline-gray-1">
+						<li
+							v-for="s in suggestions"
+							:key="s.id"
+							class="flex flex-wrap items-center gap-x-3 gap-y-2 py-2.5 first:pt-0 last:pb-0"
+						>
+							<span :class="suggestionIcon(s)" class="size-4 shrink-0 text-ink-gray-5" />
+							<span class="hz-num min-w-0 flex-1 text-sm">{{ describe(s) }}</span>
+							<span class="flex gap-2">
+								<Button size="sm" variant="solid" icon-left="lucide-send" :route="sendRoute(s)">{{
+									__("Send")
+								}}</Button>
+								<Button size="sm" :loading="dismissing === s.id" @click="dismiss(s)">{{ __("Dismiss") }}</Button>
+							</span>
+						</li>
+					</ul>
+				</section>
+
 				<section class="hz-card">
 					<div class="mb-2 flex items-center justify-between">
 						<h2 class="font-semibold">{{ __("Today's punches") }}</h2>
@@ -92,8 +119,9 @@
 </template>
 
 <script setup lang="ts">
-import { Badge, Button, ErrorMessage } from "frappe-ui"
+import { Badge, Button, ErrorMessage, toast } from "frappe-ui"
 import { computed, onMounted, ref } from "vue"
+import type { RouteLocationRaw } from "vue-router"
 import DayNumbers from "@/components/DayNumbers.vue"
 import PunchList from "@/components/PunchList.vue"
 import StatusBadge from "@/components/StatusBadge.vue"
@@ -103,7 +131,7 @@ import { countedPunches, dayPunches } from "@/lib/format"
 import { __ } from "@/lib/i18n"
 import { displayLong, fa } from "@/lib/jalali"
 import { session } from "@/lib/session"
-import type { DayDetails } from "@/lib/types"
+import type { DayDetails, Suggestion } from "@/lib/types"
 import { warningMessages } from "@/lib/warnings"
 
 const jdate = computed(() => session.today)
@@ -122,6 +150,8 @@ const attendance = computed(() => {
 	if (!a || !inProgress.value || a.first_in) return a
 	return { ...a, first_in: countedPunches(data.value)[0]?.time?.slice(0, 5) ?? null }
 })
+const suggestions = ref<Suggestion[]>([])
+const dismissing = ref<number | null>(null)
 const balance = computed(() => (leaveBalance.value == null ? "—" : fa(Number(leaveBalance.value.toFixed(2)))))
 
 async function load() {
@@ -140,6 +170,63 @@ async function load() {
 		error.value = (e as Error).message
 	} finally {
 		loading.value = false
+	}
+	loadSuggestions()
+}
+
+// requests the calculation proposes; the card is simply left out if they cannot be loaded
+async function loadSuggestions() {
+	try {
+		suggestions.value = await api.get<Suggestion[]>("/suggestions")
+	} catch {
+		suggestions.value = []
+	}
+}
+
+function describe(s: Suggestion): string {
+	const day = displayLong(s.jdate)
+	const range = !!(s.from_time && s.to_time)
+	if (s.request_type === "overtime")
+		return fa(
+			range
+				? __("Overtime {0} to {1} ({2} minutes) on {3}", [s.from_time!, s.to_time!, s.minutes, day])
+				: __("Overtime of {0} minutes on {1}", [s.minutes, day])
+		)
+	if (s.request_type === "hourly_leave")
+		return fa(
+			range
+				? __("Hourly leave {0} to {1} ({2} minutes) on {3}", [s.from_time!, s.to_time!, s.minutes, day])
+				: __("Hourly leave of {0} minutes on {1}", [s.minutes, day])
+		)
+	return __("A punch is missing on {0}: add the time the device missed", [day])
+}
+
+function suggestionIcon(s: Suggestion): string {
+	if (s.request_type === "overtime") return "lucide-clock-arrow-up"
+	if (s.request_type === "hourly_leave") return "lucide-clock-alert"
+	return "lucide-fingerprint"
+}
+
+function sendRoute(s: Suggestion): RouteLocationRaw {
+	const query: Record<string, string> = { jdate: s.jdate, suggestion_id: String(s.id) }
+	if (s.from_time) query.from_time = s.from_time
+	if (s.to_time) query.to_time = s.to_time
+	if (s.minutes) query.minutes = String(s.minutes)
+	if (s.request_type === "overtime") return { name: "new-request", params: { kind: "overtime" }, query }
+	if (s.request_type === "hourly_leave")
+		return { name: "new-request", params: { kind: "leave" }, query: { ...query, unit: "hourly" } }
+	return { name: "new-request", params: { kind: "correction" }, query: { jdate: s.jdate, suggestion_id: String(s.id) } }
+}
+
+async function dismiss(s: Suggestion) {
+	dismissing.value = s.id
+	try {
+		await api.post(`/suggestions/${s.id}/dismiss`)
+		suggestions.value = suggestions.value.filter((x) => x.id !== s.id)
+	} catch (e) {
+		toast.error((e as Error).message)
+	} finally {
+		dismissing.value = null
 	}
 }
 
