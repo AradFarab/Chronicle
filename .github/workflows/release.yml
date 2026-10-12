@@ -1,14 +1,21 @@
 name: Release
 
-# Pushing a tag like v0.3.0 publishes a GitHub release whose notes are that version's
-# section of CHANGELOG.md.
+# Every push to main whose version (backend/pyproject.toml) has no release yet publishes one:
+# the tag vX.Y.Z on that commit and that version's section of CHANGELOG.md as the notes.
+# Pushing such a tag by hand does the same.
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -16,16 +23,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Notes from CHANGELOG.md
+      - name: Version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
-          awk -v v="$version" '
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' backend/pyproject.toml | head -1)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if gh release view "v$version" >/dev/null 2>&1; then
+            echo "v$version is already released"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Notes from CHANGELOG.md
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          awk -v v="${{ steps.version.outputs.version }}" '
             $0 ~ "^## \\[" v "\\]" { found = 1; next }
             found && /^## \[/ { exit }
             found { print }
           ' CHANGELOG.md > notes.md
-          test -s notes.md || { echo "CHANGELOG.md has no section for $version"; exit 1; }
+          test -s notes.md || { echo "CHANGELOG.md has no section for this version"; exit 1; }
       - name: Publish
+        if: steps.version.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --title "Chronicle $GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" --target "$GITHUB_SHA" \
+            --title "Chronicle v${{ steps.version.outputs.version }}" --notes-file notes.md
