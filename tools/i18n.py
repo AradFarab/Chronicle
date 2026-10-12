@@ -19,7 +19,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-BACKEND = ROOT / "backend" / "hozur"
+BACKEND = ROOT / "backend" / "chronicle"
 FRONTEND = ROOT / "frontend" / "src"
 LOCALE = BACKEND / "locale"
 JS_CALL = re.compile(r"""\b__\(\s*(["'`])((?:\\.|(?!\1).)*)\1""", re.S)
@@ -94,12 +94,12 @@ def read_po(path: Path) -> dict[str, str]:
 def header(language: str | None) -> str:
 	stamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M+0000")
 	lines = [
-		"# Hozur translations.",
-		"# This file is distributed under the same license as the Hozur project (GPLv3).",
+		"# Chronicle translations.",
+		"# This file is distributed under the same license as the Chronicle project (GPLv3).",
 		"#",
 		'msgid ""',
 		'msgstr ""',
-		'"Project-Id-Version: Hozur\\n"',
+		'"Project-Id-Version: Chronicle\\n"',
 		'"Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\\n"',
 		f'"POT-Creation-Date: {stamp}\\n"',
 		'"MIME-Version: 1.0\\n"',

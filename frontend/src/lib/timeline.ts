@@ -4,7 +4,7 @@
  * the server's rules for breaks and overtime windows, and finding an identical shift.
  *
  * Minutes count from the shift day's 00:00 and run into the next day (0..2880), exactly like
- * shift_segment on the server (backend/hozur/db/models/schedules.py): 01:00 the next morning is
+ * shift_segment on the server (backend/chronicle/db/models/schedules.py): 01:00 the next morning is
  * 1500. The working hours of a shift are one "work" bar from its start to its end; an end earlier
  * than the start means the shift ends the next day.
  */

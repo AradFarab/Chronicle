@@ -1,7 +1,7 @@
 """General behaviour of the daily calculation (pairing, rounding, lateness, absences)."""
 
-from hozur.engine.daily import W_MISSING_PUNCH, calculate_day, pair_punches
-from hozur.engine.model import ABSENT, INCOMPLETE, MISSION, PRESENT, Absence, Shift
+from chronicle.engine.daily import W_MISSING_PUNCH, calculate_day, pair_punches
+from chronicle.engine.model import ABSENT, INCOMPLETE, MISSION, PRESENT, Absence, Shift
 from tests.engine.helpers import OFFICE, SHORT, hm, punches, workday
 
 
@@ -124,7 +124,7 @@ def test_madde_51_several_breaks_are_not_working_time(rules):
 def test_madde_59_extra_work_outside_the_overtime_window_stays_unapproved(rules):
 	"""Overtime may only come from 17:00-19:00; work until 20:00 with 3 h approved gives
 	2 h of overtime and 1 h of unapproved extra work."""
-	from hozur.engine.model import OvertimeApproval
+	from chronicle.engine.model import OvertimeApproval
 
 	shift = Shift(
 		"With window",

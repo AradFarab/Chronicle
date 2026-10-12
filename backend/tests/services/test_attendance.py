@@ -7,7 +7,7 @@ from datetime import time
 from orgfactory import TODAY
 from sqlalchemy import func, select
 
-from hozur.db.models import (
+from chronicle.db.models import (
 	AttendancePeriod,
 	AuditEntry,
 	DailyAttendance,
@@ -15,7 +15,7 @@ from hozur.db.models import (
 	LeaveType,
 	RawPunch,
 )
-from hozur.services import attendance, devices, leave, requests, settings
+from chronicle.services import attendance, devices, leave, requests, settings
 
 SUNDAY = "1405/07/12"
 MONDAY = "1405/07/13"
@@ -138,7 +138,7 @@ def test_everyone_employed_is_calculated_when_no_one_is_named(org):
 
 
 def test_overnight_shift_keeps_the_next_morning_punch(org):
-	from hozur.db.models import Shift, ShiftOverride
+	from chronicle.db.models import Shift, ShiftOverride
 
 	night = Shift(name="T-Night", start_time=time(22), end_time=time(6))
 	org.db.add(night)

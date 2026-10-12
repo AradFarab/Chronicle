@@ -1,6 +1,6 @@
 import { __ } from "./i18n"
 
-/** Daily attendance warnings: codes from the engine (backend/hozur/engine/daily.py). */
+/** Daily attendance warnings: codes from the engine (backend/chronicle/engine/daily.py). */
 export function warningMessages(codes: string[] | string | null | undefined): string[] {
   const messages: Record<string, string> = {
     MISSING_PUNCH: __("A punch has no pair: correct the day"),

@@ -1,8 +1,8 @@
 from collections import Counter
 
-from hozur.jalali import calendar as cal
-from hozur.jalali import holidays as hol
-from hozur.jalali.dates import is_leap, iter_days, year_bounds
+from chronicle.jalali import calendar as cal
+from chronicle.jalali import holidays as hol
+from chronicle.jalali.dates import is_leap, iter_days, year_bounds
 
 # Labor-law file, section 5: the 25 official holidays of 1405.
 OFFICIAL_1405 = {

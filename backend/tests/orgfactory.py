@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 from sqlalchemy import select
 
-from hozur.db.models import (
+from chronicle.db.models import (
 	AppUser,
 	AttendanceDevice,
 	Department,
@@ -24,8 +24,8 @@ from hozur.db.models import (
 	WorkPatternAssignment,
 	WorkPatternDay,
 )
-from hozur.services.access import actor_for
-from hozur.setup import install
+from chronicle.services.access import actor_for
+from chronicle.setup import install
 
 TODAY = "1405/07/14"  # a Tuesday
 PASSWORD = "secret-pass-1405"  # set on test users that log in through the API

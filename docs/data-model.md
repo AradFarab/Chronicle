@@ -1,7 +1,7 @@
 # Data model (PostgreSQL)
 
 The schema is the contract of the app (CLAUDE.md rule 10). Every change is an Alembic migration
-in `backend/hozur/db/migrations/` and is reflected here. Constraints live in the database.
+in `backend/chronicle/db/migrations/` and is reflected here. Constraints live in the database.
 
 ## Conventions
 

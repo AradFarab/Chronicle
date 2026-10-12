@@ -5,12 +5,12 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import func, select
 
-from hozur.calendar import service
-from hozur.calendar.sources import SourceHoliday
-from hozur.db.models import AttendancePeriod, AuditEntry, CalendarYear, Holiday, Job
-from hozur.jalali import holidays as hol
-from hozur.jalali.calendar import OFFICIAL_HOLIDAY, WORKDAY
-from hozur.setup import install
+from chronicle.calendar import service
+from chronicle.calendar.sources import SourceHoliday
+from chronicle.db.models import AttendancePeriod, AuditEntry, CalendarYear, Holiday, Job
+from chronicle.jalali import holidays as hol
+from chronicle.jalali.calendar import OFFICIAL_HOLIDAY, WORKDAY
+from chronicle.setup import install
 
 
 class FakeSource:
@@ -122,7 +122,7 @@ def test_refresh_warning(installed):
 
 
 def test_operator_edits_holidays_with_audit_and_recalculation(installed):
-	from hozur.services.errors import Conflict, ValidationError
+	from chronicle.services.errors import Conflict, ValidationError
 
 	closure = service.create_holiday(
 		installed,

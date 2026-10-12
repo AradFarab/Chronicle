@@ -107,11 +107,11 @@
 					)
 				}}
 			</p>
-			<pre class="overflow-x-auto rounded-4 bg-surface-gray-2 p-3 text-xs" dir="ltr">hozur backup restore &lt;file&gt;</pre>
+			<pre class="overflow-x-auto rounded-4 bg-surface-gray-2 p-3 text-xs" dir="ltr">chronicle backup restore &lt;file&gt;</pre>
 			<p class="text-ink-gray-6">{{ __("With Docker:") }}</p>
 			<pre class="overflow-x-auto rounded-4 bg-surface-gray-2 p-3 text-xs" dir="ltr">
 docker compose -f docker/compose.yml --env-file docker/.env stop worker
-docker compose -f docker/compose.yml --env-file docker/.env exec app hozur backup restore &lt;name&gt;
+docker compose -f docker/compose.yml --env-file docker/.env exec app chronicle backup restore &lt;name&gt;
 docker compose -f docker/compose.yml --env-file docker/.env start worker</pre
 			>
 		</section>

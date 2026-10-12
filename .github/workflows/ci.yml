@@ -47,14 +47,14 @@ jobs:
           ruff format --check .
       - name: Schema matches the models
         env:
-          HOZUR_DATABASE_URL: postgresql+psycopg://hozur:hozur@localhost:5432/hozur_test
+          CHRONICLE_DATABASE_URL: postgresql+psycopg://hozur:hozur@localhost:5432/hozur_test
         run: |
-          hozur db upgrade
+          chronicle db upgrade
           alembic check
           alembic downgrade base
       - name: Tests
         env:
-          HOZUR_TEST_DATABASE_URL: postgresql+psycopg://hozur:hozur@localhost:5432/hozur_test
+          CHRONICLE_TEST_DATABASE_URL: postgresql+psycopg://hozur:hozur@localhost:5432/hozur_test
         run: pytest -q
       - name: Every message is translated
         working-directory: .

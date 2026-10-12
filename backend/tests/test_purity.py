@@ -7,16 +7,16 @@ import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
 PURE_MODULES = [
-	"hozur/engine",
-	"hozur/jalali",
-	"hozur/devices/base.py",
-	"hozur/devices/zkteco.py",
-	"hozur/devices/file_import.py",
-	"hozur/reports/catalog.py",
-	"hozur/reports/exporters.py",
+	"chronicle/engine",
+	"chronicle/jalali",
+	"chronicle/devices/base.py",
+	"chronicle/devices/zkteco.py",
+	"chronicle/devices/file_import.py",
+	"chronicle/reports/catalog.py",
+	"chronicle/reports/exporters.py",
 ]
 FORBIDDEN = {"frappe", "sqlalchemy", "fastapi", "starlette", "psycopg", "alembic"}
-FORBIDDEN_HOZUR = ("hozur.db", "hozur.services", "hozur.api")
+FORBIDDEN_CHRONICLE = ("chronicle.db", "chronicle.services", "chronicle.api")
 
 
 def _imports(path: Path) -> set[str]:
@@ -37,6 +37,6 @@ def test_pure_modules_stay_pure(module):
 	offenders = []
 	for f in files:
 		for name in _imports(f):
-			if name.split(".")[0] in FORBIDDEN or name.startswith(FORBIDDEN_HOZUR):
+			if name.split(".")[0] in FORBIDDEN or name.startswith(FORBIDDEN_CHRONICLE):
 				offenders.append(f"{f.relative_to(ROOT)}: {name}")
 	assert not offenders, offenders

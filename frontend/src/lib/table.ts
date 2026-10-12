@@ -191,7 +191,7 @@ export function distinctValues<Row>(
 export function loadState(storageKey: string | undefined): TableState {
   if (!storageKey) return emptyState()
   try {
-    const saved = JSON.parse(localStorage.getItem(`hozur.table.${storageKey}`) || "null")
+    const saved = JSON.parse(localStorage.getItem(`chronicle.table.${storageKey}`) || "null")
     if (!saved || typeof saved !== "object") return emptyState()
     const sort = saved.sort && typeof saved.sort.key === "string" && (saved.sort.dir === "asc" || saved.sort.dir === "desc")
       ? { key: saved.sort.key, dir: saved.sort.dir as SortDir }
@@ -207,7 +207,7 @@ export function saveState(storageKey: string | undefined, state: TableState): vo
   if (!storageKey) return
   try {
     const filters = Object.fromEntries(Object.entries(state.filters).filter(([, f]) => filterActive(f)))
-    localStorage.setItem(`hozur.table.${storageKey}`, JSON.stringify({ sort: state.sort, filters }))
+    localStorage.setItem(`chronicle.table.${storageKey}`, JSON.stringify({ sort: state.sort, filters }))
   } catch {
     // private windows and blocked storage: the table simply forgets
   }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build backend/hozur/jalali/data/holidays.json: Iranian official holidays for 1400-1410.
+"""Build backend/chronicle/jalali/data/holidays.json: Iranian official holidays for 1400-1410.
 
 Dev tool, not used at runtime. Run from the repository root:
 
@@ -31,10 +31,10 @@ import jdatetime
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
 
-from hozur.jalali.holidays import LUNAR, SOLAR
+from chronicle.jalali.holidays import LUNAR, SOLAR
 
 QAMARI = ROOT / "tools" / "data" / "qamari-1440-1447.txt"
-OUTPUT = ROOT / "backend" / "hozur" / "jalali" / "data" / "holidays.json"
+OUTPUT = ROOT / "backend" / "chronicle" / "jalali" / "data" / "holidays.json"
 FIRST_YEAR, LAST_YEAR = 1400, 1410
 
 # Labor-law file, section 5: "فروردین ۱، ۲، ۳، ۴، ۱۲، ۱۳؛ خرداد ۶، ۱۴، ۱۵؛ تیر ۳، ۴؛ ..."

@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 from orgfactory import PASSWORD, TODAY
 from sqlalchemy import select
 
-from hozur.api import deps
-from hozur.db.models import AuditEntry, DesignationAssignment, Job, LaborRuleSet
-from hozur.services import devices, users
+from chronicle.api import deps
+from chronicle.db.models import AuditEntry, DesignationAssignment, Job, LaborRuleSet
+from chronicle.services import devices, users
 
 
 @pytest.fixture(autouse=True)
@@ -302,7 +302,7 @@ def test_creating_an_employee_creates_the_login_and_the_first_designation(client
 	assert body["username"] == "t-new" and body["detail_code"] == "10020030" and body["is_active_user"]
 	assert [d["designation_id"] for d in body["designations"] if d["current"]] == [org.expert_designation.id]
 	# the new person can log in with the password given on creation
-	other = TestClient(admin.app, headers={"X-Hozur": "1"})
+	other = TestClient(admin.app, headers={"X-Chronicle": "1"})
 	assert (
 		other.post("/api/auth/login", json={"username": "t-new", "password": "long-enough-1"}).status_code
 		== 200
@@ -337,7 +337,7 @@ def test_a_person_who_left_can_no_longer_log_in(client_for, org):
 		f"/api/admin/employees/{org.employee.id}", json={"status": "left", "end_date": "1405/07/10"}
 	)
 	assert r.status_code == 200 and not r.json()["is_active_user"]
-	fresh = TestClient(admin.app, headers={"X-Hozur": "1"})
+	fresh = TestClient(admin.app, headers={"X-Chronicle": "1"})
 	from orgfactory import PASSWORD
 
 	org.users.emp.password_hash = users.hash_password(PASSWORD)
@@ -488,8 +488,8 @@ def test_backups_are_taken_listed_downloaded_and_pruned(client_for, tmp_path, mo
 	import io
 	import zipfile
 
-	from hozur.config import get_settings
-	from hozur.services import backup
+	from chronicle.config import get_settings
+	from chronicle.services import backup
 	from tests.conftest import TEST_DATABASE_URL
 
 	if not backup.tools_available():
@@ -503,7 +503,7 @@ def test_backups_are_taken_listed_downloaded_and_pruned(client_for, tmp_path, mo
 		pytest.skip("pg_dump is older than the database server")
 	assert r.status_code == 200, r.text
 	name = r.json()["name"]
-	assert name.startswith("hozur-manual-14") and r.json()["jdate"].startswith("14")
+	assert name.startswith("chronicle-manual-14") and r.json()["jdate"].startswith("14")
 	listing = op.get("/api/admin/backups").json()
 	assert [b["name"] for b in listing["backups"]] == [name] and listing["schedule"]["keep"] == 14
 	download = op.get(f"/api/admin/backups/{name}")

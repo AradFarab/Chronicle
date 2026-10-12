@@ -1,6 +1,6 @@
 """Shared helpers for engine tests."""
 
-from hozur.engine.model import Day, Punch, Shift
+from chronicle.engine.model import Day, Punch, Shift
 
 
 def hm(value: str) -> int:

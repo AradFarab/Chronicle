@@ -1,5 +1,5 @@
 [project]
-name = "hozur"
+name = "chronicle"
 version = "0.3.0"
 description = "Iranian attendance (حضور و غیاب): devices, Jalali calendar, labor-law engine, PWA"
 authors = [{ name = "Arad Farab", email = "219307864+AradFarab@users.noreply.github.com" }]
@@ -27,14 +27,14 @@ dependencies = [
 dev = ["pytest~=9.1", "ruff~=0.16"]
 
 [project.scripts]
-hozur = "hozur.cli:main"
+chronicle = "chronicle.cli:main"
 
 [build-system]
 requires = ["setuptools>=75"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["hozur*"]
+include = ["chronicle*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.po", "*.mo", "*.ttf", "*.txt", "*.ini", "*.mako"]

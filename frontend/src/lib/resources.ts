@@ -1,7 +1,7 @@
 /**
  * The configuration tables edited in the PWA, described once: the generic list and form
  * (pages/ResourceList.vue, components/ResourceForm.vue) render them. The server
- * (backend/hozur/services/resources.py) validates everything again.
+ * (backend/chronicle/services/resources.py) validates everything again.
  */
 import { __ } from "./i18n"
 import { WEEKDAYS } from "./jalali"
@@ -441,7 +441,7 @@ export function resourceDef(name: string): ResourceDef | undefined {
   return RESOURCES.find((r) => r.name === name)
 }
 
-/** Labels of the labor-law parameters (backend/hozur/engine/rules.py PARAMETERS). */
+/** Labels of the labor-law parameters (backend/chronicle/engine/rules.py PARAMETERS). */
 export const PARAMETER_LABELS: Record<string, string> = {
   max_daily_minutes: __("Most work per day (minutes)"),
   max_weekly_minutes: __("Most work per week (minutes)"),

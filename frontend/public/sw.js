@@ -1,5 +1,5 @@
-// Hozur PWA service worker: cache the app shell, keep data (/api) always fresh.
-const CACHE = "hozur-v2"
+// Chronicle PWA service worker: cache the app shell, keep data (/api) always fresh.
+const CACHE = "chronicle-v3"
 self.addEventListener("install", () => self.skipWaiting())
 self.addEventListener("activate", (event) => {
   event.waitUntil(

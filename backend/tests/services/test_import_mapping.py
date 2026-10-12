@@ -8,9 +8,9 @@ import datetime
 import pytest
 from sqlalchemy import select
 
-from hozur.db.models import Shift, WorkLocation
-from hozur.services import cleaning, excel
-from hozur.services.errors import ValidationError
+from chronicle.db.models import Shift, WorkLocation
+from chronicle.services import cleaning, excel
+from chronicle.services.errors import ValidationError
 from tests.services.test_excel import ctx, workbook
 
 

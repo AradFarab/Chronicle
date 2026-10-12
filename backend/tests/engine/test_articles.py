@@ -2,7 +2,7 @@
 
 from dataclasses import replace
 
-from hozur.engine.daily import (
+from chronicle.engine.daily import (
 	W_DAILY_LIMIT,
 	W_EMERGENCY_CAP,
 	W_HARD_HARMFUL_LIMIT,
@@ -14,7 +14,7 @@ from hozur.engine.daily import (
 	W_UNAPPROVED_EXTRA,
 	calculate_day,
 )
-from hozur.engine.model import (
+from chronicle.engine.model import (
 	ABSENT,
 	EMERGENCY,
 	EXCEPTIONAL,
@@ -28,7 +28,7 @@ from hozur.engine.model import (
 	OvertimeApproval,
 	Shift,
 )
-from hozur.engine.periodic import (
+from chronicle.engine.periodic import (
 	EVENING,
 	MORNING,
 	NIGHT,
@@ -41,7 +41,7 @@ from hozur.engine.periodic import (
 	weekly_schedule_excess,
 	year_end_carry_over,
 )
-from hozur.engine.rules import violations
+from chronicle.engine.rules import violations
 from tests.engine.helpers import OFFICE, SHORT, hm, punches, workday
 
 

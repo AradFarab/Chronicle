@@ -1,4 +1,4 @@
-# CLAUDE.md — Iranian Attendance App (working name: `hozur`)
+# CLAUDE.md — Chronicle (کرونیکل), an Iranian attendance app (package and command `chronicle`)
 
 Guidance for Claude Code (and any contributor) working in this repository. Read this file fully before writing code.
 
@@ -9,7 +9,7 @@ backend on PostgreSQL plus one Vue PWA. It reads punches from attendance devices
 Labor Law (قانون کار ۱۳۶۹), and produces working-time reports. It is **Persian-first**: Jalali (شمسی)
 calendar, RTL, Persian UI copy.
 
-Until 1405/07/15 the app was a Frappe app; the product owner decided to leave Frappe (see
+The app was called «حضور» / `hozur` until 1405/07/20, when the product owner renamed it Chronicle (see `docs/decisions.md`); the English name is the one shown. The PostgreSQL database and role are still named `hozur`, so existing installations keep their data, and `HOZUR_*` environment variables are still read. Until 1405/07/15 the app was a Frappe app; the product owner decided to leave Frappe (see
 `docs/decisions.md`, «استقلال از Frappe»). The last Frappe version is commit `b7a596f` on `main`.
 
 Source-of-truth documents (read before designing anything):
@@ -33,9 +33,9 @@ Out of scope — do not build: payroll, insurance or tax amounts; Bale or any me
 
 | Layer | Choice |
 | --- | --- |
-| Backend | Python 3.13+, **FastAPI**, Pydantic v2, in `backend/` (package `hozur`) |
+| Backend | Python 3.13+, **FastAPI**, Pydantic v2, in `backend/` (package `chronicle`) |
 | Database | **PostgreSQL 17**, SQLAlchemy 2.0 (typed ORM), **Alembic** migrations, psycopg 3 |
-| Background work | a `hozur worker` process: scheduler (device polling, nightly jobs) + a job table in PostgreSQL (`FOR UPDATE SKIP LOCKED`). No Redis |
+| Background work | a `chronicle worker` process: scheduler (device polling, nightly jobs) + a job table in PostgreSQL (`FOR UPDATE SKIP LOCKED`). No Redis |
 | Auth | own users table, Argon2 password hashes, server-side sessions in PostgreSQL, httpOnly cookie |
 | Frontend | Vue 3 + TypeScript + Tailwind (frappe-ui components for now: a standalone MIT UI kit, no Frappe server), in `frontend/`, installable PWA |
 | Font / direction | Vazirmatn, RTL everywhere, light + dark mode |
@@ -44,7 +44,7 @@ Out of scope — do not build: payroll, insurance or tax amounts; Bale or any me
 | Device protocol | `pyzk` for ZKTeco (TCP 4370) |
 | Jalali math | `jdatetime` (Python), `jalaali-js` (frontend) |
 | Holidays | time.ir (official calendar) fetched on the system admin's yearly refresh; bundled offline seed as fallback |
-| Translations | English source strings in code, Persian in `backend/hozur/locale/fa.po` (gettext) |
+| Translations | English source strings in code, Persian in `backend/chronicle/locale/fa.po` (gettext) |
 | Deploy | Docker Compose on each company's own server |
 | License | GPLv3 |
 
@@ -58,7 +58,7 @@ We never depend on Frappe, ERPNext or Frappe HR. Code ported from Frappe HR (GPL
    - Gregorian values allowed: (a) the raw device timestamp, kept untouched as evidence and converted to Jalali day + time **once, at ingestion**; (b) system instants (`timestamptz`: created_at, audit time, session expiry), which are shown to people only as Jalali.
    - Display Persian digits in the UI; store ASCII digits.
 2. **Labor law is data, not code.** Every legal number (8 h/day, 44 h/week, 4 h overtime cap, 26 leave days, 9 carry-over days, 7 h 20 min = one leave day, night window 22–06, etc.) lives in a `labor_rule_set` with a Jalali effective date. Validation must reject settings that are worse for the worker than the legal floor; more generous values are allowed. No legal constant may be hard-coded in the engine.
-3. **The calculation engine is pure Python.** `backend/hozur/engine/` must not import the database, FastAPI or SQLAlchemy. Inputs: punches, the day's resolved shift, the day type, approved requests, the rule set. Output: a daily attendance record. Every labor-law article gets at least one pytest case named after the article (e.g. `test_madde_59_overtime_cap`).
+3. **The calculation engine is pure Python.** `backend/chronicle/engine/` must not import the database, FastAPI or SQLAlchemy. Inputs: punches, the day's resolved shift, the day type, approved requests, the rule set. Output: a daily attendance record. Every labor-law article gets at least one pytest case named after the article (e.g. `test_madde_59_overtime_cap`).
 4. **Raw punches are append-only.** A database trigger rejects UPDATE and DELETE on `raw_punch` (and on `audit_entry` and `leave_ledger_entry`). Corrections are separate requests that go through approval. Every change to a calculated or configured record writes an `audit_entry` (who, when, why, before/after).
 5. **Devices are configured, not coded.** IP, port, comm key, work location, polling interval and direction mode are columns of `attendance_device`, edited in the PWA. Adapters implement one interface (`fetch_since`, `list_users`, `sync_time`, `health`) and register themselves; adding a device of a supported type must never require a code change. The app must never clear device logs.
 6. **Approval is data-driven and follows the designation tree.** A person's parent is whoever holds the nearest filled designation above theirs; the CEO holds the designation flagged `is_ceo` and has no parent. `approval_process` steps are `parent`, `ceo` or a specific person; the standard processes are parent only, parent then CEO (just the CEO when the parent is the CEO), and CEO only; the CEO's own requests need no approval. Chosen per request type, with per-employee `approval_override`. A manager can delegate approval authority to someone for a period (both can then approve). No numeric conditions. Overtime assigned by a manager needs employee acceptance (Article 59).
@@ -73,7 +73,7 @@ We never depend on Frappe, ERPNext or Frappe HR. Code ported from Frappe HR (GPL
 backend/
   pyproject.toml
   alembic.ini
-  hozur/
+  chronicle/
     config.py              # settings from environment
     db/                    # engine/session, types (jdate), models/, migrations/ (Alembic)
     engine/                # pure-Python labor-law engine
@@ -83,7 +83,7 @@ backend/
     services/              # business logic: resources (config tables), devices (ingestion), attendance,
                            # requests, approvals, suggestions, leave, periods, reports, users, audit,
                            # jobs, excel + cleaning (Excel import with column mapping), backup
-    worker.py              # `hozur worker`: device polling, job queue, nightly work
+    worker.py              # `chronicle worker`: device polling, job queue, nightly work
     reports/               # field catalog and exporters (xlsx, csv/txt, pdf); the builder is services/reports.py
     api/                   # FastAPI routers used by the PWA
     locale/                # fa.po
@@ -96,7 +96,7 @@ docs/
 ## Development environment
 
 - `docker compose -f docker/dev.yml up -d` starts PostgreSQL 17 with the databases `hozur` and `hozur_test` (user/password `hozur`).
-- Backend: `cd backend && python -m venv .venv && .venv/bin/pip install -e '.[dev]'`, then `hozur db install` (migrations + reference data), `hozur create-user admin --role admin`, `hozur serve --reload` (API on :8000) and `hozur worker` (devices, jobs, nightly work and the nightly backup). Backups: `hozur backup create|list|restore`.
+- Backend: `cd backend && python -m venv .venv && .venv/bin/pip install -e '.[dev]'`, then `chronicle db install` (migrations + reference data), `chronicle create-user admin --role admin`, `chronicle serve --reload` (API on :8000) and `chronicle worker` (devices, jobs, nightly work and the nightly backup). Backups: `chronicle backup create|list|restore`.
 - Frontend: `cd frontend && yarn && yarn dev` (PWA on :8080, `/api` proxied to :8000).
 - Tests: `pytest` in `backend/` (DB tests use `hozur_test`; engine and jalali tests run without it). Frontend: `yarn typecheck && yarn test`. Translations: `python3 tools/i18n.py --check`.
 - Production: `Dockerfile` + `docker/compose.yml` (PostgreSQL, app, worker) on the company's own server.
@@ -132,4 +132,4 @@ docs/
 | مدیر سیستم | System admin (role `admin`; there is no separate operator) |
 | استراحت / بازهٔ مجاز اضافه‌کار | Break / overtime window (`shift_segment.kind` = `break` / `overtime`) |
 | درخواست پیشنهادی | Suggested request (`request_suggestion`): proposed by the calculation, sent or dismissed by the employee |
-| پشتیبان | Backup (`hozur backup`, `services/backup.py`) |
+| پشتیبان | Backup (`chronicle backup`, `services/backup.py`) |

@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 from orgfactory import TODAY, make_employee
 
-from hozur.db.models import ApprovalDelegation, Designation, DesignationAssignment
-from hozur.services import access, delegations
-from hozur.services.errors import ValidationError
+from chronicle.db.models import ApprovalDelegation, Designation, DesignationAssignment
+from chronicle.services import access, delegations
+from chronicle.services.errors import ValidationError
 
 
 def test_parent_is_the_holder_of_the_designation_above(org):

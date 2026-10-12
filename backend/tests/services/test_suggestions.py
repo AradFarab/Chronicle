@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from sqlalchemy import select
 
-from hozur.db.models import LeaveType, RequestSuggestion
-from hozur.services import leave, requests, suggestions
+from chronicle.db.models import LeaveType, RequestSuggestion
+from chronicle.services import leave, requests, suggestions
 from tests.services.test_attendance import SUNDAY, calc, punch
 
 
@@ -81,7 +81,7 @@ def test_a_missing_punch_proposes_a_correction(org):
 def test_someone_else_cannot_dismiss_my_suggestion(org):
 	import pytest
 
-	from hozur.services.errors import PermissionDenied
+	from chronicle.services.errors import PermissionDenied
 
 	punch(org, SUNDAY, "08:00")
 	calc(org, SUNDAY)
@@ -91,9 +91,9 @@ def test_someone_else_cannot_dismiss_my_suggestion(org):
 
 
 def test_two_overtime_windows_give_two_suggestions_of_exactly_the_time_worked():
-	from hozur.engine.daily import calculate_day
-	from hozur.engine.model import Day, EmployeeFlags, Punch, Shift
-	from hozur.engine.rules import baseline_rule_set
+	from chronicle.engine.daily import calculate_day
+	from chronicle.engine.model import Day, EmployeeFlags, Punch, Shift
+	from chronicle.engine.rules import baseline_rule_set
 
 	shift = Shift(
 		"9-5",

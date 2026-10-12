@@ -3,8 +3,8 @@ import io
 import pytest
 from openpyxl import load_workbook
 
-from hozur.reports import catalog
-from hozur.reports.exporters import (
+from chronicle.reports import catalog
+from chronicle.reports.exporters import (
 	DAYS_UNIT,
 	DECIMAL_HOURS,
 	FIXED_WIDTH,
@@ -101,9 +101,9 @@ def test_pdf_renders(tmp_path):
 	pytest.importorskip("weasyprint")
 	from pathlib import Path
 
-	from hozur.reports.exporters import to_pdf
+	from chronicle.reports.exporters import to_pdf
 
-	fonts = Path(__file__).resolve().parents[2] / "hozur" / "public" / "fonts" / "vazirmatn"
+	fonts = Path(__file__).resolve().parents[2] / "chronicle" / "public" / "fonts" / "vazirmatn"
 	pdf = to_pdf("کارکرد ماهانه", ["مهر ۱۴۰۵"], COLUMNS, ROWS, HOURS_MINUTES, 440, f"file://{fonts}")
 	assert pdf.startswith(b"%PDF") and len(pdf) > 5000
 

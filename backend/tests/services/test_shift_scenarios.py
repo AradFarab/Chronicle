@@ -8,10 +8,10 @@ from datetime import time
 from orgfactory import TODAY
 from sqlalchemy import select
 
-from hozur.db.models import DailyAttendance, Shift, WorkPattern, WorkPatternAssignment, WorkPatternDay
-from hozur.jalali.dates import add_days
-from hozur.services import attendance, devices
-from hozur.services.schedules import resolve
+from chronicle.db.models import DailyAttendance, Shift, WorkPattern, WorkPatternAssignment, WorkPatternDay
+from chronicle.jalali.dates import add_days
+from chronicle.services import attendance, devices
+from chronicle.services.schedules import resolve
 
 
 def punch(org, jdate, clock):

@@ -9,9 +9,9 @@ from openpyxl import Workbook, load_workbook
 from orgfactory import TODAY
 from sqlalchemy import func, select
 
-from hozur.db.models import Designation, Employee, Holiday, Shift, WorkLocation, WorkPattern
-from hozur.services import excel, resources
-from hozur.services.errors import ValidationError
+from chronicle.db.models import Designation, Employee, Holiday, Shift, WorkLocation, WorkPattern
+from chronicle.services import excel, resources
+from chronicle.services.errors import ValidationError
 
 
 def ctx(org, actor=None):
@@ -76,7 +76,7 @@ def test_the_sample_covers_every_field_of_its_form(org):
 			}
 		]
 		assert not missing, (resource.name, missing)
-	from hozur.services.employees import FIELDS
+	from chronicle.services.employees import FIELDS
 
 	assert set(FIELDS) <= {c.key for c in excel.spec("employees").columns}
 
@@ -133,12 +133,12 @@ def test_importing_employees_creates_their_logins_and_designations(org):
 	assert (result.imported, result.created, result.errors) == (True, 2, []), result.errors
 	ali = org.db.scalar(select(Employee).where(Employee.code == "2001"))
 	assert ali.start_date == "1405/01/15" and ali.detail_code == "30001"  # Persian digits accepted
-	from hozur.db.models import AppUser
+	from chronicle.db.models import AppUser
 
 	assert org.db.get(AppUser, ali.user_id).username == "2001"
 	mina = org.db.scalar(select(Employee).where(Employee.code == "2002"))
 	assert org.db.get(AppUser, mina.user_id).username == "mina"
-	from hozur.services import access
+	from chronicle.services import access
 
 	assert access.designations_on(org.db, ali.id, TODAY) == [org.expert_designation.id]
 

@@ -98,7 +98,7 @@ export function headerSignature(columns: ImportColumn[]): string {
   return columns.map((c) => c.header.trim()).join("|")
 }
 
-const STORE = "hozur.import-mapping."
+const STORE = "chronicle.import-mapping."
 const REMEMBERED = 10 // header rows remembered per import
 
 /** The last mapping used for a file with this header row (per import), if any. */

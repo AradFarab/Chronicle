@@ -8,12 +8,12 @@ from fastapi.testclient import TestClient
 from orgfactory import TODAY
 from sqlalchemy import select
 
-from hozur.db.models import LeaveType
-from hozur.services import leave
+from chronicle.db.models import LeaveType
+from chronicle.services import leave
 
 
 def test_login_errors_are_translated(app, org):
-	client = TestClient(app, headers={"X-Hozur": "1"})
+	client = TestClient(app, headers={"X-Chronicle": "1"})
 	r = client.post("/api/auth/login", json={"username": "emp", "password": "nope-nope"})
 	assert r.status_code == 401
 	assert r.json()["message"] == "نام کاربری یا رمز عبور اشتباه است"
@@ -22,7 +22,7 @@ def test_login_errors_are_translated(app, org):
 
 def test_unsafe_requests_need_the_custom_header(client_for):
 	client = client_for("emp")
-	del client.headers["X-Hozur"]
+	del client.headers["X-Chronicle"]
 	assert client.post("/api/requests/overtime", json={"jdate": TODAY, "minutes": 30}).status_code == 403
 
 

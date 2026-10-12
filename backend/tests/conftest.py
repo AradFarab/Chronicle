@@ -1,4 +1,4 @@
-"""Database fixtures. DB tests run against HOZUR_TEST_DATABASE_URL (a scratch database whose
+"""Database fixtures. DB tests run against CHRONICLE_TEST_DATABASE_URL (a scratch database whose
 schema is rebuilt once per run); each test runs in a transaction that is rolled back."""
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 TEST_DATABASE_URL = os.environ.get(
-	"HOZUR_TEST_DATABASE_URL", "postgresql+psycopg://hozur:hozur@localhost:5432/hozur_test"
+	"CHRONICLE_TEST_DATABASE_URL", "postgresql+psycopg://hozur:hozur@localhost:5432/hozur_test"
 )
 
 
@@ -23,7 +23,7 @@ def db_engine():
 			pass
 	except OperationalError as e:
 		pytest.skip(f"test database not reachable: {e.orig}")
-	from hozur.db.migrate import upgrade
+	from chronicle.db.migrate import upgrade
 
 	with engine.begin() as conn:
 		conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public"))
