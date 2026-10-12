@@ -1,6 +1,6 @@
 [project]
 name = "hozur"
-version = "0.2.0"
+version = "0.3.0"
 description = "Iranian attendance (حضور و غیاب): devices, Jalali calendar, labor-law engine, PWA"
 authors = [{ name = "Arad Farab", email = "219307864+AradFarab@users.noreply.github.com" }]
 license = "GPL-3.0-only"
