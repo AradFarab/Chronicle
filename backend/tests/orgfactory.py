@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 from sqlalchemy import select
 
-from hozur.db.models import (
+from chronicle.db.models import (
 	AppUser,
 	AttendanceDevice,
 	Department,
@@ -18,13 +18,14 @@ from hozur.db.models import (
 	Employee,
 	Organization,
 	Shift,
+	ShiftSegment,
 	UserRole,
 	WorkPattern,
 	WorkPatternAssignment,
 	WorkPatternDay,
 )
-from hozur.services.access import actor_for
-from hozur.setup import install
+from chronicle.services.access import actor_for
+from chronicle.setup import install
 
 TODAY = "1405/07/14"  # a Tuesday
 PASSWORD = "secret-pass-1405"  # set on test users that log in through the API
@@ -87,8 +88,7 @@ def build_org(db):
 		name="T-Office",
 		start_time=time(8),
 		end_time=time(16, 30),
-		break_start_time=time(12, 30),
-		break_end_time=time(13, 10),
+		segments=[ShiftSegment(kind="break", start_minute=12 * 60 + 30, end_minute=13 * 60 + 10)],
 		grace_late_minutes=5,
 		grace_early_minutes=5,
 	)

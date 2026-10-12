@@ -7,9 +7,9 @@ from typing import ClassVar
 
 import pytest
 
-from hozur.devices import REGISTRY, get_adapter_class
-from hozur.devices.base import IN, OUT, UNKNOWN, DeviceConfig, DeviceError
-from hozur.devices.zkteco import ZKTecoAdapter
+from chronicle.devices import REGISTRY, get_adapter_class
+from chronicle.devices.base import IN, OUT, UNKNOWN, DeviceConfig, DeviceError
+from chronicle.devices.zkteco import ZKTecoAdapter
 
 
 class FakeAttendance:
@@ -84,7 +84,7 @@ def fake_create_connection(address, timeout=None):
 
 @pytest.fixture(autouse=True)
 def fake_pyzk(monkeypatch):
-	monkeypatch.setattr("hozur.devices.zkteco.socket.create_connection", fake_create_connection)
+	monkeypatch.setattr("chronicle.devices.zkteco.socket.create_connection", fake_create_connection)
 	module = types.ModuleType("zk")
 
 	class ZK:

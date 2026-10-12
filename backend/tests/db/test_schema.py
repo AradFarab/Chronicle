@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
-from hozur.db.models import (
+from chronicle.db.models import (
 	AppUser,
 	AttendanceDevice,
 	CorrectionItem,
@@ -144,7 +144,7 @@ def test_schema_matches_models(db_engine):
 	from alembic.autogenerate import compare_metadata
 	from alembic.runtime.migration import MigrationContext
 
-	from hozur.db.base import Base
+	from chronicle.db.base import Base
 
 	with db_engine.connect() as conn:
 		diff = compare_metadata(MigrationContext.configure(conn, opts={"compare_type": True}), Base.metadata)

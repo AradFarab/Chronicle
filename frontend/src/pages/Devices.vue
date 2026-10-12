@@ -9,88 +9,137 @@
 		</div>
 
 		<ErrorMessage v-if="error" :message="error" />
-		<p v-if="loading" class="text-center text-sm text-ink-gray-5">{{ __("Loading...") }}</p>
-		<div v-else-if="!devices.length" class="hz-card space-y-2 text-center">
-			<p class="text-ink-gray-7">{{ __("No device yet.") }}</p>
-			<p class="text-sm text-ink-gray-5">
-				{{ __("Add the device with its IP address and port; you can test the connection right away.") }}
-			</p>
-		</div>
-
-		<ul class="space-y-3">
-			<li v-for="d in devices" :key="d.id" class="hz-card space-y-3">
-				<RouterLink :to="{ name: 'device', params: { id: d.id } }" class="flex items-start gap-3">
-					<span class="flex size-10 shrink-0 items-center justify-center rounded-4 bg-surface-gray-2">
-						<span
-							:class="isNetwork(d) ? 'lucide-fingerprint' : 'lucide-file-up'"
-							class="size-5"
-						/>
-					</span>
-					<span class="min-w-0 flex-1">
-						<span class="flex flex-wrap items-center gap-2">
-							<span class="font-semibold">{{ d.name }}</span>
-							<Badge v-if="!d.enabled" theme="gray" :label="__('Disabled')" />
-							<StatusBadge v-if="d.last_sync_status" :status="d.last_sync_status" />
-						</span>
-						<span class="mt-0.5 block text-sm text-ink-gray-5">
-							{{ adapterLabel(d.adapter_type) }}
-							<template v-if="d.host">
-								· <span dir="ltr" class="hz-num">{{ d.host }}:{{ d.port }}</span></template
-							>
-							<template v-if="d.work_location_id && locations[d.work_location_id]"> · {{ locations[d.work_location_id] }}</template>
-						</span>
-					</span>
-					<span class="lucide-chevron-left size-4 text-ink-gray-4" />
-				</RouterLink>
-				<dl class="hz-num grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-					<div>
-						<dt class="text-xs text-ink-gray-5">{{ __("Last Read") }}</dt>
-						<dd>{{ d.last_sync_at ? fa(d.last_sync_at) : "—" }}</dd>
-					</div>
-					<div>
-						<dt class="text-xs text-ink-gray-5">{{ __("Users on Device") }}</dt>
-						<dd>{{ fa(d.user_count || 0) }}</dd>
-					</div>
-					<div>
-						<dt class="text-xs text-ink-gray-5">{{ __("Log Records on Device") }}</dt>
-						<dd>{{ fa(d.record_count || 0) }}</dd>
-					</div>
-					<div>
-						<dt class="text-xs text-ink-gray-5">{{ __("Unmapped users") }}</dt>
-						<dd :class="unmapped[d.id] ? 'font-semibold text-ink-amber-7' : ''">
-							{{ fa(unmapped[d.id] || 0) }}
-						</dd>
-					</div>
-				</dl>
-				<p
-					v-if="d.last_sync_status === 'error' && d.last_error"
-					class="rounded-4 bg-surface-red-1 p-2 text-sm text-ink-red-7"
-				>
+		<DataTable
+			:columns="columns"
+			:rows="devices"
+			:loading="loading"
+			storage-key="devices"
+			@row-click="(d) => router.push({ name: 'device', params: { id: d.id } })"
+		>
+			<template #empty>
+				<p class="text-ink-gray-7">{{ __("No device yet.") }}</p>
+				<p class="text-sm">
+					{{ __("Add the device with its IP address and port; you can test the connection right away.") }}
+				</p>
+			</template>
+			<template #cell-name="{ row: d }">
+				<span class="flex items-center gap-2">
+					<span :class="isNetwork(d) ? 'lucide-fingerprint' : 'lucide-file-up'" class="size-4 shrink-0 text-ink-gray-5" />
+					<span class="font-medium">{{ d.name }}</span>
+					<Badge v-if="!d.enabled" theme="gray" :label="__('Disabled')" />
+				</span>
+			</template>
+			<template #cell-address="{ text }">
+				<span dir="ltr" class="hz-num">{{ text }}</span>
+			</template>
+			<template #cell-last_sync_status="{ row: d }">
+				<StatusBadge v-if="d.last_sync_status" :status="d.last_sync_status" />
+				<p v-if="d.last_sync_status === 'error' && d.last_error" class="mt-1 max-w-64 text-xs text-ink-red-7">
 					{{ d.last_error }}
 				</p>
-				<div v-if="isNetwork(d)" class="flex flex-wrap gap-2">
-					<Button icon-left="lucide-plug-zap" :loading="busy === d.id + 'test'" @click="test(d)">
-						{{ __("Test Connection") }}
-					</Button>
-					<Button icon-left="lucide-refresh-cw" :loading="busy === d.id + 'sync'" @click="sync(d)">
-						{{ __("Read punches now") }}
-					</Button>
+			</template>
+			<template #cell-unmapped="{ row: d, text }">
+				<span :class="unmapped[d.id] ? 'font-semibold text-ink-amber-7' : ''">{{ text }}</span>
+			</template>
+			<template #cell-actions="{ row: d }">
+				<div v-if="isNetwork(d)" class="flex gap-1" @click.stop>
+					<Button
+						size="sm"
+						icon="lucide-plug-zap"
+						:tooltip="__('Test Connection')"
+						:aria-label="__('Test Connection')"
+						:loading="busy === d.id + 'test'"
+						@click="test(d)"
+					/>
+					<Button
+						size="sm"
+						icon="lucide-refresh-cw"
+						:tooltip="__('Read punches now')"
+						:aria-label="__('Read punches now')"
+						:loading="busy === d.id + 'sync'"
+						@click="sync(d)"
+					/>
 				</div>
-			</li>
-		</ul>
+			</template>
+			<template #card="{ row: d }">
+				<div class="hz-card space-y-3">
+					<RouterLink :to="{ name: 'device', params: { id: d.id } }" class="flex items-start gap-3">
+						<span class="flex size-10 shrink-0 items-center justify-center rounded-4 bg-surface-gray-2">
+							<span
+								:class="isNetwork(d) ? 'lucide-fingerprint' : 'lucide-file-up'"
+								class="size-5"
+							/>
+						</span>
+						<span class="min-w-0 flex-1">
+							<span class="flex flex-wrap items-center gap-2">
+								<span class="font-semibold">{{ d.name }}</span>
+								<Badge v-if="!d.enabled" theme="gray" :label="__('Disabled')" />
+								<StatusBadge v-if="d.last_sync_status" :status="d.last_sync_status" />
+							</span>
+							<span class="mt-0.5 block text-sm text-ink-gray-5">
+								{{ adapterLabel(d.adapter_type) }}
+								<template v-if="d.host">
+									· <span dir="ltr" class="hz-num">{{ d.host }}:{{ d.port }}</span></template
+								>
+								<template v-if="d.work_location_id && locations[d.work_location_id]"> · {{ locations[d.work_location_id] }}</template>
+							</span>
+						</span>
+						<span class="lucide-chevron-left size-4 text-ink-gray-4" />
+					</RouterLink>
+					<dl class="hz-num grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+						<div>
+							<dt class="text-xs text-ink-gray-5">{{ __("Last Read") }}</dt>
+							<dd>{{ d.last_sync_at ? fa(d.last_sync_at) : "—" }}</dd>
+						</div>
+						<div>
+							<dt class="text-xs text-ink-gray-5">{{ __("Users on Device") }}</dt>
+							<dd>{{ fa(d.user_count || 0) }}</dd>
+						</div>
+						<div>
+							<dt class="text-xs text-ink-gray-5">{{ __("Log Records on Device") }}</dt>
+							<dd>{{ fa(d.record_count || 0) }}</dd>
+						</div>
+						<div>
+							<dt class="text-xs text-ink-gray-5">{{ __("Unmapped users") }}</dt>
+							<dd :class="unmapped[d.id] ? 'font-semibold text-ink-amber-7' : ''">
+								{{ fa(unmapped[d.id] || 0) }}
+							</dd>
+						</div>
+					</dl>
+					<p
+						v-if="d.last_sync_status === 'error' && d.last_error"
+						class="rounded-4 bg-surface-red-1 p-2 text-sm text-ink-red-7"
+					>
+						{{ d.last_error }}
+					</p>
+					<div v-if="isNetwork(d)" class="flex flex-wrap gap-2">
+						<Button icon-left="lucide-plug-zap" :loading="busy === d.id + 'test'" @click="test(d)">
+							{{ __("Test Connection") }}
+						</Button>
+						<Button icon-left="lucide-refresh-cw" :loading="busy === d.id + 'sync'" @click="sync(d)">
+							{{ __("Read punches now") }}
+						</Button>
+					</div>
+				</div>
+			</template>
+		</DataTable>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { Badge, Button, ErrorMessage, toast } from "frappe-ui"
 import { onMounted, ref } from "vue"
+import { useRouter } from "vue-router"
+import DataTable from "@/components/DataTable.vue"
 import ExcelImport from "@/components/ExcelImport.vue"
 import StatusBadge from "@/components/StatusBadge.vue"
 import { api } from "@/lib/api"
 import { refreshCounts } from "@/lib/counts"
+import { statusLabel } from "@/lib/format"
 import { __ } from "@/lib/i18n"
 import { hasImport } from "@/lib/imports"
 import { fa } from "@/lib/jalali"
+import type { TableColumn } from "@/lib/table"
 
 interface Device {
 	id: number
@@ -128,6 +177,28 @@ const unmapped = ref<Record<number, number>>({}) // device id -> device users wi
 const loading = ref(false)
 const error = ref("")
 const busy = ref("")
+const router = useRouter()
+
+const columns: TableColumn<Device>[] = [
+	{ key: "name", label: __("Name") },
+	{ key: "adapter_type", label: __("Type"), value: (d) => adapterLabel(d.adapter_type) },
+	{ key: "address", label: __("Address"), value: (d) => (d.host ? `${d.host}:${d.port}` : "") },
+	{
+		key: "work_location_id",
+		label: __("Work location"),
+		value: (d) => (d.work_location_id ? locations.value[d.work_location_id] ?? "" : ""),
+	},
+	{
+		key: "last_sync_status",
+		label: __("Status"),
+		value: (d) => [d.enabled ? "" : __("Disabled"), statusLabel(d.last_sync_status)].filter(Boolean).join(" · "),
+	},
+	{ key: "last_sync_at", label: __("Last Read"), type: "date", format: (d) => (d.last_sync_at ? fa(d.last_sync_at) : "") },
+	{ key: "user_count", label: __("Users on Device"), type: "number", value: (d) => d.user_count || 0 },
+	{ key: "record_count", label: __("Log Records on Device"), type: "number", value: (d) => d.record_count || 0 },
+	{ key: "unmapped", label: __("Unmapped users"), type: "number", value: (d) => unmapped.value[d.id] || 0 },
+	{ key: "actions", label: "", sortable: false, filterable: false },
+]
 
 function isNetwork(d: Device) {
 	return adapters.value[d.adapter_type]?.network ?? d.adapter_type !== "file_import"

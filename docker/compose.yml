@@ -1,7 +1,7 @@
 # Production on the company's own server:
-#   cp docker/.env.example docker/.env   # then set HOZUR_SECRET_KEY and POSTGRES_PASSWORD
+#   cp docker/.env.example docker/.env   # then set CHRONICLE_SECRET_KEY and POSTGRES_PASSWORD
 #   docker compose -f docker/compose.yml --env-file docker/.env up -d --build
-#   docker compose -f docker/compose.yml exec app hozur create-user admin --role admin
+#   docker compose -f docker/compose.yml exec app chronicle create-user admin --role admin
 # The app listens on port 8000; put it behind the company's HTTPS reverse proxy for the PWA.
 
 services:
@@ -22,23 +22,23 @@ services:
 
   app:
     build: ..
-    image: hozur:latest
+    image: chronicle:latest
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment: &env
-      HOZUR_DATABASE_URL: postgresql+psycopg://hozur:${POSTGRES_PASSWORD}@db:5432/hozur
-      HOZUR_SECRET_KEY: ${HOZUR_SECRET_KEY:?set HOZUR_SECRET_KEY in docker/.env}
-      HOZUR_TIMEZONE: ${HOZUR_TIMEZONE:-Asia/Tehran}
-      HOZUR_COOKIE_SECURE: ${HOZUR_COOKIE_SECURE:-true}
+      CHRONICLE_DATABASE_URL: postgresql+psycopg://hozur:${POSTGRES_PASSWORD}@db:5432/hozur
+      CHRONICLE_SECRET_KEY: ${CHRONICLE_SECRET_KEY:?set CHRONICLE_SECRET_KEY in docker/.env}
+      CHRONICLE_TIMEZONE: ${CHRONICLE_TIMEZONE:-Asia/Tehran}
+      CHRONICLE_COOKIE_SECURE: ${CHRONICLE_COOKIE_SECURE:-true}
     volumes:
       - files:/data
     ports:
-      - "${HOZUR_PORT:-8000}:8000"
+      - "${CHRONICLE_PORT:-8000}:8000"
 
   worker:
-    image: hozur:latest
+    image: chronicle:latest
     restart: unless-stopped
     depends_on:
       app:
@@ -46,7 +46,7 @@ services:
     environment: *env
     volumes:
       - files:/data
-    command: ["hozur", "worker"]
+    command: ["chronicle", "worker"]
     # The worker talks to attendance devices on the company network (TCP 4370).
 
 volumes:

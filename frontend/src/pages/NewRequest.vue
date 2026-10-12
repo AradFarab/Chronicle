@@ -2,6 +2,14 @@
 	<form class="space-y-4" @submit.prevent="submit">
 		<h1 class="text-lg font-bold">{{ __("New request") }}</h1>
 		<Segmented v-model="kind" :options="kinds" />
+		<p v-if="fromSuggestion" class="hz-num flex gap-2 rounded-4 bg-surface-blue-1 p-3 text-sm text-ink-blue-7">
+			<span class="lucide-lightbulb mt-0.5 size-4 shrink-0" />
+			{{
+				suggestedMinutes
+					? fa(__("Filled in from a suggested request ({0} minutes). Check it before you submit.", [suggestedMinutes]))
+					: __("Filled in from a suggested request. Check it before you submit.")
+			}}
+		</p>
 
 		<section class="hz-card space-y-4">
 			<EmployeePicker
@@ -136,6 +144,7 @@ import { api } from "@/lib/api"
 import { refreshCounts } from "@/lib/counts"
 import { clock, dayPunches, directionLabel, sourceLabel, statusLabel } from "@/lib/format"
 import { __ } from "@/lib/i18n"
+import { fa } from "@/lib/jalali"
 import { session } from "@/lib/session"
 import type { DayDetails, LeaveType, Punch, RequestView } from "@/lib/types"
 
@@ -166,7 +175,21 @@ const overtimeKinds = computed(() => [
 	{ value: "emergency", label: __("Emergency") },
 ])
 
-const date = String(route.query.date || "") || session.today
+// prefilled values: ?date= from the day views; ?jdate=&from_time=&to_time=&minutes=&unit=&suggestion_id=
+// when the employee sends a suggested request (Today)
+function query(key: string): string {
+	const value = route.query[key]
+	return typeof value === "string" ? value : ""
+}
+const date = query("jdate") || query("date") || session.today
+const fromTime = query("from_time") || null
+const toTime = query("to_time") || null
+const suggestionId = Number(query("suggestion_id")) || null
+const suggestedKind = suggestionId ? kind.value : null
+const suggestedMinutes = Number(query("minutes")) || 0
+// the suggestion is sent with the request only for the kind it proposed
+const fromSuggestion = computed(() => !!suggestionId && kind.value === suggestedKind)
+const hourlyLeave = query("unit") === "hourly"
 const employee = ref<number | null>(Number(route.query.employee) || session.employee?.id || null)
 const canChooseEmployee = computed(() => session.is_admin || (kind.value === "overtime" && session.is_manager))
 // the request is for someone else only when the picker is shown and another person is chosen
@@ -177,12 +200,12 @@ const assigning = computed(() => kind.value === "overtime" && forSomeoneElse.val
 
 const leave = reactive({
 	leave_type_id: null as number | null,
-	unit: "daily",
+	unit: hourlyLeave ? "hourly" : "daily",
 	from_date: date as string | null,
 	to_date: date as string | null,
 	jdate: date as string | null,
-	from_time: null as string | null,
-	to_time: null as string | null,
+	from_time: hourlyLeave ? fromTime : null,
+	to_time: hourlyLeave ? toTime : null,
 	reason: "",
 })
 const mission = reactive({
@@ -198,8 +221,8 @@ const mission = reactive({
 const overtime = reactive({
 	jdate: date as string | null,
 	overtime_kind: "normal",
-	from_time: null as string | null,
-	to_time: null as string | null,
+	from_time: (kind.value === "overtime" ? fromTime : null) as string | null,
+	to_time: (kind.value === "overtime" ? toTime : null) as string | null,
 	reason: "",
 })
 const correction = reactive({
@@ -221,7 +244,10 @@ watch(allowHourly, (allowed) => {
 onMounted(async () => {
 	try {
 		leaveTypes.value = await api.get<LeaveType[]>("/leave-types")
-		leave.leave_type_id = leaveTypes.value[0]?.id ?? null
+		// an hourly leave (from a suggestion) starts with a leave type that allows hours
+		const first = hourlyLeave ? leaveTypes.value.find((t) => t.allow_hourly) : undefined
+		leave.leave_type_id = (first ?? leaveTypes.value[0])?.id ?? null
+		if (!allowHourly.value) leave.unit = "daily"
 	} catch (e) {
 		error.value = (e as Error).message
 	}
@@ -259,7 +285,8 @@ function addTime() {
 }
 
 function values(): Record<string, unknown> {
-	const base = forSomeoneElse.value ? { employee_id: employee.value } : {}
+	const base: Record<string, unknown> = forSomeoneElse.value ? { employee_id: employee.value } : {}
+	if (fromSuggestion.value) base.suggestion_id = suggestionId
 	if (kind.value === "leave") {
 		const v = { ...leave }
 		return v.unit === "daily"

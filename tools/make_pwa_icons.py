@@ -8,10 +8,10 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
-FONT = ROOT / "hozur/public/fonts/vazirmatn/Vazirmatn-Bold.ttf"
+FONT = ROOT / "backend/chronicle/reports/fonts/Vazirmatn-Bold.ttf"
 OUT = ROOT / "frontend/public/icons"
 BRAND = (15, 118, 110)  # --hz-brand
-LETTER = "ح"
+LETTER = "C"  # Chronicle
 
 
 def icon(size: int, maskable: bool = False, radius: float = 0.22) -> Image.Image:

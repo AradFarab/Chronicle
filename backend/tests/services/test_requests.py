@@ -9,7 +9,7 @@ import pytest
 from orgfactory import TODAY
 from sqlalchemy import func, select
 
-from hozur.db.models import (
+from chronicle.db.models import (
 	ApprovalOverride,
 	ApprovalProcess,
 	AttendancePeriod,
@@ -20,10 +20,10 @@ from hozur.db.models import (
 	LeaveType,
 	RawPunch,
 )
-from hozur.services import approvals, leave, requests
-from hozur.services.errors import Conflict, PermissionDenied, ValidationError
-from hozur.services.punches import effective_punches
-from hozur.setup import data
+from chronicle.services import approvals, leave, requests
+from chronicle.services.errors import Conflict, PermissionDenied, ValidationError
+from chronicle.services.punches import effective_punches
+from chronicle.setup import data
 
 EARNED = "استحقاقی"
 
@@ -144,7 +144,7 @@ def test_employees_file_only_for_themselves_the_admin_for_anyone(org):
 	with pytest.raises(PermissionDenied):
 		daily_leave(org, "1405/07/12", "1405/07/12", actor=org.mgr, employee_id=org.employee.id)
 	no_approval = org.db.scalar(select(ApprovalProcess).where(ApprovalProcess.name == data.NO_APPROVAL))
-	from hozur.db.models import ApprovalDefault
+	from chronicle.db.models import ApprovalDefault
 
 	org.db.get(ApprovalDefault, "admin_entry").process_id = no_approval.id
 	r = daily_leave(org, "1405/07/12", "1405/07/12", actor=org.op, employee_id=org.employee.id)
@@ -354,7 +354,7 @@ def test_any_holder_of_the_parent_designation_can_approve(org):
 def test_a_delegate_approves_in_the_managers_place_and_the_manager_still_can(org):
 	from orgfactory import make_employee
 
-	from hozur.services import access, delegations
+	from chronicle.services import access, delegations
 
 	peer, peer_user = make_employee(org.db, "T-PEER", org.accountant_designation)
 	delegations.create(org.db, org.mgr, {"delegate_id": peer.id}, TODAY)

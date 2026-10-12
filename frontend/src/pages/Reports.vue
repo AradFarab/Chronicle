@@ -72,24 +72,7 @@
 			<p class="text-sm text-ink-gray-5">
 				{{ __("{0} rows · {1} to {2}", [fa(result.total_rows), display(result.from_date), display(result.to_date)]) }}
 			</p>
-			<div class="overflow-x-auto rounded-6 border border-outline-gray-1 bg-surface-base">
-				<table class="w-full text-sm">
-					<thead class="bg-surface-gray-1 text-ink-gray-5">
-						<tr>
-							<th v-for="c in result.columns" :key="c.key" class="whitespace-nowrap px-3 py-2 text-start font-medium">
-								{{ c.label }}
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(row, i) in result.rows" :key="i" class="border-t border-outline-gray-1">
-							<td v-for="c in result.columns" :key="c.key" class="hz-num whitespace-nowrap px-3 py-2">
-								{{ cell(c, row[c.key]) }}
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+			<DataTable :columns="tableColumns" :rows="tableRows" row-key="__row" />
 		</div>
 	</div>
 </template>
@@ -98,12 +81,14 @@
 import { Button, Combobox, ErrorMessage, Select, TextInput, toast } from "frappe-ui"
 import { computed, onMounted, reactive, ref, watch } from "vue"
 import JalaliDatePicker from "@/components/JalaliDatePicker.vue"
+import DataTable from "@/components/DataTable.vue"
 import PageHeader from "@/components/PageHeader.vue"
 import { api, download } from "@/lib/api"
 import { __ } from "@/lib/i18n"
 import { display, fa, hm, monthLength } from "@/lib/jalali"
 import { refOptions } from "@/lib/refs"
 import { session } from "@/lib/session"
+import type { ColumnType, TableColumn } from "@/lib/table"
 
 interface Template {
 	id: number
@@ -203,6 +188,20 @@ function body(exportFormat?: string) {
 		export_format: exportFormat,
 	}
 }
+
+// the preview as a sortable, filterable table (sorting uses the raw numbers and dates)
+type ResultRow = Record<string, unknown>
+const NUMERIC_KINDS = ["minutes", "days", "count"]
+const tableColumns = computed<TableColumn<ResultRow>[]>(() =>
+	(result.value?.columns ?? []).map((c) => ({
+		key: c.key,
+		label: c.label,
+		type: (c.kind === "date" ? "date" : NUMERIC_KINDS.includes(c.kind) ? "number" : "text") as ColumnType,
+		format: (row: ResultRow) => cell(c, row[c.key]),
+		class: "hz-num whitespace-nowrap",
+	}))
+)
+const tableRows = computed(() => (result.value?.rows ?? []).map((row, i) => ({ ...row, __row: i })))
 
 function cell(c: Column, value: unknown): string {
 	if (value === null || value === undefined) return ""

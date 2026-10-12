@@ -1,11 +1,12 @@
-# hozur — حضور و غیاب
+# Chronicle (کرونیکل) — حضور و غیاب
 
 Open-source attendance for Iranian companies: punches come from attendance devices (ZKTeco
 first), the Iranian Labor Law (قانون کار ۱۳۶۹) is applied as configurable data, and everything
 is Jalali, Persian and RTL. An independent Python server (FastAPI) on PostgreSQL plus one
 installable PWA for every role.
 
-Status: phase 1 (MVP) in progress. Working name `hozur`; the final name is still open.
+Status: phase 1 (MVP), version 0.3.0 (see [CHANGELOG.md](CHANGELOG.md)). Until 0.3.0 the project was called
+«حضور» / `hozur`; the database is still named `hozur` and `HOZUR_*` variables are still read.
 
 - **Employees** see their day and month, their leave balance, and file leave, mission,
   overtime and manual time entries.
@@ -25,13 +26,13 @@ Status: phase 1 (MVP) in progress. Working name `hozur`; the final name is still
 ## Development
 
 ```bash
-docker compose -f docker/dev.yml up -d          # PostgreSQL 17 (hozur, hozur_test)
+docker compose -f docker/dev.yml up -d          # PostgreSQL 17 (databases hozur, hozur_test)
 cd backend
 python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
-.venv/bin/hozur db install                      # schema + reference data + holidays 1400-1410
-.venv/bin/hozur create-user admin --name "مدیر سیستم" --role admin
-.venv/bin/hozur serve --reload                  # API on http://localhost:8000/api
-.venv/bin/hozur worker                          # devices, job queue, nightly work (second terminal)
+.venv/bin/chronicle db install                      # schema + reference data + holidays 1400-1410
+.venv/bin/chronicle create-user admin --name "مدیر سیستم" --role admin
+.venv/bin/chronicle serve --reload                  # API on http://localhost:8000/api
+.venv/bin/chronicle worker                          # devices, job queue, nightly work (second terminal)
 .venv/bin/pytest -q
 
 cd ../frontend && yarn && yarn dev              # PWA on http://localhost:8080
@@ -40,18 +41,23 @@ cd ../frontend && yarn && yarn dev              # PWA on http://localhost:8080
 ## Production (one company, its own server)
 
 ```bash
-cp docker/.env.example docker/.env               # set POSTGRES_PASSWORD and HOZUR_SECRET_KEY
+cp docker/.env.example docker/.env               # set POSTGRES_PASSWORD and CHRONICLE_SECRET_KEY
 docker compose -f docker/compose.yml --env-file docker/.env up -d --build
-docker compose -f docker/compose.yml exec app hozur create-user admin --role admin
+docker compose -f docker/compose.yml --env-file docker/.env exec app chronicle create-user admin --role admin
 ```
 
 The app listens on port 8000; serve it over HTTPS (the company's reverse proxy) so the PWA can
-be installed on phones. Back up the `db` and `files` volumes.
+be installed on phones.
+
+Backups: the worker takes one every night (Manage → Backups sets the hour and how many to keep)
+into `/data/backups` of the `files` volume; download copies from the same page and keep them
+somewhere else. To restore, stop the worker and run
+`docker compose -f docker/compose.yml --env-file docker/.env exec app chronicle backup restore <name>`.
 
 ## Contributing
 
 `pre-commit install` once (ruff). Every user-facing string is English in code and Persian in
-`backend/hozur/locale/fa.po`: run `python3 tools/i18n.py` after adding strings.
+`backend/chronicle/locale/fa.po`: run `python3 tools/i18n.py` after adding strings.
 
 ## License
 

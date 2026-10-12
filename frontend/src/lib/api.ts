@@ -1,5 +1,5 @@
 /**
- * The client for the Hozur JSON API (/api). Every unsafe request carries the X-Hozur header
+ * The client for the Chronicle JSON API (/api). Every unsafe request carries the X-Chronicle header
  * (the server's CSRF guard); errors come back as {message} already translated to Persian.
  */
 
@@ -32,7 +32,7 @@ export function setUnauthorizedHandler(handler: () => void): void {
 }
 
 async function request<T>(method: string, path: string, body?: unknown, query?: Query): Promise<T> {
-  const headers: Record<string, string> = { Accept: "application/json", "X-Hozur": "1" }
+  const headers: Record<string, string> = { Accept: "application/json", "X-Chronicle": "1" }
   let payload: BodyInit | undefined
   if (body instanceof FormData) payload = body
   else if (body !== undefined) {
@@ -65,8 +65,10 @@ async function saveResponse(response: Response, fallbackName: string): Promise<v
     throw new ApiError(data.message || response.statusText, response.status)
   }
   const disposition = response.headers.get("content-disposition") ?? ""
+  // filename*=UTF-8''... (Persian names) or a plain filename="..." (backups)
   const match = /filename\*=UTF-8''([^;]+)/.exec(disposition)
-  const name = match ? decodeURIComponent(match[1]) : fallbackName
+  const plain = /filename="?([^";]+)"?/.exec(disposition)
+  const name = match ? decodeURIComponent(match[1]) : plain ? plain[1] : fallbackName
   const link = document.createElement("a")
   link.href = URL.createObjectURL(await response.blob())
   link.download = name
@@ -78,19 +80,19 @@ async function saveResponse(response: Response, fallbackName: string): Promise<v
 export async function download(path: string, body: unknown): Promise<void> {
   const response = await fetch(url(path), {
     method: "POST",
-    headers: { "Content-Type": "application/json; charset=utf-8", "X-Hozur": "1" },
+    headers: { "Content-Type": "application/json; charset=utf-8", "X-Chronicle": "1" },
     body: JSON.stringify(body),
     credentials: "same-origin",
   })
   await saveResponse(response, "report")
 }
 
-/** GET that returns a file (the sample workbook of an Excel import). */
-export async function downloadGet(path: string, query?: Query): Promise<void> {
+/** GET that returns a file (the sample workbook of an Excel import, a backup). */
+export async function downloadGet(path: string, query?: Query, fallbackName = "sample.xlsx"): Promise<void> {
   const response = await fetch(url(path, query), {
-    headers: { "X-Hozur": "1" },
+    headers: { "X-Chronicle": "1" },
     credentials: "same-origin",
   })
   if (response.status === 401) onUnauthorized()
-  await saveResponse(response, "sample.xlsx")
+  await saveResponse(response, fallbackName)
 }

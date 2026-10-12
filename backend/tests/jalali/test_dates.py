@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 import pytest
 
-from hozur.jalali import dates as jd
+from chronicle.jalali import dates as jd
 
 
 def test_parse_and_format_round_trip():

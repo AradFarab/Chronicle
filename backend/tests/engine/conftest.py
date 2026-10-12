@@ -1,6 +1,6 @@
 import pytest
 
-from hozur.engine.rules import baseline_rule_set
+from chronicle.engine.rules import baseline_rule_set
 
 
 @pytest.fixture

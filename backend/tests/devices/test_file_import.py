@@ -4,8 +4,8 @@ from datetime import datetime
 import pytest
 from openpyxl import Workbook
 
-from hozur.devices.base import IN, OUT, UNKNOWN, DeviceError
-from hozur.devices.file_import import CSV, EXCEL, ZKTECO_USB, parse_rows, read_table
+from chronicle.devices.base import IN, OUT, UNKNOWN, DeviceError
+from chronicle.devices.file_import import CSV, EXCEL, ZKTECO_USB, parse_rows, read_table
 
 ATTLOG = b"""      1\t2026-10-06 07:58:11\t1\t0\t1\t0
       1\t2026-10-06 16:31:02\t1\t1\t1\t0

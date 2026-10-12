@@ -177,7 +177,7 @@ function holidaysOf(year: number): Promise<Holiday[]> {
 	return holidayCache.get(year)!
 }
 
-/** Same rule as the server (hozur.jalali.holidays.day_off_kind); null = not a day off. */
+/** Same rule as the server (chronicle.jalali.holidays.day_off_kind); null = not a day off. */
 function dayOffKind(h: Holiday): string | null {
 	if (h.holiday_type === "office_closure")
 		return { paid_holiday: "official_holiday", employer_paid: "company_holiday" }[h.closure_pay_mode ?? ""] ?? null

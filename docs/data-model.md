@@ -1,7 +1,7 @@
 # Data model (PostgreSQL)
 
 The schema is the contract of the app (CLAUDE.md rule 10). Every change is an Alembic migration
-in `backend/hozur/db/migrations/` and is reflected here. Constraints live in the database.
+in `backend/chronicle/db/migrations/` and is reflected here. Constraints live in the database.
 
 ## Conventions
 
@@ -67,7 +67,8 @@ Parameters are JSONB so that a new legal parameter does not need a schema change
 
 | Table | Purpose | Key invariants |
 | --- | --- | --- |
-| `shift` | one working day's hours | name unique; `shift_type ∈ fixed, flexible`; break inside the shift (checked in Python) |
+| `shift` | one working day's hours | name unique; `shift_type ∈ fixed, flexible`; `grace_late_minutes` / `grace_early_minutes`: up to this late or early is forgiven, beyond it the whole time counts; `overtime_after_minutes`: staying up to this long after the end is ignored, beyond it all of it is extra work |
+| `shift_segment` | timed parts of a shift drawn in the PWA: breaks (never working time, Article 51; several per shift) and overtime windows (only extra work inside them can become overtime, still with request and approval) | `kind ∈ break, overtime`; `start_minute`/`end_minute` from the shift day's 00:00, `0 ≤ start < end ≤ 2880` (CHECK); breaks inside the shift, windows outside a fixed shift, no overlap within a kind (checked in Python) |
 | `work_pattern` | weekly or rotating pattern | name unique; `pattern_type ∈ weekly, rotating`; rotating needs `cycle_start_date` |
 | `work_pattern_day` | a day of the pattern | weekly: `weekday` 0–6 (0 = Saturday) unique per pattern; rotating: `cycle_day` 1..n unique per pattern; `shift_id` NULL = rest day |
 | `work_pattern_assignment` | who follows which pattern, from–to | `target_type ∈ employee, designation, department, company` and exactly the matching FK (CHECK); `valid_to ≥ valid_from`; `cycle_offset_days ≥ 0` moves a group along a rotating pattern's cycle, so two groups of guards can follow one pattern half a cycle apart |
@@ -99,6 +100,7 @@ The request number (`LV-00012`, `MS-…`, `OT-…`, `COR-…`) is a generated co
 | `leave_request` | 1:1 detail | daily: from/to dates; hourly: one date and from/to time (CHECK per unit) |
 | `mission_request` | 1:1 detail | same shape as leave |
 | `overtime_request` | 1:1 detail | `overtime_kind ∈ normal, exceptional, emergency`; `minutes > 0`; `assigned_by_manager` |
+| `request_suggestion` | a request the calculation proposes from a day's punches and pattern: overtime (extra work in an overtime window), hourly leave (late / early), correction (missing punch) | `request_type ∈ overtime, hourly_leave, attendance_correction`; `status ∈ open, sent, dismissed`; unique (`employee_id`, `jdate`, `key`) so a dismissed or sent one is never proposed again; open ones are replaced on every recalculation; the employee sends (their consent, Article 59) or dismisses, nothing is submitted for them |
 | `correction_item` | lines of a correction | `action ∈ add_punch, ignore_punch`; add needs `time`, ignore needs `raw_punch_id` (CHECK) |
 | `request_approval` | one step of the approval chain of a request | unique (`request_id`, `step`); `status ∈ pending, approved, rejected, skipped`; `approver_type ∈ parent, ceo, specific_person, employee_acceptance`; `acted_by_id` is who really decided |
 | `request_approval_approver` | who may decide a step: the holders of the designation it resolved to (any one of them, or someone they delegated to) | PK (`approval_id`, `employee_id`); the inbox is a join on this table |

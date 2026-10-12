@@ -7,34 +7,51 @@
 			<Button @click="load">{{ __("Show") }}</Button>
 		</div>
 		<ErrorMessage :message="error" />
-		<div class="flex flex-col gap-2">
-			<details v-for="e in entries" :key="e.id" class="rounded-6 border border-outline-gray-1 bg-surface-base px-4 py-2">
-				<summary class="flex cursor-pointer flex-wrap items-center gap-2 text-sm">
-					<Badge>{{ actionLabel(e.action) }}</Badge>
-					<span dir="ltr" class="font-mono text-xs">{{ e.entity }} #{{ e.entity_id }}</span>
-					<span class="flex-1">{{ e.user || __("System") }}</span>
-					<span class="hz-num text-xs text-ink-gray-5">{{ fa(e.at) }}</span>
-				</summary>
-				<p v-if="e.reason" class="mt-2 text-sm">{{ __("Reason") }}: {{ e.reason }}</p>
-				<table v-if="e.changed_fields.length" class="mt-2 w-full text-xs">
-					<tr v-for="f in e.changed_fields" :key="f" class="border-t border-outline-gray-1">
-						<td dir="ltr" class="py-1 font-mono">{{ f }}</td>
-						<td dir="ltr" class="py-1 text-ink-red-4">{{ show(e.before?.[f]) }}</td>
-						<td dir="ltr" class="py-1 text-ink-green-4">{{ show(e.after?.[f]) }}</td>
-					</tr>
-				</table>
-			</details>
-		</div>
+		<DataTable :columns="columns" :rows="entries" :loading="loading" storage-key="audit" @row-click="openEntry">
+			<template #cell-action="{ row }"><Badge>{{ actionLabel(row.action) }}</Badge></template>
+			<template #cell-entity="{ row }"><span dir="ltr" class="font-mono text-xs">{{ row.entity }}</span></template>
+			<template #cell-entity_id="{ text }">
+				<span dir="ltr" class="block max-w-48 truncate text-right font-mono text-xs" :title="text">{{ text }}</span>
+			</template>
+			<template #cell-reason="{ text }">
+				<span class="line-clamp-2 min-w-40 max-w-72" :title="text">{{ text }}</span>
+			</template>
+			<template #cell-changed_fields="{ text }">
+				<span dir="ltr" class="block max-w-64 truncate text-right font-mono text-xs" :title="text">{{ text }}</span>
+			</template>
+		</DataTable>
+
+		<Dialog v-model:open="entryOpen" :title="current ? actionLabel(current.action) : ''" size="2xl">
+			<div v-if="current" class="flex flex-col gap-3 text-sm">
+				<p class="flex flex-wrap items-center gap-2">
+					<span dir="ltr" class="font-mono text-xs">{{ current.entity }} #{{ current.entity_id }}</span>
+					<span class="flex-1">{{ current.user || __("System") }}</span>
+					<span class="hz-num text-xs text-ink-gray-5">{{ fa(current.at) }}</span>
+				</p>
+				<p v-if="current.reason">{{ __("Reason") }}: {{ current.reason }}</p>
+				<div v-if="current.changed_fields.length" class="overflow-x-auto">
+					<table class="w-full text-xs">
+						<tr v-for="f in current.changed_fields" :key="f" class="border-t border-outline-gray-1">
+							<td dir="ltr" class="py-1 pe-2 font-mono">{{ f }}</td>
+							<td dir="ltr" class="py-1 pe-2 text-ink-red-4">{{ show(current.before?.[f]) }}</td>
+							<td dir="ltr" class="py-1 text-ink-green-4">{{ show(current.after?.[f]) }}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</Dialog>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Badge, Button, ErrorMessage, TextInput } from "frappe-ui"
+import { Badge, Button, Dialog, ErrorMessage, TextInput } from "frappe-ui"
 import { onMounted, ref } from "vue"
+import DataTable from "@/components/DataTable.vue"
 import PageHeader from "@/components/PageHeader.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
+import type { TableColumn } from "@/lib/table"
 
 interface Entry {
 	id: number
@@ -53,6 +70,28 @@ const entries = ref<Entry[]>([])
 const entity = ref("")
 const entityId = ref("")
 const error = ref("")
+const loading = ref(false)
+const entryOpen = ref(false)
+const current = ref<Entry | null>(null)
+
+const columns: TableColumn<Entry>[] = [
+	{ key: "at", label: __("When"), type: "date", format: (e) => fa(e.at) },
+	{ key: "action", label: __("Action"), value: (e) => actionLabel(e.action) },
+	{ key: "entity", label: __("Table") },
+	{ key: "entity_id", label: __("Record id"), type: "number", format: (e) => e.entity_id },
+	{ key: "user", label: __("By"), value: (e) => e.user || __("System") },
+	{ key: "reason", label: __("Reason") },
+	{
+		key: "changed_fields",
+		label: __("Changed fields"),
+		value: (e) => e.changed_fields.join(", "),
+	},
+]
+
+function openEntry(e: Entry) {
+	current.value = e
+	entryOpen.value = true
+}
 
 function actionLabel(action: string) {
 	return (
@@ -78,6 +117,7 @@ function show(value: unknown): string {
 
 async function load() {
 	error.value = ""
+	loading.value = true
 	try {
 		entries.value = await api.get<Entry[]>("/admin/audit", {
 			entity: entity.value,
@@ -86,6 +126,8 @@ async function load() {
 		})
 	} catch (e) {
 		error.value = (e as Error).message
+	} finally {
+		loading.value = false
 	}
 }
 

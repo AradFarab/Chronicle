@@ -2,24 +2,18 @@
 	<div class="space-y-4">
 		<h1 class="text-lg font-bold">{{ __("Waiting for my approval") }}</h1>
 		<ErrorMessage v-if="error" :message="error" />
-		<p v-if="loading" class="text-center text-sm text-ink-gray-5">{{ __("Loading...") }}</p>
-		<p v-else-if="!rows.length" class="hz-card text-center text-sm text-ink-gray-5">
-			{{ __("Nothing is waiting for you") }}
-		</p>
-
-		<ul class="space-y-3">
-			<li v-for="r in rows" :key="r.id" class="hz-card space-y-2">
-				<div class="flex items-center gap-2">
-					<Badge :label="requestTypeLabel(r.request_type)" />
-					<span class="font-semibold">{{ r.employee_name }}</span>
-				</div>
-				<p class="hz-num text-sm text-ink-gray-7">{{ requestSummary(r, leaveTypes) }}</p>
-				<p v-if="r.reason" class="text-sm text-ink-gray-5">{{ r.reason }}</p>
-				<p v-if="r.is_acceptance" class="text-xs text-ink-amber-7">
+		<DataTable :columns="columns" :rows="rows" :loading="loading" storage-key="approvals">
+			<template #empty>{{ __("Nothing is waiting for you") }}</template>
+			<template #cell-request_type="{ row: r, text }">
+				<Badge :label="text" />
+				<p v-if="r.is_acceptance" class="mt-1 max-w-56 text-xs text-ink-amber-7">
 					{{ __("Your manager assigned this overtime; it needs your acceptance (Article 59).") }}
 				</p>
-				<div class="flex gap-2 pt-1">
+			</template>
+			<template #cell-actions="{ row: r }">
+				<div class="flex gap-1 whitespace-nowrap">
 					<Button
+						size="sm"
 						variant="solid"
 						theme="green"
 						icon-left="lucide-check"
@@ -28,12 +22,39 @@
 					>
 						{{ r.is_acceptance ? __("Accept") : __("Approve") }}
 					</Button>
-					<Button theme="red" icon-left="lucide-x" @click="askReject(r)">
+					<Button size="sm" theme="red" icon-left="lucide-x" @click="askReject(r)">
 						{{ r.is_acceptance ? __("Decline") : __("Reject") }}
 					</Button>
 				</div>
-			</li>
-		</ul>
+			</template>
+			<template #card="{ row: r }">
+				<div class="hz-card space-y-2">
+					<div class="flex items-center gap-2">
+						<Badge :label="requestTypeLabel(r.request_type)" />
+						<span class="font-semibold">{{ r.employee_name }}</span>
+					</div>
+					<p class="hz-num text-sm text-ink-gray-7">{{ requestSummary(r, leaveTypes) }}</p>
+					<p v-if="r.reason" class="text-sm text-ink-gray-5">{{ r.reason }}</p>
+					<p v-if="r.is_acceptance" class="text-xs text-ink-amber-7">
+						{{ __("Your manager assigned this overtime; it needs your acceptance (Article 59).") }}
+					</p>
+					<div class="flex gap-2 pt-1">
+						<Button
+							variant="solid"
+							theme="green"
+							icon-left="lucide-check"
+							:loading="busy === r.id + 'approve'"
+							@click="act(r, 'approve')"
+						>
+							{{ r.is_acceptance ? __("Accept") : __("Approve") }}
+						</Button>
+						<Button theme="red" icon-left="lucide-x" @click="askReject(r)">
+							{{ r.is_acceptance ? __("Decline") : __("Reject") }}
+						</Button>
+					</div>
+				</div>
+			</template>
+		</DataTable>
 
 		<Dialog v-model:open="rejectOpen" :title="__('Reject')">
 			<Textarea v-model="comment" :label="__('Reason')" :rows="3" />
@@ -54,10 +75,12 @@
 <script setup lang="ts">
 import { Badge, Button, Dialog, ErrorMessage, Textarea, toast } from "frappe-ui"
 import { onMounted, ref } from "vue"
+import DataTable from "@/components/DataTable.vue"
 import { api } from "@/lib/api"
 import { refreshCounts } from "@/lib/counts"
 import { requestSummary, requestTypeLabel } from "@/lib/format"
 import { __ } from "@/lib/i18n"
+import type { TableColumn } from "@/lib/table"
 import type { LeaveType, RequestView } from "@/lib/types"
 
 const rows = ref<RequestView[]>([])
@@ -68,6 +91,16 @@ const busy = ref("")
 const rejectOpen = ref(false)
 const rejecting = ref<RequestView | null>(null)
 const comment = ref("")
+
+const columns: TableColumn<RequestView>[] = [
+	{ key: "employee_name", label: __("Employee"), class: "whitespace-nowrap font-medium" },
+	{ key: "request_type", label: __("Type"), value: (r) => requestTypeLabel(r.request_type) },
+	{ key: "start_jdate", label: __("From"), type: "date" },
+	{ key: "end_jdate", label: __("Until"), type: "date" },
+	{ key: "summary", label: __("Details"), value: (r) => requestSummary(r, leaveTypes.value), class: "hz-num" },
+	{ key: "reason", label: __("Reason"), class: "text-ink-gray-6" },
+	{ key: "actions", label: "", sortable: false, filterable: false },
+]
 
 async function load() {
 	loading.value = true

@@ -132,3 +132,74 @@ export interface Option {
   value: string
   label: string
 }
+
+/** A field of an Excel import (POST /import/{name}/inspect). */
+export interface ImportField {
+  key: string
+  label: string
+  kind: "text" | "number" | "bool" | "jdate" | "time" | "choice" | "ref"
+  required: boolean
+  help: string
+  example: string
+  choices: string[]
+}
+
+/** A column of the uploaded file: 1-based index, its header and a few values under it. */
+export interface ImportColumn {
+  index: number
+  header: string
+  samples: string[]
+}
+
+/** POST /import/{name}/inspect: what the column-mapping panel needs. */
+export interface ImportInspection {
+  sheets: string[]
+  sheet: string
+  header_row: number
+  row_count: number
+  columns: ImportColumn[]
+  fields: ImportField[]
+  suggested: Record<string, number | null>
+}
+
+/** What the server receives as `mapping`: field -> column index, or one value for every row. */
+export type ImportMapping = Record<string, number | { value: string }>
+
+/** POST /import/{name}: a dry run (check) or the real import. */
+export interface ImportResult {
+  imported: boolean
+  dry_run: boolean
+  created: number
+  checked: number
+  errors: { row: number; message: string }[]
+  rows: { row: number; values: Record<string, unknown>; notes: string[]; errors: string[] }[]
+}
+
+/** A backup file on the server (GET /admin/backups). */
+export interface Backup {
+  name: string
+  size: number // bytes
+  automatic: boolean
+  jdate: string
+  time: string // 'HH:MM'
+  created_at: string
+}
+
+export interface BackupSchedule {
+  enabled: boolean
+  hour: number // 0-23
+  keep: number // automatic backups kept
+}
+
+/** A request the calculation proposes from a day (GET /suggestions). */
+export interface Suggestion {
+  id: number
+  employee_id: number
+  jdate: string
+  request_type: "overtime" | "hourly_leave" | "attendance_correction"
+  from_time: string | null // 'HH:MM'
+  to_time: string | null
+  minutes: number
+  status: string
+  request_id: number | null
+}

@@ -1,6 +1,6 @@
 /**
  * Translations for the PWA. Source strings are English (like the server) and are extracted
- * into backend/hozur/locale/main.pot; the catalog comes from /api/translations/<language>.
+ * into backend/chronicle/locale/main.pot; the catalog comes from /api/translations/<language>.
  */
 let messages: Record<string, string> = {}
 

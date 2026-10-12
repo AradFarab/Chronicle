@@ -8,29 +8,20 @@
 		</div>
 		<TextInput v-model="search" :placeholder="__('Search')" />
 		<ErrorMessage :message="error" />
-		<div class="overflow-x-auto rounded-6 border border-outline-gray-1 bg-surface-base">
-			<table class="w-full text-sm">
-				<thead class="bg-surface-gray-1 text-ink-gray-5">
-					<tr>
-						<th v-for="c in columns" :key="c.key" class="px-3 py-2 text-start font-medium">{{ c.label }}</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="row in filtered"
-						:key="String(row.id)"
-						class="cursor-pointer border-t border-outline-gray-1 hover:bg-surface-gray-1"
-						@click="edit(row)"
-					>
-						<td v-for="c in columns" :key="c.key" class="hz-num px-3 py-2">{{ cell(c, row) }}</td>
-					</tr>
-					<tr v-if="!loading && !filtered.length">
-						<td :colspan="columns.length" class="px-3 py-6 text-center text-ink-gray-5">{{ __("Nothing here yet") }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<DataTable
+			:columns="columns"
+			:rows="rows"
+			:search="search"
+			:loading="loading"
+			:storage-key="`resource.${def.name}`"
+			@row-click="edit"
+		>
+			<template v-if="canWrite && def.name === 'work-pattern-assignments'" #toolbar>
+				<Button icon-left="lucide-users" @click="bulkOpen = true">{{ __("Assign to several people") }}</Button>
+			</template>
+		</DataTable>
 		<ResourceForm v-model:open="formOpen" :def="def" :row="current" :read-only="!canWrite" @saved="load" />
+		<BulkAssignDialog v-if="def.name === 'work-pattern-assignments'" v-model:open="bulkOpen" @done="load" />
 	</div>
 	<p v-else class="text-ink-gray-5">{{ __("Not found") }}</p>
 </template>
@@ -38,6 +29,8 @@
 <script setup lang="ts">
 import { Button, ErrorMessage, TextInput } from "frappe-ui"
 import { computed, ref, watch } from "vue"
+import BulkAssignDialog from "@/components/BulkAssignDialog.vue"
+import DataTable from "@/components/DataTable.vue"
 import ExcelImport from "@/components/ExcelImport.vue"
 import ResourceForm from "@/components/ResourceForm.vue"
 import { api } from "@/lib/api"
@@ -47,6 +40,7 @@ import { display, fa } from "@/lib/jalali"
 import { refLabel } from "@/lib/refs"
 import { resourceDef, type FieldDef } from "@/lib/resources"
 import { session } from "@/lib/session"
+import type { ColumnType, TableColumn } from "@/lib/table"
 
 const props = defineProps<{ resource: string }>()
 
@@ -59,20 +53,35 @@ const formOpen = ref(false)
 const current = ref<Record<string, unknown> | null>(null)
 
 const canWrite = computed(() => session.is_admin)
-const columns = computed(() => def.value?.fields.filter((f) => f.list) ?? [])
+const bulkOpen = ref(false)
 
-const filtered = computed(() => {
-	const q = search.value.trim()
-	if (!q) return rows.value
-	return rows.value.filter((r) => columns.value.some((c) => cell(c, r).includes(q)))
-})
+type Row = Record<string, unknown>
+
+const TYPES: Partial<Record<FieldDef["type"], ColumnType>> = {
+	number: "number",
+	jdate: "date",
+	bool: "bool",
+	badge: "bool",
+}
+
+// sorting uses what people see for references and choices, the stored value for the rest
+const columns = computed<TableColumn<Row>[]>(() =>
+	(def.value?.fields.filter((f) => f.list) ?? []).map((f) => ({
+		key: f.key,
+		label: f.label,
+		type: TYPES[f.type] ?? "text",
+		value: f.type === "ref" || f.type === "select" ? (row: Row) => cell(f, row) : undefined,
+		format: (row: Row) => cell(f, row),
+		class: f.type === "textarea" ? "min-w-48" : "hz-num",
+	}))
+)
 
 function cell(field: FieldDef, row: Record<string, unknown>): string {
 	const value = row[field.key]
 	if (value === null || value === undefined || value === "") return ""
 	if (field.type === "bool" || field.type === "badge") return value ? "✓" : ""
 	if (field.type === "jdate") return display(String(value))
-	if (field.type === "ref") return refLabel(field.ref!, value)
+	if (field.type === "ref") return fa(refLabel(field.ref!, value))
 	if (field.type === "select") {
 		const option = field.options?.().find((o) => o.value === value)
 		return option ? option.label : String(value)

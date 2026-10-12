@@ -7,7 +7,7 @@ import json
 import httpx
 import pytest
 
-from hozur.calendar.sources import (
+from chronicle.calendar.sources import (
 	BundledSource,
 	CalendarSourceError,
 	FileSource,
@@ -15,7 +15,7 @@ from hozur.calendar.sources import (
 	clean_title,
 	parse_time_ir_month,
 )
-from hozur.jalali import holidays as hol
+from chronicle.jalali import holidays as hol
 
 URL = "https://api.time.ir/v1/event/fa/events/calendar?year={year}&month={month}&day=0"
 

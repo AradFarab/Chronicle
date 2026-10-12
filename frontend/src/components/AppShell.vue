@@ -3,9 +3,9 @@
 		<!-- desktop: navigation on the start side (right, in RTL) -->
 		<aside class="hidden w-60 shrink-0 border-e border-outline-gray-1 bg-surface-base md:flex md:flex-col">
 			<div class="flex items-center gap-2 px-4 py-4">
-				<span class="hz-brand flex size-9 items-center justify-center rounded-4 text-lg font-bold">ح</span>
+				<span class="hz-brand flex size-9 items-center justify-center rounded-4 text-lg font-bold">C</span>
 				<div class="min-w-0">
-					<p class="truncate font-semibold">{{ __("Hozur") }}</p>
+					<p class="truncate font-semibold">{{ __("Chronicle") }}</p>
 					<p class="truncate text-xs text-ink-gray-5">{{ session.organization }}</p>
 				</div>
 			</div>
@@ -36,7 +36,7 @@
 			<header
 				class="sticky top-0 z-20 flex items-center gap-2 border-b border-outline-gray-1 bg-surface-base/95 px-4 py-3 backdrop-blur md:hidden"
 			>
-				<span class="hz-brand flex size-8 items-center justify-center rounded-4 font-bold">ح</span>
+				<span class="hz-brand flex size-8 items-center justify-center rounded-4 font-bold">C</span>
 				<p class="flex-1 truncate font-semibold">{{ title }}</p>
 				<UserMenu compact />
 			</header>
@@ -139,7 +139,7 @@ function isActive(item: NavItem) {
 	return item.match.includes(String(route.name))
 }
 
-const title = computed(() => items.value.find(isActive)?.label ?? __("Hozur"))
+const title = computed(() => items.value.find(isActive)?.label ?? __("Chronicle"))
 
 onMounted(() => refreshCounts())
 watch(

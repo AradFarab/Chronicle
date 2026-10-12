@@ -40,6 +40,7 @@ const routes: RouteRecordRaw[] = [
   { path: "/manage/settings", name: "settings", component: () => import("./pages/Settings.vue"), meta: admin },
   { path: "/manage/approval-defaults", name: "approval-defaults", component: () => import("./pages/ApprovalDefaults.vue"), meta: admin },
   { path: "/manage/audit", name: "audit", component: () => import("./pages/Audit.vue"), meta: admin },
+  { path: "/manage/backups", name: "backups", component: () => import("./pages/Backups.vue"), meta: admin },
   { path: "/devices", name: "devices", component: () => import("./pages/Devices.vue"), meta: admin },
   { path: "/devices/new", name: "new-device", component: () => import("./pages/DeviceForm.vue"), meta: admin },
   {

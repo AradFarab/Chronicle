@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 from orgfactory import PASSWORD
 from sqlalchemy.orm import sessionmaker
 
-from hozur.api.app import create_app
-from hozur.services import users
+from chronicle.api.app import create_app
+from chronicle.services import users
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def client_for(app, org):
 		user = getattr(org.users, username)
 		user.password_hash = users.hash_password(PASSWORD)
 		org.db.flush()
-		client = TestClient(app, headers={"X-Hozur": "1"})
+		client = TestClient(app, headers={"X-Chronicle": "1"})
 		r = client.post("/api/auth/login", json={"username": user.username, "password": PASSWORD})
 		assert r.status_code == 200, r.text
 		return client

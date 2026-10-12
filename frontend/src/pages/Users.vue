@@ -11,32 +11,16 @@
 			}}
 		</p>
 		<ErrorMessage :message="error" />
-		<div class="overflow-x-auto rounded-6 border border-outline-gray-1 bg-surface-base">
-			<table class="w-full text-sm">
-				<thead class="bg-surface-gray-1 text-ink-gray-5">
-					<tr>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Username") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Name") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Roles") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Last login") }}</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="u in users"
-						:key="u.id"
-						class="cursor-pointer border-t border-outline-gray-1 hover:bg-surface-gray-1"
-						:class="u.is_active ? '' : 'text-ink-gray-4'"
-						@click="edit(u)"
-					>
-						<td class="px-3 py-2" dir="ltr">{{ u.username }}</td>
-						<td class="px-3 py-2">{{ u.full_name }}</td>
-						<td class="px-3 py-2">{{ u.roles.map(roleLabel).join("، ") }}</td>
-						<td class="hz-num px-3 py-2">{{ fa(u.last_login_at ?? "") }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<DataTable
+			:columns="columns"
+			:rows="users"
+			:loading="loading"
+			:row-class="(u) => (u.is_active ? '' : 'text-ink-gray-4')"
+			storage-key="users"
+			@row-click="edit"
+		>
+			<template #cell-username="{ row }"><span dir="ltr">{{ row.username }}</span></template>
+		</DataTable>
 
 		<Dialog v-model:open="open" :title="current ? current.username : __('New user')">
 			<div class="flex flex-col gap-4">
@@ -68,10 +52,12 @@
 <script setup lang="ts">
 import { Button, Dialog, ErrorMessage, Switch, TextInput, toast } from "frappe-ui"
 import { onMounted, reactive, ref } from "vue"
+import DataTable from "@/components/DataTable.vue"
 import PageHeader from "@/components/PageHeader.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
 import { fa } from "@/lib/jalali"
+import type { TableColumn } from "@/lib/table"
 
 interface User {
 	id: number
@@ -96,7 +82,16 @@ function roleLabel(role: string) {
 }
 
 const users = ref<User[]>([])
+const loading = ref(false)
 const error = ref("")
+
+const columns: TableColumn<User>[] = [
+	{ key: "username", label: __("Username") },
+	{ key: "full_name", label: __("Name") },
+	{ key: "roles", label: __("Roles"), value: (u) => u.roles.map(roleLabel).join("، ") },
+	{ key: "is_active", label: __("Active"), type: "bool" },
+	{ key: "last_login_at", label: __("Last login"), type: "date", format: (u) => fa(u.last_login_at ?? "") },
+]
 const open = ref(false)
 const current = ref<User | null>(null)
 const busy = ref(false)
@@ -110,10 +105,13 @@ const form = reactive({
 })
 
 async function load() {
+	loading.value = true
 	try {
 		users.value = await api.get<User[]>("/admin/users")
 	} catch (e) {
 		error.value = (e as Error).message
+	} finally {
+		loading.value = false
 	}
 }
 

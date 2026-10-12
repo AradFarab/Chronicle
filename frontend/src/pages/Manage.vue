@@ -93,6 +93,7 @@ const groups = computed(() => {
 				{ label: __("Users and roles"), icon: "lucide-user-round-cog", to: { name: "users" } },
 				{ label: __("Settings"), icon: "lucide-sliders-horizontal", to: { name: "settings" } },
 				{ label: __("Change history"), icon: "lucide-history", to: { name: "audit" } },
+				{ label: __("Backups"), icon: "lucide-database-backup", to: { name: "backups" } },
 			],
 		},
 	]

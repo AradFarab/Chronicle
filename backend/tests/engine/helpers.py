@@ -1,6 +1,6 @@
 """Shared helpers for engine tests."""
 
-from hozur.engine.model import Day, Punch, Shift
+from chronicle.engine.model import Day, Punch, Shift
 
 
 def hm(value: str) -> int:
@@ -30,8 +30,7 @@ OFFICE = Shift(
 	"Office",
 	start=hm("08:00"),
 	end=hm("16:30"),
-	break_start=hm("12:30"),
-	break_end=hm("13:10"),
+	breaks=((hm("12:30"), hm("13:10")),),
 	grace_late=5,
 	grace_early=5,
 )

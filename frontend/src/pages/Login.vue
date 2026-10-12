@@ -2,9 +2,9 @@
 	<div class="flex min-h-screen items-center justify-center bg-surface-gray-1 px-4">
 		<form class="w-full max-w-sm rounded-8 bg-surface-base p-6 shadow-sm" @submit.prevent="submit">
 			<div class="mb-6 flex items-center gap-3">
-				<span class="hz-brand flex size-10 items-center justify-center rounded-4 text-xl font-bold">ح</span>
+				<span class="hz-brand flex size-10 items-center justify-center rounded-4 text-xl font-bold">C</span>
 				<div>
-					<h1 class="text-lg font-semibold">{{ __("Hozur") }}</h1>
+					<h1 class="text-lg font-semibold">{{ __("Chronicle") }}</h1>
 					<p class="text-sm text-ink-gray-5">{{ __("Attendance") }}</p>
 				</div>
 			</div>

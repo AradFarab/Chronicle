@@ -8,44 +8,33 @@
 		</div>
 		<TextInput v-model="search" :placeholder="__('Search')" />
 		<ErrorMessage :message="error" />
-		<div class="overflow-x-auto rounded-6 border border-outline-gray-1 bg-surface-base">
-			<table class="w-full text-sm">
-				<thead class="bg-surface-gray-1 text-ink-gray-5">
-					<tr>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Personnel code") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Name") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Department") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Designations") }}</th>
-						<th class="px-3 py-2 text-start font-medium">{{ __("Status") }}</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="e in filtered"
-						:key="e.id"
-						class="cursor-pointer border-t border-outline-gray-1 hover:bg-surface-gray-1"
-						:class="e.status === 'active' ? '' : 'text-ink-gray-4'"
-						@click="router.push({ name: 'employee', params: { id: e.id } })"
-					>
-						<td class="hz-num px-3 py-2" dir="ltr">{{ fa(e.code) }}</td>
-						<td class="px-3 py-2">{{ e.full_name }}</td>
-						<td class="px-3 py-2">{{ refLabel("departments", e.department_id) }}</td>
-						<td class="px-3 py-2">{{ designationNames(e) }}</td>
-						<td class="px-3 py-2">{{ statusText(e.status) }}</td>
-					</tr>
-					<tr v-if="!loading && !filtered.length">
-						<td colspan="5" class="px-3 py-6 text-center text-ink-gray-5">{{ __("Nothing here yet") }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<DataTable
+			v-model:selected="selected"
+			:columns="columns"
+			:rows="rows"
+			:search="search"
+			:loading="loading"
+			:row-class="(e) => (e.status === 'active' ? '' : 'text-ink-gray-4')"
+			storage-key="employees"
+			selectable
+			@row-click="(e) => router.push({ name: 'employee', params: { id: e.id } })"
+		>
+			<template #toolbar>
+				<Button icon-left="lucide-calendar-check" :disabled="!selected.length" @click="bulkOpen = true">{{
+					__("Assign a work pattern ({0})", [fa(selected.length)])
+				}}</Button>
+			</template>
+		</DataTable>
+		<BulkAssignDialog v-model:open="bulkOpen" :employee-ids="selected.map(Number)" @done="selected = []" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import { Button, ErrorMessage, TextInput } from "frappe-ui"
-import { computed, onMounted, ref } from "vue"
+import { onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
+import BulkAssignDialog from "@/components/BulkAssignDialog.vue"
+import DataTable from "@/components/DataTable.vue"
 import ExcelImport from "@/components/ExcelImport.vue"
 import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
@@ -53,12 +42,15 @@ import { hasImport } from "@/lib/imports"
 import { fa } from "@/lib/jalali"
 import { refLabel } from "@/lib/refs"
 import { employeeStatusOptions, type EmployeeRow } from "@/lib/people"
+import type { TableColumn } from "@/lib/table"
 
 const router = useRouter()
 const rows = ref<EmployeeRow[]>([])
 const loading = ref(false)
 const error = ref("")
 const search = ref("")
+const selected = ref<(string | number)[]>([])
+const bulkOpen = ref(false)
 
 function designationNames(e: EmployeeRow): string {
 	return e.designations
@@ -71,15 +63,18 @@ function statusText(status: string): string {
 	return employeeStatusOptions().find((o) => o.value === status)?.label ?? status
 }
 
-const filtered = computed(() => {
-	const q = search.value.trim()
-	if (!q) return rows.value
-	return rows.value.filter((e) =>
-		[e.code, e.full_name, refLabel("departments", e.department_id), designationNames(e), statusText(e.status)].some((text) =>
-			fa(text).includes(fa(q))
-		)
-	)
-})
+const columns: TableColumn<EmployeeRow>[] = [
+	{ key: "code", label: __("Personnel code"), format: (e) => fa(e.code), class: "hz-num whitespace-nowrap" },
+	{ key: "full_name", label: __("Name") },
+	{ key: "department_id", label: __("Department"), value: (e) => refLabel("departments", e.department_id) },
+	{
+		key: "work_location_id",
+		label: __("Work location"),
+		value: (e) => refLabel("work-locations", e.work_location_id),
+	},
+	{ key: "designations", label: __("Designations"), value: designationNames },
+	{ key: "status", label: __("Status"), value: (e) => statusText(e.status) },
+]
 
 async function load() {
 	loading.value = true

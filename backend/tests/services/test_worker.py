@@ -7,9 +7,9 @@ from orgfactory import TODAY
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from hozur import worker
-from hozur.db.models import DailyAttendance, Job
-from hozur.services import jobs
+from chronicle import worker
+from chronicle.db.models import DailyAttendance, Job
+from chronicle.services import jobs
 
 
 @pytest.fixture

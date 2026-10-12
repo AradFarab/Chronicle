@@ -8,10 +8,10 @@ from typing import ClassVar
 import pytest
 from sqlalchemy import func, select
 
-from hozur.db.models import AuditEntry, DeviceUserMap, Job, PunchImportTemplate, RawPunch
-from hozur.devices import base
-from hozur.services import devices
-from hozur.services.errors import Conflict, ValidationError
+from chronicle.db.models import AuditEntry, DeviceUserMap, Job, PunchImportTemplate, RawPunch
+from chronicle.devices import base
+from chronicle.services import devices
+from chronicle.services.errors import Conflict, ValidationError
 
 
 @base.register
@@ -145,8 +145,8 @@ def test_network_device_needs_a_host(org):
 
 
 def test_csv_import_with_a_template(org, tmp_path, monkeypatch):
-	monkeypatch.setenv("HOZUR_DATA_DIR", str(tmp_path))
-	from hozur.config import get_settings
+	monkeypatch.setenv("CHRONICLE_DATA_DIR", str(tmp_path))
+	from chronicle.config import get_settings
 
 	get_settings.cache_clear()
 	try:
