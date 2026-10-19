@@ -25,7 +25,7 @@ If code and these documents disagree, stop and ask. Do not silently pick one.
 
 ## Scope
 
-In scope: Jalali calendar with editable holidays refreshed yearly by the system admin; org structure (work location, department tags, the designation tree, employee = user); work patterns (fixed, flexible, rotating) assigned with Jalali validity dates; device ingestion; labor-law calculation engine; leave, mission, overtime and punch-correction requests with configurable approval; report builder with Excel / text / PDF export; one PWA for all roles, including every admin screen.
+In scope: Jalali calendar with editable holidays refreshed yearly by the system admin; org structure (work location, department tags, the designation tree, employee = user); work patterns (fixed, flexible, rotating) assigned with Jalali validity dates; device ingestion; labor-law calculation engine; leave, mission, overtime and punch-correction requests with configurable approval; report builder with Excel / text / PDF export; payslip distribution (the payroll software's PDF pages sent to each employee as a private SMS link, no pay computation); one PWA for all roles, including every admin screen.
 
 Out of scope — do not build: payroll, insurance or tax amounts; Bale or any messenger bot; punching from the PWA or phone (punches come **only** from devices); native mobile apps; multi-tenant cloud; employee monthly sign-off.
 
@@ -42,6 +42,7 @@ Out of scope — do not build: payroll, insurance or tax amounts; Bale or any me
 | PDF | WeasyPrint |
 | Excel | openpyxl |
 | Device protocol | `pyzk` for ZKTeco (TCP 4370) |
+| SMS | gateway adapters in `chronicle/sms/` (sms.ir first), configured in the PWA; payslip PDFs are read with `pypdf` + `pdfplumber` and watermarked with `reportlab` |
 | Jalali math | `jdatetime` (Python), `jalaali-js` (frontend) |
 | Holidays | time.ir (official calendar) fetched on the system admin's yearly refresh; bundled offline seed as fallback |
 | Translations | English source strings in code, Persian in `backend/chronicle/locale/fa.po` (gettext) |
@@ -84,6 +85,8 @@ backend/
                            # requests, approvals, suggestions, leave, periods, reports, users, audit,
                            # jobs, excel + cleaning (Excel import with column mapping), backup
     worker.py              # `chronicle worker`: device polling, job queue, nightly work
+    payslips/              # PDF page splitting and the viewer watermark
+    sms/                   # SMS gateway interface + adapters (smsir.py)
     reports/               # field catalog and exporters (xlsx, csv/txt, pdf); the builder is services/reports.py
     api/                   # FastAPI routers used by the PWA
     locale/                # fa.po
@@ -133,3 +136,4 @@ docs/
 | استراحت / بازهٔ مجاز اضافه‌کار | Break / overtime window (`shift_segment.kind` = `break` / `overtime`) |
 | درخواست پیشنهادی | Suggested request (`request_suggestion`): proposed by the calculation, sent or dismissed by the employee |
 | پشتیبان | Backup (`chronicle backup`, `services/backup.py`) |
+| فیش حقوقی | Payslip (`payslip`): one PDF page of the payroll software per employee and month, sent as a private SMS link (`payslip_link`) |

@@ -15,6 +15,10 @@ Status: phase 1 (MVP), version 0.3.0 (see [CHANGELOG.md](CHANGELOG.md)). Until 0
   form the chart), work patterns, devices (IP, port, comm key — no code changes), punch-file
   imports, the yearly holiday refresh (time.ir) and the monthly period lock, all from the PWA.
   Every create form also has an Excel sample to download and an Excel import.
+- **Payslips** (فیش حقوقی): the system admin uploads the payroll software's PDF, each page is matched
+  to an employee by the personnel code printed on it, and a private link is sent to every employee by
+  SMS (sms.ir). The link opens with the last four digits of the national id and shows the payslip with
+  a watermark. Set the site address and the SMS connection under Manage → Payslips → Settings.
 
 | Document | |
 | --- | --- |

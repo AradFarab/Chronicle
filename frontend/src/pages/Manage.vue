@@ -88,6 +88,10 @@ const groups = computed(() => {
 			],
 		},
 		{
+			title: __("Payslips"),
+			items: [{ label: __("Payslips and SMS links"), icon: "lucide-file-text", to: { name: "payslips" } }],
+		},
+		{
 			title: __("System"),
 			items: [
 				{ label: __("Users and roles"), icon: "lucide-user-round-cog", to: { name: "users" } },

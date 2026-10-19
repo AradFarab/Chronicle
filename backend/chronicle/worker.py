@@ -20,7 +20,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from chronicle.clock import now, today_jalali
 from chronicle.db.models import AttendanceDevice, Job
 from chronicle.jalali.dates import add_days, iter_days
-from chronicle.services import attendance, backup, devices, jobs, leave
+from chronicle.services import attendance, backup, devices, jobs, leave, payslips
 
 log = logging.getLogger("chronicle.worker")
 
@@ -68,10 +68,16 @@ def _backup(session: Session, payload: dict[str, Any], today: str) -> dict:
 	return {"backup": made.name, "removed": backup.prune(backup.schedule(session)["keep"])}
 
 
+def _payslip_send(session: Session, payload: dict[str, Any], today: str) -> dict:
+	"""The SMS of payslip links the system admin queued (see services/payslips.py)."""
+	return payslips.send_pending(session, payload.get("link_ids"))
+
+
 HANDLERS: dict[str, Callable[[Session, dict[str, Any], str], Any]] = {
 	jobs.RECALCULATE: _recalculate,
 	NIGHTLY: _nightly,
 	BACKUP: _backup,
+	jobs.PAYSLIP_SEND: _payslip_send,
 }
 
 

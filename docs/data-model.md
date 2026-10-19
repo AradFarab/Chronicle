@@ -124,6 +124,19 @@ The request number (`LV-00012`, `MS-…`, `OT-…`, `COR-…`) is a generated co
 | `daily_attendance_leave` | leave minutes/days per type in that day | PK (`attendance_id`, `leave_type_id`) |
 | `attendance_period` | Jalali month open/closed (rule 9) | unique (`jyear`, `jmonth`) |
 
+### Payslips
+
+Payslips are not computed here: the payroll software's PDF is split into pages, each stored as a PDF of its own and handed to its owner through a private link sent by SMS. Out of scope stays everything about pay itself.
+
+| Table | Purpose | Key invariants |
+| --- | --- | --- |
+| `payslip` | one stored PDF page per employee and Jalali month | unique (`employee_id`, `jyear`, `jmonth`); `file_id` → `stored_file`; `national_status ∈ match, mismatch, unknown` (the national id printed on the page against the employee's; a mismatch blocks the link so nobody's slip reaches somebody else) |
+| `payslip_rejection` | a page of an upload that could not be matched, with the reason (the page is not kept) | listed per month until the system admin clears it |
+| `payslip_link` | the private link to one payslip | `token_hash` (SHA-256) unique; the token itself waits in `token_encrypted` until the SMS has gone out; **at most one active (`NOT locked`) link per payslip** (partial unique index); `locked` ⇔ `lock_reason ∈ voided, failed_attempts`; `sms_status ∈ pending, sent, failed`; limits `expires_at`, `max_views`, `view_count`, `failed_attempts` |
+| `payslip_view` | one successful opening of a link (time, IP) | cascades with the link |
+
+The SMS connection and the link settings are `app_setting` rows (`sms`, `payslips`); the API key is stored encrypted (`secrets.encrypt`) and never returned.
+
 ### Reports, settings, audit, jobs
 
 | Table | Purpose | Key invariants |

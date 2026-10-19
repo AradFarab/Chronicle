@@ -203,3 +203,65 @@ export interface Suggestion {
   status: string
   request_id: number | null
 }
+
+/** One employee in a payslip month (GET /payslips/{year}/{month}). */
+export interface PayslipRow {
+  employee_id: number
+  code: string
+  full_name: string
+  mobile: string | null
+  payslip: { id: number; national_status: "match" | "mismatch" | "unknown"; source_name: string | null; source_page: number | null } | null
+  /** Why no link can be sent to this person now. */
+  problem: "no_payslip" | "not_active" | "national_mismatch" | "no_national_id" | "bad_mobile" | null
+  link: {
+    id: number
+    state: "active" | "expired" | "exhausted" | "voided" | "failed_attempts"
+    sms_status: "pending" | "sent" | "failed"
+    sms_error: string | null
+    sms_sent_at: string | null
+    expires_at: string | null
+    view_count: number
+    max_views: number
+  } | null
+}
+
+export interface PayslipMonth {
+  jyear: number
+  jmonth: number
+  month_label: string
+  rows: PayslipRow[]
+  rejections: { id: number; source_name: string; page_no: number | null; reason: string; created_at: string | null }[]
+  counts: {
+    employees: number
+    payslips: number
+    missing: number
+    blocked: number
+    sent: number
+    failed: number
+    viewed: number
+    rejected: number
+  }
+}
+
+export interface PayslipPreview {
+  count: number
+  replacing: number
+  blocked: { employee_id: number; code: string; full_name: string; problem: NonNullable<PayslipRow["problem"]> }[]
+  sample: string | null
+  unavailable: string | null
+}
+
+export interface PayslipSettings {
+  base_url: string
+  link_expiry_days: number
+  link_max_views: number
+  max_failed_attempts: number
+  message: string
+}
+
+export interface SmsSettings {
+  provider: string
+  line_number: string
+  has_key: boolean
+  providers: { code: string; label: string }[]
+}

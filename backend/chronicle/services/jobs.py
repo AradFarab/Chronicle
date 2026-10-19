@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from chronicle.db.models import Job
 
 RECALCULATE = "recalculate"  # payload: {"dates": [...], "employee_ids": [...] | None, "reason": str}
+PAYSLIP_SEND = "payslip_send"  # payload: {"link_ids": [...]}: send the SMS of these payslip links
 
 
 def enqueue(session: Session, kind: str, payload: dict[str, Any], dedup_key: str | None = None) -> Job:

@@ -40,3 +40,11 @@ def save(
 
 def read(row: StoredFile) -> bytes:
 	return (_root() / row.storage_path).read_bytes()
+
+
+def delete(session: Session, row: StoredFile) -> None:
+	"""Remove a stored file's record and its bytes (nothing may reference it any more)."""
+	path = _root() / row.storage_path
+	session.delete(row)
+	session.flush()
+	path.unlink(missing_ok=True)

@@ -20,6 +20,7 @@ from chronicle.db.models.org import (
 	Province,
 	WorkLocation,
 )
+from chronicle.db.models.payslips import Payslip, PayslipLink, PayslipRejection, PayslipView
 from chronicle.db.models.requests import (
 	ApprovalDefault,
 	ApprovalDelegation,
@@ -75,6 +76,10 @@ __all__ = [
 	"MissionRequest",
 	"Organization",
 	"OvertimeRequest",
+	"Payslip",
+	"PayslipLink",
+	"PayslipRejection",
+	"PayslipView",
 	"Province",
 	"PunchImport",
 	"PunchImportTemplate",

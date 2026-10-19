@@ -19,6 +19,7 @@ from chronicle.api.routes import (
 	devices,
 	imports,
 	me,
+	payslips,
 	people,
 	reports,
 	requests,
@@ -57,8 +58,10 @@ def create_app() -> FastAPI:
 		return {"ok": True, "version": __version__}
 
 	# people before admin: its employee routes win over the generic /api/admin/{name}
-	for module in (auth, me, requests, calendar, attendance, devices, reports, people, imports, admin):
+	routers = (auth, me, requests, calendar, attendance, devices, reports, people, imports, payslips, admin)
+	for module in routers:
 		app.include_router(module.router)
+	app.include_router(payslips.public)
 
 	dist = get_settings().frontend_dist
 	if dist and Path(dist).is_dir():
