@@ -45,6 +45,14 @@ from chronicle.db.models.schedules import (
 	WorkPatternAssignment,
 	WorkPatternDay,
 )
+from chronicle.db.models.sms import (
+	ShortLink,
+	SmsEvent,
+	SmsMessage,
+	SmsOptOut,
+	SmsProviderConfig,
+	SmsTemplate,
+)
 from chronicle.db.models.system import AppSetting, AuditEntry, Job, ReportTemplate, StoredFile
 
 __all__ = [
@@ -92,6 +100,12 @@ __all__ = [
 	"Shift",
 	"ShiftOverride",
 	"ShiftSegment",
+	"ShortLink",
+	"SmsEvent",
+	"SmsMessage",
+	"SmsOptOut",
+	"SmsProviderConfig",
+	"SmsTemplate",
 	"StoredFile",
 	"UserRole",
 	"UserSession",

@@ -58,6 +58,7 @@
 				<span>{{ __("Blocked: {0}", [fa(data.counts.blocked)]) }}</span>
 				<span>{{ __("SMS sent: {0}", [fa(data.counts.sent)]) }}</span>
 				<span>{{ __("SMS failed: {0}", [fa(data.counts.failed)]) }}</span>
+				<span v-if="data.counts.unknown" class="text-ink-amber-7">{{ __("Unknown outcome: {0}", [fa(data.counts.unknown)]) }}</span>
 				<span>{{ __("Opened: {0}", [fa(data.counts.viewed)]) }}</span>
 			</div>
 			<DataTable :columns="columns" :rows="data?.rows ?? []" :loading="loading" row-key="employee_id" storage-key="payslips">
@@ -66,7 +67,7 @@
 					<span v-else class="lucide-check size-4 text-ink-green-3" />
 				</template>
 				<template #cell-sms="{ row: r }">
-					<span v-if="r.link" :class="smsClass(r.link.sms_status)" :title="r.link.sms_error ?? ''">{{ smsLabel(r.link.sms_status) }}</span>
+					<span v-if="r.link" :class="smsStatusClass(r.link.sms_status)" :title="r.link.sms_error ?? ''">{{ smsStatusLabel(r.link.sms_status) }}</span>
 				</template>
 				<template #cell-actions="{ row: r }">
 					<span class="flex items-center gap-1">
@@ -97,15 +98,20 @@
 		<Dialog v-model:open="previewOpen" :title="__('Send the payslip links')" size="lg">
 			<div v-if="preview" class="flex flex-col gap-3 text-sm">
 				<p v-if="preview.unavailable" class="flex gap-2 rounded-4 bg-surface-amber-1 p-3 text-ink-amber-7">
-					<span class="lucide-triangle-alert mt-0.5 size-4 shrink-0" />{{ preview.unavailable }}
+					<span class="lucide-triangle-alert mt-0.5 size-4 shrink-0" />
+					<span>
+						{{ preview.unavailable }}
+						<RouterLink :to="{ name: 'sms-templates' }" class="underline">{{ __("Open the SMS section") }}</RouterLink>
+					</span>
 				</p>
 				<p class="hz-num font-medium">{{ __("{0} people will get an SMS now.", [fa(preview.count)]) }}</p>
 				<p v-if="preview.replacing" class="hz-num text-ink-amber-7">
 					{{ __("{0} of them already have a link; it stops working and the new one replaces it.", [fa(preview.replacing)]) }}
 				</p>
 				<div v-if="preview.sample">
-					<p class="mb-1 text-ink-gray-5">{{ __("The first message:") }}</p>
-					<pre class="whitespace-pre-wrap rounded-4 bg-surface-gray-2 p-3 text-xs">{{ preview.sample }}</pre>
+					<p class="mb-1 text-ink-gray-5">{{ __("The first message, exactly as it is sent:") }}</p>
+					<pre v-if="preview.sample.text" class="whitespace-pre-wrap rounded-4 bg-surface-gray-2 p-3 text-xs">{{ preview.sample.text }}</pre>
+					<pre v-else class="whitespace-pre-wrap rounded-4 bg-surface-gray-2 p-3 text-xs" dir="ltr">{{ JSON.stringify(preview.sample.request, null, 2) }}</pre>
 				</div>
 				<div v-if="preview.blocked.length">
 					<p class="mb-1 text-ink-gray-5">{{ __("Left out ({0}):", [fa(preview.blocked.length)]) }}</p>
@@ -134,6 +140,7 @@ import { api } from "@/lib/api"
 import { __ } from "@/lib/i18n"
 import { fa, MONTHS } from "@/lib/jalali"
 import { session } from "@/lib/session"
+import { smsStatusClass, smsStatusLabel } from "@/lib/sms"
 import type { TableColumn } from "@/lib/table"
 import type { PayslipMonth, PayslipPreview, PayslipRow } from "@/lib/types"
 
@@ -171,14 +178,6 @@ function problemLabel(code: NonNullable<PayslipRow["problem"]>): string {
 	}
 }
 
-function smsLabel(status: string): string {
-	return status === "sent" ? __("Sent") : status === "failed" ? __("Failed") : __("Waiting")
-}
-
-function smsClass(status: string): string {
-	return status === "sent" ? "text-ink-green-3" : status === "failed" ? "text-ink-red-3" : "text-ink-gray-5"
-}
-
 function stateLabel(state: string): string {
 	switch (state) {
 		case "active":
@@ -199,7 +198,7 @@ const columns: TableColumn<PayslipRow>[] = [
 	{ key: "full_name", label: __("Name"), class: "min-w-40" },
 	{ key: "mobile", label: __("Mobile"), format: (r) => fa(r.mobile ?? "") },
 	{ key: "problem", label: __("Ready"), value: (r) => (r.problem ? problemLabel(r.problem) : __("Ready")) },
-	{ key: "sms", label: __("SMS"), value: (r) => (r.link ? smsLabel(r.link.sms_status) : "") },
+	{ key: "sms", label: __("SMS"), value: (r) => (r.link ? smsStatusLabel(r.link.sms_status) : "") },
 	{ key: "link_state", label: __("Link"), value: (r) => (r.link ? stateLabel(r.link.state) : "") },
 	{
 		key: "views",

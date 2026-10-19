@@ -13,7 +13,6 @@ from chronicle.api.deps import DB, Admin
 from chronicle.api.views import jalali_moment
 from chronicle.i18n import _
 from chronicle.services import payslips as service
-from chronicle.services import sms as sms_service
 from chronicle.services.errors import ValidationError
 
 router = APIRouter(prefix="/api/payslips", tags=["payslips"])
@@ -31,7 +30,7 @@ class Secret(BaseModel):
 	secret: str = ""
 
 
-# settings and the SMS connection ----------------------------------------------------------------
+# settings ----------------------------------------------------------------------------------------
 
 
 @router.get("/settings")
@@ -42,21 +41,6 @@ def get_settings(actor: Admin, db: DB) -> dict[str, Any]:
 @router.put("/settings")
 def put_settings(values: dict[str, Any], actor: Admin, db: DB) -> dict[str, Any]:
 	return service.save_settings(db, actor, values)
-
-
-@router.get("/sms")
-def get_sms(actor: Admin, db: DB) -> dict[str, Any]:
-	return sms_service.view(db)
-
-
-@router.put("/sms")
-def put_sms(values: dict[str, Any], actor: Admin, db: DB) -> dict[str, Any]:
-	return sms_service.save(db, values, actor.user_id)
-
-
-@router.post("/sms/test")
-def test_sms(actor: Admin, db: DB) -> dict[str, Any]:
-	return sms_service.check(db)
 
 
 # one payslip or link ----------------------------------------------------------------------------

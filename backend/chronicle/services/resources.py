@@ -149,10 +149,13 @@ def check(actor: access.Actor, level: str) -> None:
 # integrity errors -> messages -----------------------------------------------------------------
 
 
-def flush(session: Session, deleting: bool = False) -> None:
-	"""Flush inside a savepoint; constraint violations become messages for the system admin."""
+def flush(session: Session, deleting: bool = False, add: Any = None) -> None:
+	"""Flush inside a savepoint; constraint violations become messages for the system admin.
+	A row passed as `add` is added inside the savepoint, so a violation leaves nothing pending."""
 	try:
 		with session.begin_nested():
+			if add is not None:
+				session.add(add)
 			session.flush()
 	except IntegrityError as e:
 		state = getattr(e.orig, "sqlstate", None)

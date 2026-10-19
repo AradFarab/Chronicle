@@ -2,11 +2,12 @@
 private link by SMS, and serve the page to its owner after a second factor.
 
 The app never computes pay. A payslip is one PDF page per employee and Jalali month, found by
-the personnel code printed on it. The link is a random token (only its SHA-256 is stored for
-lookup; the token waits encrypted until the SMS has gone out), limited in time and views, and
-the page opens only with the last four digits of the employee's national id. The national id
-printed on the page must be the employee's, or no link is made: nobody's slip may reach somebody
-else. Every file served carries the viewer's name and the time as a watermark.
+the personnel code printed on it. The link is a random token (only its SHA-256 is stored), limited
+in time and views, and the page opens only with the last four digits of the employee's national
+id. The SMS itself is the SMS module's (services/sms_dispatch.py): the link goes out as a short
+``l/<code>`` path inside the admin's approved pattern. The national id printed on the page must be
+the employee's, or no link is made: nobody's slip may reach somebody else. Every file served
+carries the viewer's name and the time as a watermark.
 """
 
 from __future__ import annotations
@@ -16,7 +17,6 @@ import hmac
 import io
 import re
 import secrets
-import string
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
@@ -32,42 +32,26 @@ from chronicle.db.models import (
 	PayslipLink,
 	PayslipRejection,
 	PayslipView,
+	SmsMessage,
 	StoredFile,
 )
 from chronicle.db.models.org import ACTIVE, LEFT
-from chronicle.db.models.payslips import (
-	FAILED,
-	MATCH,
-	MISMATCH,
-	PENDING,
-	SENT,
-	TOO_MANY_ATTEMPTS,
-	UNKNOWN,
-	VOIDED,
-)
+from chronicle.db.models.payslips import MATCH, MISMATCH, TOO_MANY_ATTEMPTS, UNKNOWN, VOIDED
+from chronicle.db.models.sms import DELIVERED, FAILED, QUEUED, SENDING, SENT, SKIPPED
+from chronicle.db.models.sms import UNKNOWN as UNKNOWN_STATUS
 from chronicle.i18n import DEFAULT_LANGUAGE, _, translate
 from chronicle.jalali.dates import MONTH_NAMES, from_gregorian, to_ascii_digits
 from chronicle.payslips import pdf
 from chronicle.payslips.watermark import watermark_pdf
-from chronicle.secrets import decrypt, encrypt
-from chronicle.services import audit, files, jobs, settings
-from chronicle.services import sms as sms_service
-from chronicle.services.access import Actor
-from chronicle.services.errors import ChronicleError, NotFound, PermissionDenied, ValidationError
-from chronicle.sms.base import SmsError, SmsMessage
+from chronicle.services import audit, files, settings, sms_dispatch
+from chronicle.services.access import Actor, require_admin
+from chronicle.services.errors import ChronicleError, NotFound, ValidationError
 
 SETTING = "payslips"
-DEFAULT_MESSAGE = "{name} عزیز، فیش حقوقی {month} شما آماده است:\n{link}\nاعتبار تا {expires}"
-PLACEHOLDERS = frozenset({"name", "month", "link", "expires"})
-DEFAULTS: dict[str, Any] = {
-	"base_url": "",  # the public address of this server, e.g. https://chronicle.example.ir
-	"link_expiry_days": 14,
-	"link_max_views": 5,
-	"max_failed_attempts": 5,
-	"message": DEFAULT_MESSAGE,
-}
+DEFAULTS: dict[str, Any] = {"link_expiry_days": 14, "link_max_views": 5, "max_failed_attempts": 5}
 LINK_PATH = "/p/"  # the PWA's public payslip page
 MOBILE_RE = re.compile(r"^09\d{9}$")
+IN_FLIGHT = (QUEUED, SENDING)
 MODES = ("unsent", "all")  # who gets an SMS: people without a working link, or everyone ready
 
 
@@ -79,11 +63,6 @@ class WrongSecret(ChronicleError):
 	status_code = 403
 
 
-def _require_admin(actor: Actor) -> None:
-	if not actor.is_admin:
-		raise PermissionDenied(_("Not permitted"))
-
-
 # settings ---------------------------------------------------------------------------------------
 
 
@@ -91,29 +70,10 @@ def get_settings(session: Session) -> dict[str, Any]:
 	return {**DEFAULTS, **(settings.get(session, SETTING) or {})}
 
 
-def _check_message(message: str) -> None:
-	try:
-		names = {f for _t, f, _s, _c in string.Formatter().parse(message) if f is not None}
-	except ValueError:
-		names = set()
-		message = ""
-	if "link" not in names or names - PLACEHOLDERS or not message.strip():
-		raise ValidationError(
-			_("The message must contain {0} and may only use {1}"),
-			"{link}",
-			"{name} {month} {link} {expires}",
-		)
-
-
 def save_settings(session: Session, actor: Actor, values: dict[str, Any]) -> dict[str, Any]:
-	_require_admin(actor)
+	require_admin(actor)
 	current = get_settings(session)
 	new = dict(current)
-	if "base_url" in values:
-		url = str(values["base_url"] or "").strip().rstrip("/")
-		if url and not re.match(r"^https?://[^\s/]+\S*$", url):
-			raise ValidationError(_("The site address must start with http:// or https://"))
-		new["base_url"] = url
 	for key, low, high, label in (
 		("link_expiry_days", 1, 365, _("Days a link works")),
 		("link_max_views", 1, 100, _("Times a link can be opened")),
@@ -127,10 +87,6 @@ def save_settings(session: Session, actor: Actor, values: dict[str, Any]) -> dic
 			if not low <= number <= high:
 				raise ValidationError(_("{0} must be between {1} and {2}"), label, low, high)
 			new[key] = number
-	if "message" in values:
-		message = str(values["message"] or "")
-		_check_message(message)
-		new["message"] = message
 	settings.set_value(session, SETTING, new, actor.user_id)
 	audit.log(session, "app_setting", SETTING, "update", actor.user_id, None, current, new)
 	return new
@@ -216,7 +172,7 @@ def upload(
 ) -> dict[str, int]:
 	"""Split the uploaded PDFs, match each page to an employee by the personnel code printed on it
 	and store it. Pages that cannot be matched are listed with the reason; nothing is guessed."""
-	_require_admin(actor)
+	require_admin(actor)
 	year, month = _period(jyear, jmonth)
 	index: dict[str, list[Employee]] = {}
 	for employee in session.scalars(select(Employee)):
@@ -315,7 +271,7 @@ def _links_of(session: Session, payslip_ids: list[int]) -> dict[int, PayslipLink
 
 
 def overview(session: Session, actor: Actor, jyear: Any, jmonth: Any) -> dict[str, Any]:
-	_require_admin(actor)
+	require_admin(actor)
 	year, month = _period(jyear, jmonth)
 	at = now()
 	payslips = {
@@ -323,12 +279,14 @@ def overview(session: Session, actor: Actor, jyear: Any, jmonth: Any) -> dict[st
 		for p in session.scalars(select(Payslip).where(Payslip.jyear == year, Payslip.jmonth == month))
 	}
 	links = _links_of(session, [p.id for p in payslips.values()])
+	messages = _messages_of(session, links)
 	rows = []
 	for employee in session.scalars(select(Employee).order_by(Employee.code)):
 		payslip = payslips.get(employee.id)
 		if payslip is None and employee.status == LEFT:
 			continue
 		link = links.get(payslip.id) if payslip else None
+		message = messages.get(link.sms_message_id) if link and link.sms_message_id else None
 		rows.append(
 			{
 				"employee_id": employee.id,
@@ -350,9 +308,10 @@ def overview(session: Session, actor: Actor, jyear: Any, jmonth: Any) -> dict[st
 					{
 						"id": link.id,
 						"state": link_state(link, at),
-						"sms_status": link.sms_status,
-						"sms_error": link.sms_error,
-						"sms_sent_at": link.sms_sent_at,
+						"sms_message_id": link.sms_message_id,
+						"sms_status": message.status if message else None,
+						"sms_error": message.error if message else None,
+						"sms_sent_at": message.sent_at if message else None,
 						"expires_at": link.expires_at,
 						"view_count": link.view_count,
 						"max_views": link.max_views,
@@ -388,8 +347,10 @@ def overview(session: Session, actor: Actor, jyear: Any, jmonth: Any) -> dict[st
 			"payslips": len(payslips),
 			"missing": sum(1 for r in rows if r["problem"] == "no_payslip"),
 			"blocked": sum(1 for r in rows if r["problem"] not in (None, "no_payslip")),
-			"sent": sum(1 for link in with_link if link["sms_status"] == SENT),
-			"failed": sum(1 for link in with_link if link["sms_status"] == FAILED),
+			"sent": sum(1 for link in with_link if link["sms_status"] in (SENT, DELIVERED)),
+			"pending": sum(1 for link in with_link if link["sms_status"] in IN_FLIGHT),
+			"failed": sum(1 for link in with_link if link["sms_status"] in (FAILED, SKIPPED)),
+			"unknown": sum(1 for link in with_link if link["sms_status"] == UNKNOWN_STATUS),
 			"viewed": sum(1 for link in with_link if link["view_count"] > 0),
 			"rejected": len(rejections),
 		},
@@ -405,7 +366,7 @@ def _payslip(session: Session, payslip_id: int) -> Payslip:
 
 def delete_payslip(session: Session, actor: Actor, payslip_id: int) -> None:
 	"""Remove a payslip, its links and its file (a wrong upload)."""
-	_require_admin(actor)
+	require_admin(actor)
 	row = _payslip(session, payslip_id)
 	file_row = session.get(StoredFile, row.file_id)
 	before = {"employee_id": row.employee_id, "jyear": row.jyear, "jmonth": row.jmonth}
@@ -417,7 +378,7 @@ def delete_payslip(session: Session, actor: Actor, payslip_id: int) -> None:
 
 
 def clear_rejections(session: Session, actor: Actor, jyear: Any, jmonth: Any) -> None:
-	_require_admin(actor)
+	require_admin(actor)
 	year, month = _period(jyear, jmonth)
 	for row in session.scalars(
 		select(PayslipRejection).where(PayslipRejection.jyear == year, PayslipRejection.jmonth == month)
@@ -427,38 +388,45 @@ def clear_rejections(session: Session, actor: Actor, jyear: Any, jmonth: Any) ->
 
 def void_link(session: Session, actor: Actor, link_id: int) -> None:
 	"""Stop a link from working (it was sent to the wrong number, say)."""
-	_require_admin(actor)
+	require_admin(actor)
 	link = session.get(PayslipLink, link_id)
 	if link is None:
 		raise NotFound(_("Not found"))
 	if not link.locked:
-		link.locked, link.lock_reason, link.token_encrypted = True, VOIDED, None
+		link.locked, link.lock_reason = True, VOIDED
 		audit.log(session, "payslip_link", link.id, "update", actor.user_id, "link voided")
 
 
 def payslip_file(session: Session, actor: Actor, payslip_id: int) -> bytes:
 	"""The stored page for the system admin to check (no watermark)."""
-	_require_admin(actor)
+	require_admin(actor)
 	row = _payslip(session, payslip_id)
 	return files.read(session.get(StoredFile, row.file_id))
 
 
 # sending ----------------------------------------------------------------------------------------
 
-
-def _render(cfg: dict[str, Any], name: str, label: str, link: str, expires: str) -> str:
-	return cfg["message"].format(name=name, month=label, link=link, expires=expires)
+EVENT = "payslip_link"  # the SMS event (chronicle/sms/events.py): its template is made in the SMS section
 
 
 def _expires_label(expires_at) -> str:
 	return from_gregorian(expires_at.astimezone(now().tzinfo).date())
 
 
+def _messages_of(session: Session, links: dict[int, PayslipLink]) -> dict[int, SmsMessage]:
+	ids = [link.sms_message_id for link in links.values() if link.sms_message_id]
+	if not ids:
+		return {}
+	return {m.id: m for m in session.scalars(select(SmsMessage).where(SmsMessage.id.in_(ids)))}
+
+
 def _targets(
 	session: Session, year: int, month: int, mode: str, payslip_ids: list[int] | None
 ) -> tuple[list[tuple[Payslip, Employee, PayslipLink | None]], list[dict[str, Any]]]:
-	"""(ready to send, blocked) for the month. «unsent» takes everyone without a link that works
-	(none yet, or the SMS failed); «all» everyone who can be sent one, replacing their link."""
+	"""(ready to send, blocked) for the month. «unsent» takes everyone whose SMS has not gone out
+	and is not on its way (no link yet, or the SMS failed or was skipped); a message whose outcome
+	is unknown is left alone until the admin has checked the panel. «all» takes everyone who can
+	be sent a link, replacing their link; only messages still on their way are left alone."""
 	if mode not in MODES:
 		raise ValidationError(_("Unknown way of choosing the people"))
 	query = (
@@ -471,10 +439,14 @@ def _targets(
 		query = query.where(Payslip.id.in_(payslip_ids))
 	pairs = list(session.execute(query).all())
 	links = _links_of(session, [p.id for p, _e in pairs])
+	messages = _messages_of(session, links)
 	ready, blocked = [], []
 	for payslip, employee in pairs:
 		link = links.get(payslip.id)
 		active = link if link is not None and not link.locked else None
+		status = (
+			messages[active.sms_message_id].status if active and active.sms_message_id in messages else None
+		)
 		reason = problem(employee, payslip)
 		if reason:
 			blocked.append(
@@ -485,21 +457,20 @@ def _targets(
 					"problem": reason,
 				}
 			)
-		elif active is not None and active.sms_status == PENDING:
+		elif status in IN_FLIGHT:
 			continue  # its SMS is already on its way
-		elif mode == "all" or active is None or active.sms_status == FAILED:
+		elif mode == "all" or active is None or status in (FAILED, SKIPPED):
 			ready.append((payslip, employee, active))
 	return ready, blocked
 
 
-def _not_ready(session: Session) -> ValidationError | None:
-	if not get_settings(session)["base_url"]:
-		return ValidationError(_("Enter the site address in the payslip settings first"))
-	try:
-		sms_service.gateway(session)
-	except ValidationError as e:
-		return e
-	return None
+def _context(employee: Employee, payslip: Payslip, expires_at, link: str) -> dict[str, str]:
+	return {
+		"name": employee.full_name,
+		"month": month_label(payslip.jyear, payslip.jmonth),
+		"expires": _expires_label(expires_at),
+		"link": link,
+	}
 
 
 def preview(
@@ -511,25 +482,33 @@ def preview(
 	payslip_ids: list[int] | None = None,
 ) -> dict[str, Any]:
 	"""What sending would do, before anything is sent: how many, who is left out and why, and
-	the text of the first message."""
-	_require_admin(actor)
+	what the first message would send (the text, or the pattern code and parameters exactly as the
+	panel gets them)."""
+	require_admin(actor)
 	year, month = _period(jyear, jmonth)
 	cfg = get_settings(session)
 	ready, blocked = _targets(session, year, month, mode, payslip_ids)
 	sample = None
 	if ready:
-		_p, employee, _l = ready[0]
-		base = cfg["base_url"] or "https://…"
-		expires = _expires_label(now() + timedelta(days=cfg["link_expiry_days"]))
-		link = f"{base}{LINK_PATH}{'x' * 20}"
-		sample = _render(cfg, employee.full_name, month_label(year, month), link, expires)
-	error = _not_ready(session)
+		payslip, employee, _old = ready[0]
+		context = _context(employee, payslip, now() + timedelta(days=cfg["link_expiry_days"]), "")
+		context["link_path"] = "l/xxxxxxxx"  # what dispatch makes of the link
+		del context["link"]
+		sample = sms_dispatch.preview_event(session, EVENT, context)
+	problem_text = sms_dispatch.readiness(session, EVENT)
+	messages = _messages_of(session, _links_of(session, [p.id for p, _e, _l in ready]))
 	return {
 		"count": len(ready),
-		"replacing": sum(1 for _p, _e, link in ready if link is not None and link.sms_status == SENT),
+		"replacing": sum(
+			1
+			for _p, _e, link in ready
+			if link is not None
+			and link.sms_message_id in messages
+			and messages[link.sms_message_id].status in (SENT, DELIVERED)
+		),
 		"blocked": blocked,
 		"sample": sample,
-		"unavailable": error.translated(actor.language) if error else None,
+		"unavailable": translate(problem_text, actor.language) if problem_text else None,
 	}
 
 
@@ -541,39 +520,46 @@ def queue_send(
 	mode: str = "unsent",
 	payslip_ids: list[int] | None = None,
 ) -> dict[str, Any]:
-	"""Make a fresh link for each person and queue the SMS for the worker. A link that was sent
-	before is voided: sending again replaces it."""
-	_require_admin(actor)
+	"""Make a fresh link for each person and dispatch its SMS (the worker sends it). A link that
+	was sent before is voided: sending again replaces it."""
+	require_admin(actor)
 	year, month = _period(jyear, jmonth)
-	error = _not_ready(session)
-	if error:
-		raise error
+	problem_text = sms_dispatch.readiness(session, EVENT)
+	if problem_text:
+		raise ValidationError(problem_text)
 	cfg = get_settings(session)
 	ready, _blocked = _targets(session, year, month, mode, payslip_ids)
 	if not ready:
 		raise ValidationError(_("There is nobody to send to"))
 	at = now()
-	link_ids = []
-	for payslip, _employee, old in ready:
+	queued = 0
+	for payslip, employee, old in ready:
 		if old is not None:
-			old.locked, old.lock_reason, old.token_encrypted = True, VOIDED, None
+			old.locked, old.lock_reason = True, VOIDED
 			session.flush()  # only one active link per payslip may exist
 		token = secrets.token_urlsafe(32)
+		expires_at = at + timedelta(days=cfg["link_expiry_days"])
 		link = PayslipLink(
 			payslip_id=payslip.id,
 			token_hash=_hash(token),
-			token_encrypted=encrypt(token),
-			expires_at=at + timedelta(days=cfg["link_expiry_days"]),
+			expires_at=expires_at,
 			max_views=cfg["link_max_views"],
 			view_count=0,
 			failed_attempts=0,
 			locked=False,
-			sms_status=PENDING,
 			created_by_id=actor.user_id,
 		)
 		session.add(link)
 		session.flush()
-		link_ids.append(link.id)
+		message = sms_dispatch.dispatch(
+			session,
+			EVENT,
+			employee.mobile,
+			_context(employee, payslip, expires_at, f"{LINK_PATH}{token}"),
+			entity_key=f"payslip_link:{link.id}",
+		)
+		link.sms_message_id = message.id
+		queued += 1
 		audit.log(
 			session,
 			"payslip_link",
@@ -581,83 +567,13 @@ def queue_send(
 			"insert",
 			actor.user_id,
 			"SMS queued",
-			after={"payslip_id": payslip.id, "replaced": old.id if old else None},
+			after={
+				"payslip_id": payslip.id,
+				"replaced": old.id if old else None,
+				"sms_message_id": message.id,
+			},
 		)
-	job = jobs.enqueue(session, jobs.PAYSLIP_SEND, {"link_ids": link_ids})
-	return {"queued": len(link_ids), "job_id": job.id}
-
-
-def send_pending(session: Session, link_ids: list[int] | None = None) -> dict[str, int]:
-	"""The worker's job: send the SMS of the pending links in batches and record the outcome of
-	each. A failure is recorded on the links, not retried by itself: nobody is texted twice, and
-	«send to those without a working link» picks the failed ones up again."""
-	query = select(PayslipLink).where(PayslipLink.sms_status == PENDING, PayslipLink.locked.is_(False))
-	if link_ids:
-		query = query.where(PayslipLink.id.in_(link_ids))
-	links = list(session.scalars(query.order_by(PayslipLink.id)))
-	result = {"sent": 0, "failed": 0}
-	if not links:
-		return result
-
-	def fail(chosen: list[PayslipLink], why: str) -> None:
-		for link in chosen:
-			link.sms_status, link.sms_error, link.token_encrypted = FAILED, why[:1000], None
-		result["failed"] += len(chosen)
-
-	cfg = get_settings(session)
-	try:
-		gateway = sms_service.gateway(session)
-	except ValidationError as e:
-		fail(links, e.translated(DEFAULT_LANGUAGE))
-		return result
-	if not cfg["base_url"]:
-		fail(links, translate(_("Enter the site address in the payslip settings first"), DEFAULT_LANGUAGE))
-		return result
-	info = {
-		p.id: (p, e)
-		for p, e in session.execute(
-			select(Payslip, Employee)
-			.join(Employee, Employee.id == Payslip.employee_id)
-			.where(Payslip.id.in_([link.payslip_id for link in links]))
-		)
-	}
-	size = max(1, gateway.batch_size)
-	for start in range(0, len(links), size):
-		chunk = links[start : start + size]
-		messages, sendable = [], []
-		for link in chunk:
-			payslip, employee = info[link.payslip_id]
-			token = decrypt(link.token_encrypted)
-			mobile = _mobile(employee)
-			if not token or not mobile:
-				fail([link], translate(_("The link or the mobile number is not usable"), DEFAULT_LANGUAGE))
-				continue
-			text = _render(
-				cfg,
-				employee.full_name,
-				month_label(payslip.jyear, payslip.jmonth),
-				f"{cfg['base_url']}{LINK_PATH}{token}",
-				_expires_label(link.expires_at),
-			)
-			messages.append(SmsMessage(mobile, text))
-			sendable.append(link)
-		if messages:
-			try:
-				outcomes = gateway.send(messages)
-			except SmsError as e:
-				fail(sendable, sms_service.admin_text(e))
-			else:
-				stamp = now()
-				for link, outcome in zip(sendable, outcomes, strict=True):
-					if outcome.ok:
-						link.sms_status, link.sms_sent_at = SENT, stamp
-						link.sms_provider_id = outcome.provider_id
-						link.sms_error, link.token_encrypted = None, None
-						result["sent"] += 1
-					else:
-						fail([link], outcome.error or translate(_("The SMS was refused"), DEFAULT_LANGUAGE))
-		session.commit()  # progress survives a crash: what was sent is never sent again
-	return result
+	return {"queued": queued}
 
 
 # the employee's side (no login) -----------------------------------------------------------------

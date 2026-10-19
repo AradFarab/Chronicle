@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import re
+import hashlib
 from datetime import timedelta
 
 import pytest
@@ -11,41 +11,29 @@ from payslipfactory import slip_pdf
 from sqlalchemy import select
 
 from chronicle.clock import now
-from chronicle.db.models import Job, Payslip, PayslipLink, PayslipRejection, StoredFile
-from chronicle.db.models.payslips import FAILED, MATCH, MISMATCH, PENDING, SENT, UNKNOWN, VOIDED
-from chronicle.services import jobs, payslips
-from chronicle.services import sms as sms_service
+from chronicle.db.models import Payslip, PayslipLink, PayslipRejection, ShortLink, SmsMessage, StoredFile
+from chronicle.db.models.payslips import MATCH, MISMATCH, UNKNOWN, VOIDED
+from chronicle.services import payslips, sms, sms_dispatch
 from chronicle.services.errors import PermissionDenied, ValidationError
-from chronicle.sms.base import SmsError, SmsGateway, SmsHealth, SmsResult
+from chronicle.sms.mock import MockDriver
 
 YEAR, MONTH = 1405, 7
 ALI = ("EMP042", "0012345678", "09121234567")  # code, national id, mobile
+BODY = "{name}|{month}|{expires}|{link_path}"
 
 
-class FakeGateway(SmsGateway):
-	code = "fake"
-	batch_size = 2
-
-	def __init__(self):
-		self.batches = []
-		self.error = None
-
-	def send(self, messages):
-		if self.error:
-			raise self.error
-		self.batches.append(list(messages))
-		return [SmsResult(m.mobile, True, f"id-{i}") for i, m in enumerate(messages)]
-
-	def health(self):
-		return SmsHealth(True, "", 1000.0)
+@pytest.fixture(autouse=True)
+def clean_mock():
+	MockDriver.sent.clear()
 
 
 @pytest.fixture
-def gateway(monkeypatch, org):
-	fake = FakeGateway()
-	monkeypatch.setattr(sms_service, "gateway", lambda session: fake)
-	payslips.save_settings(org.db, org.admin, {"base_url": "https://hr.example.ir"})
-	return fake
+def panel(org):
+	"""A working mock panel and a template for the payslip event: what the admin sets up in the SMS section."""
+	sms.save_provider(org.db, org.admin, "mock", {"config": {}, "is_primary": True})
+	sms.save_template(
+		org.db, org.admin, {"event": "payslip_link", "provider_code": "mock", "mode": "bulk", "body": BODY}
+	)
 
 
 @pytest.fixture
@@ -58,13 +46,29 @@ def upload(org, *pages, actor=None):
 	return payslips.upload(org.db, actor or org.admin, YEAR, MONTH, [("slips.pdf", slip_pdf(*pages))])
 
 
-def sent_token(gateway) -> str:
-	return re.search(r"/p/(\S+)", gateway.batches[-1][-1].text).group(1)
+def queue(org, mode="unsent"):
+	return payslips.queue_send(org.db, org.admin, YEAR, MONTH, mode)
 
 
-def send_all(org, gateway, mode="unsent"):
-	payslips.queue_send(org.db, org.admin, YEAR, MONTH, mode)
-	return payslips.send_pending(org.db)
+def messages(org):
+	return list(org.db.scalars(select(SmsMessage).order_by(SmsMessage.id)))
+
+
+def deliver(org):
+	"""What the worker does: send every queued message."""
+	for m in messages(org):
+		sms_dispatch.send_message(org.db, m.id)
+
+
+def sent_token(org) -> str:
+	"""The token as the employee gets it: the SMS carries a short path, which leads to /p/<token>."""
+	short = MockDriver.sent[-1]["text"].split("|")[3]
+	return sms_dispatch.resolve_short_link(org.db, short.removeprefix("l/")).removeprefix("/p/")
+
+
+def send_all(org, mode="unsent"):
+	queue(org, mode)
+	deliver(org)
 
 
 # uploading --------------------------------------------------------------------------------------
@@ -96,9 +100,9 @@ def test_a_file_that_is_not_a_pdf_is_listed_not_fatal(org, ali):
 	assert counts["rejected"] == 1 and counts["created"] == 0
 
 
-def test_uploading_again_replaces_the_file_and_keeps_the_link(org, gateway, ali):
+def test_uploading_again_replaces_the_file_and_keeps_the_link(org, panel, ali):
 	upload(org, ("42", "0012345678"))
-	send_all(org, gateway)
+	send_all(org)
 	first = org.db.scalar(select(Payslip))
 	old_file = first.file_id
 	assert upload(org, ("42", "0012345678"))["replaced"] == 1
@@ -116,121 +120,168 @@ def test_only_the_system_admin_may_upload(org, ali):
 # sending ----------------------------------------------------------------------------------------
 
 
-def test_sending_makes_a_pending_link_and_a_job_then_the_worker_texts_it(org, gateway, ali):
+def test_sending_makes_a_link_and_a_message_that_carries_only_a_short_path(org, panel, ali):
 	upload(org, ("42", "0012345678"))
-	queued = payslips.queue_send(org.db, org.admin, YEAR, MONTH)
-	assert queued["queued"] == 1
+	assert queue(org) == {"queued": 1}
 	link = org.db.scalar(select(PayslipLink))
-	assert link.sms_status == PENDING and link.token_encrypted and len(link.token_hash) == 64
-	assert org.db.scalar(select(Job.kind)) == jobs.PAYSLIP_SEND
-
-	assert payslips.send_pending(org.db) == {"sent": 1, "failed": 0}
-	[[message]] = gateway.batches
-	assert message.mobile == "09121234567"
-	assert message.text.startswith("کارمند EMP042 عزیز") and "https://hr.example.ir/p/" in message.text
-	org.db.refresh(link)
-	assert link.sms_status == SENT and link.token_encrypted is None and link.sms_provider_id == "id-0"
-
-
-def test_messages_go_out_in_batches_of_the_gateways_size(org, gateway):
-	for n in range(3):
-		make_employee(org.db, f"EMP10{n}", national_id=f"00000000{n}1", mobile=f"0912000000{n}")
-	upload(org, ("100", None), ("101", None), ("102", None))
-	send_all(org, gateway)
-	assert [len(b) for b in gateway.batches] == [2, 1]
+	[message] = messages(org)
+	assert link.sms_message_id == message.id and message.entity_key == f"payslip_link:{link.id}"
+	assert message.status == "queued" and message.to_number == "09121234567"
+	assert set(message.context) == {"name", "month", "expires", "link_path"}  # the full link is not kept
+	deliver(org)
+	text = MockDriver.sent[0]["text"]
+	assert text.startswith("کارمند EMP042|مهر 1405|") and text.split("|")[3].startswith("l/")
+	token = sent_token(org)
+	assert link.token_hash == hashlib.sha256(token.encode()).hexdigest()
+	assert org.db.scalar(select(ShortLink.target_path)) == f"/p/{token}"
 
 
-def test_the_preview_says_who_is_left_out_and_why(org, gateway, ali):
+def test_the_preview_says_who_is_left_out_and_what_the_first_sms_would_be(org, panel, ali):
 	make_employee(org.db, "EMP7", national_id="0087654321", mobile="123")
 	upload(org, ("42", "0012345678"), ("7", None))
 	preview = payslips.preview(org.db, org.admin, YEAR, MONTH)
 	assert preview["count"] == 1 and preview["unavailable"] is None
 	assert [b["problem"] for b in preview["blocked"]] == ["bad_mobile"]
-	assert "https://hr.example.ir/p/" in preview["sample"]
+	assert preview["sample"]["text"].startswith("کارمند EMP042|مهر 1405|")
+	assert "l/xxxxxxxx" in preview["sample"]["text"]
 
 
-def test_nothing_is_sent_without_the_site_address_or_a_working_connection(org, ali):
+def test_a_pattern_template_is_previewed_as_the_request_the_panel_gets(org, ali):
+	sms.save_provider(org.db, org.admin, "mock", {"config": {}, "is_primary": True})
+	sms.save_template(
+		org.db,
+		org.admin,
+		{
+			"event": "payslip_link",
+			"provider_code": "mock",
+			"mode": "pattern",
+			"pattern_code": "55",
+			"param_map": {"NAME": "name", "LINK": "link_path"},
+		},
+	)
 	upload(org, ("42", "0012345678"))
-	with pytest.raises(ValidationError):  # no site address yet
-		payslips.queue_send(org.db, org.admin, YEAR, MONTH)
-	payslips.save_settings(org.db, org.admin, {"base_url": "https://hr.example.ir"})
-	with pytest.raises(ValidationError):  # no SMS key yet
-		payslips.queue_send(org.db, org.admin, YEAR, MONTH)
+	sample = payslips.preview(org.db, org.admin, YEAR, MONTH)["sample"]
+	assert sample["request"]["pattern_code"] == "55"
+	assert sample["request"]["params"] == {"NAME": "کارمند‌EMP042", "LINK": "l/xxxxxxxx"}
+
+
+def test_nothing_is_sent_without_a_panel_and_a_template(org, ali):
+	upload(org, ("42", "0012345678"))
 	assert payslips.preview(org.db, org.admin, YEAR, MONTH)["unavailable"]
+	with pytest.raises(ValidationError):  # no panel yet
+		queue(org)
+	sms.save_provider(org.db, org.admin, "mock", {"config": {}, "is_primary": True})
+	with pytest.raises(ValidationError):  # a panel but no template
+		queue(org)
 
 
-def test_sending_to_those_who_already_have_a_link_needs_the_everyone_choice(org, gateway, ali):
+def test_sending_to_those_who_already_have_a_link_needs_the_everyone_choice(org, panel, ali):
 	upload(org, ("42", "0012345678"))
-	send_all(org, gateway)
+	send_all(org)
 	with pytest.raises(ValidationError):
-		payslips.queue_send(org.db, org.admin, YEAR, MONTH, "unsent")
+		queue(org, "unsent")
 	first = org.db.scalar(select(PayslipLink))
-	payslips.queue_send(org.db, org.admin, YEAR, MONTH, "all")
+	assert payslips.preview(org.db, org.admin, YEAR, MONTH, "all")["replacing"] == 1
+	queue(org, "all")
 	org.db.refresh(first)
 	assert first.locked and first.lock_reason == VOIDED  # the old link no longer works
-	assert org.db.scalar(select(PayslipLink).where(PayslipLink.locked.is_(False))).sms_status == PENDING
+	assert (
+		org.db.scalar(select(PayslipLink).where(PayslipLink.locked.is_(False))).sms_message_id
+		!= first.sms_message_id
+	)
 
 
-def test_a_failed_sms_is_recorded_and_picked_up_by_the_next_send(org, gateway, ali):
+def test_a_message_still_on_its_way_is_not_sent_twice(org, panel, ali):
 	upload(org, ("42", "0012345678"))
-	gateway.error = SmsError("sms.ir refused the API key")
-	assert send_all(org, gateway) == {"sent": 0, "failed": 1}
-	link = org.db.scalar(select(PayslipLink))
-	assert link.sms_status == FAILED and link.sms_error and link.token_encrypted is None
-	gateway.error = None
-	assert send_all(org, gateway)["sent"] == 1  # "unsent" includes the failed ones
+	queue(org)  # queued, not yet sent by the worker
+	for mode in ("unsent", "all"):
+		with pytest.raises(ValidationError):
+			queue(org, mode)
 
 
-def test_a_mismatched_slip_never_gets_a_link(org, gateway, ali):
+def test_a_failed_sms_is_picked_up_by_the_next_send(org, ali):
+	sms.save_provider(org.db, org.admin, "mock", {"config": {"behavior": "fatal"}, "is_primary": True})
+	sms.save_template(
+		org.db, org.admin, {"event": "payslip_link", "provider_code": "mock", "mode": "bulk", "body": BODY}
+	)
+	upload(org, ("42", "0012345678"))
+	send_all(org)
+	[failed] = messages(org)
+	assert failed.status == "failed"
+	overview = payslips.overview(org.db, org.admin, YEAR, MONTH)
+	row = next(r for r in overview["rows"] if r["code"] == "EMP042")
+	assert (
+		row["link"]["sms_status"] == "failed"
+		and row["link"]["sms_error"]
+		and overview["counts"]["failed"] == 1
+	)
+	sms.save_provider(org.db, org.admin, "mock", {"config": {"behavior": "ok"}})
+	send_all(org)  # "unsent" includes the failed ones
+	assert [m.status for m in messages(org)] == ["failed", "sent"]
+
+
+def test_a_message_of_unknown_outcome_waits_for_the_admin(org, ali):
+	sms.save_provider(org.db, org.admin, "mock", {"config": {"behavior": "timeout"}, "is_primary": True})
+	sms.save_template(
+		org.db, org.admin, {"event": "payslip_link", "provider_code": "mock", "mode": "bulk", "body": BODY}
+	)
+	upload(org, ("42", "0012345678"))
+	send_all(org)
+	assert messages(org)[0].status == "unknown"
+	with pytest.raises(ValidationError):  # it may have been delivered: never resent by itself
+		queue(org, "unsent")
+	assert payslips.overview(org.db, org.admin, YEAR, MONTH)["counts"]["unknown"] == 1
+	queue(org, "all")  # the admin can choose to send again
+
+
+def test_a_mismatched_slip_never_gets_a_link(org, panel, ali):
 	upload(org, ("42", "1111111111"))
 	with pytest.raises(ValidationError):
-		payslips.queue_send(org.db, org.admin, YEAR, MONTH)
+		queue(org)
 
 
 # the employee's side ----------------------------------------------------------------------------
 
 
-def opened(org, gateway, secret="5678"):
-	return payslips.open_payslip(org.db, sent_token(gateway), secret, "10.0.0.5")
+def opened(org, secret="5678"):
+	return payslips.open_payslip(org.db, sent_token(org), secret, "10.0.0.5")
 
 
 @pytest.fixture
-def sent(org, gateway, ali):
+def sent(org, panel, ali):
 	upload(org, ("42", "0012345678"))
-	send_all(org, gateway)
+	send_all(org)
 
 
-def test_the_right_last_four_digits_open_the_payslip_and_are_counted(org, gateway, sent):
-	content, filename = opened(org, gateway, "۵۶۷۸")  # Persian digits are fine
+def test_the_right_last_four_digits_open_the_payslip_and_are_counted(org, sent):
+	content, filename = opened(org, "۵۶۷۸")  # Persian digits are fine
 	assert content.startswith(b"%PDF") and filename == "payslip-1405-07.pdf"
-	link = org.db.scalar(select(PayslipLink))
-	assert link.view_count == 1
+	assert org.db.scalar(select(PayslipLink)).view_count == 1
 
 
-def test_a_wrong_answer_is_counted_and_enough_of_them_lock_the_link(org, gateway, sent):
+def test_a_wrong_answer_is_counted_and_enough_of_them_lock_the_link(org, sent):
 	payslips.save_settings(org.db, org.admin, {"max_failed_attempts": 2})
 	with pytest.raises(payslips.WrongSecret):
-		opened(org, gateway, "0000")
+		opened(org, "0000")
 	link = org.db.scalar(select(PayslipLink))
 	assert link.failed_attempts == 1
 	with pytest.raises(payslips.LinkInvalid):
-		opened(org, gateway, "1111")
+		opened(org, "1111")
 	with pytest.raises(payslips.LinkInvalid):  # locked: even the right answer is refused
-		opened(org, gateway, "5678")
+		opened(org, "5678")
 	assert link.locked and link.lock_reason == "failed_attempts"
 
 
-def test_a_link_stops_after_its_views_and_after_its_time(org, gateway, sent):
-	payslips.save_settings(org.db, org.admin, {"link_max_views": 1})
+def test_a_link_stops_after_its_views_and_after_its_time(org, sent):
 	link = org.db.scalar(select(PayslipLink))
 	link.max_views = 1
-	opened(org, gateway)
+	opened(org)
 	with pytest.raises(payslips.LinkInvalid):
-		opened(org, gateway)
+		opened(org)
 	link.max_views, link.view_count = 5, 0
 	link.expires_at = now() - timedelta(minutes=1)
 	with pytest.raises(payslips.LinkInvalid):
-		opened(org, gateway)
+		opened(org)
 
 
 def test_an_unknown_token_gets_the_same_answer(org):
@@ -240,16 +291,16 @@ def test_an_unknown_token_gets_the_same_answer(org):
 		payslips.link_info(org.db, "")
 
 
-def test_someone_who_left_cannot_open_an_old_link(org, gateway, sent, ali):
+def test_someone_who_left_cannot_open_an_old_link(org, sent, ali):
 	ali.status = "left"
 	org.db.flush()
 	with pytest.raises(payslips.LinkInvalid):
-		opened(org, gateway)
+		opened(org)
 
 
-def test_the_message_must_carry_the_link_and_only_known_fields(org):
-	for bad in ("no link here", "{link} {secret}", "{link} {}", "{link"):
+def test_the_link_settings_are_checked(org):
+	saved = payslips.save_settings(org.db, org.admin, {"link_expiry_days": "30", "link_max_views": 3})
+	assert (saved["link_expiry_days"], saved["link_max_views"]) == (30, 3)
+	for bad in ({"link_expiry_days": 0}, {"link_max_views": 1000}, {"max_failed_attempts": "x"}):
 		with pytest.raises(ValidationError):
-			payslips.save_settings(org.db, org.admin, {"message": bad})
-	saved = payslips.save_settings(org.db, org.admin, {"message": "{name}: {link}"})
-	assert saved["message"] == "{name}: {link}"
+			payslips.save_settings(org.db, org.admin, bad)

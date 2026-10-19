@@ -48,7 +48,7 @@ from chronicle.db.models.requests import (
 )
 from chronicle.i18n import _
 from chronicle.jalali.dates import InvalidJalaliDate, iter_days, normalize_jdate, normalize_time
-from chronicle.services import access, approvals, audit, jobs, leave, settings
+from chronicle.services import access, approvals, audit, jobs, leave, settings, sms_triggers
 from chronicle.services.errors import NotFound, PermissionDenied, ValidationError
 from chronicle.services.periods import assert_open
 from chronicle.services.punches import employee_raw_punches
@@ -329,6 +329,8 @@ def submit(session: Session, actor: access.Actor, kind: str, values: dict, today
 		suggestions.mark_sent(session, actor, int(values["suggestion_id"]), request)
 	if request.status == APPROVED:
 		_on_approved(session, actor, request)
+	sms_triggers.on_waiting(session, request)
+	sms_triggers.on_decided(session, request)
 	return request
 
 
@@ -419,6 +421,8 @@ def act(
 	)
 	if request.status == APPROVED:
 		_on_approved(session, actor, request)
+	sms_triggers.on_waiting(session, request)  # the next step, if the request moved on
+	sms_triggers.on_decided(session, request)
 	return request
 
 

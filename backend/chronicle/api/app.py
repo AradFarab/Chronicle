@@ -6,11 +6,11 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from chronicle import __version__
-from chronicle.api.deps import csrf_guard
+from chronicle.api.deps import DB, csrf_guard
 from chronicle.api.routes import (
 	admin,
 	attendance,
@@ -23,9 +23,11 @@ from chronicle.api.routes import (
 	people,
 	reports,
 	requests,
+	sms,
 )
 from chronicle.config import get_settings
 from chronicle.i18n import DEFAULT_LANGUAGE, translate
+from chronicle.services import sms_dispatch
 from chronicle.services.errors import ChronicleError
 
 
@@ -58,10 +60,31 @@ def create_app() -> FastAPI:
 		return {"ok": True, "version": __version__}
 
 	# people before admin: its employee routes win over the generic /api/admin/{name}
-	routers = (auth, me, requests, calendar, attendance, devices, reports, people, imports, payslips, admin)
+	routers = (
+		auth,
+		me,
+		requests,
+		calendar,
+		attendance,
+		devices,
+		reports,
+		people,
+		imports,
+		payslips,
+		sms,
+		admin,
+	)
 	for module in routers:
 		app.include_router(module.router)
 	app.include_router(payslips.public)
+
+	@app.get("/l/{code}", include_in_schema=False)
+	def short_link(code: str, db: DB):
+		"""The short path an SMS carries (see services/sms_dispatch.py): to the page it stands for."""
+		target = sms_dispatch.resolve_short_link(db, code)
+		if target is None:
+			return JSONResponse({"message": "Not found"}, status_code=404)
+		return RedirectResponse(target, status_code=302, headers={"Cache-Control": "no-store"})
 
 	dist = get_settings().frontend_dist
 	if dist and Path(dist).is_dir():

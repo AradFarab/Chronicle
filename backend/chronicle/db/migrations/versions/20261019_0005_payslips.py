@@ -1,11 +1,12 @@
-"""payslips: the pages of the finance software's PDF and the SMS links to them
+"""payslips: the pages of the payroll PDF and the private links to them
 
-``payslip`` is one stored PDF page per employee and Jalali month, ``payslip_rejection`` the pages
-that could not be matched, ``payslip_link`` the private link sent by SMS (at most one active per
-payslip, enforced by a partial unique index) and ``payslip_view`` each opening of a link.
+``payslip`` is one stored PDF page per employee and Jalali month, ``payslip_rejection`` the
+pages that could not be matched, ``payslip_link`` the private link (at most one active per
+payslip, enforced by a partial unique index) with the SMS that carried it, and ``payslip_view``
+each opening of a link.
 
-Revision ID: 0004
-Revises: 0003
+Revision ID: 0005
+Revises: 0004
 Create Date: 2026-10-19 10:00:00
 """
 
@@ -16,13 +17,28 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = "0004"
-down_revision: str | None = "0003"
+revision: str = "0005"
+down_revision: str | None = "0004"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+	op.create_table(
+		"payslip_rejection",
+		sa.Column("jyear", sa.SmallInteger(), nullable=False),
+		sa.Column("jmonth", sa.SmallInteger(), nullable=False),
+		sa.Column("source_name", sa.String(length=255), nullable=False),
+		sa.Column("page_no", sa.Integer(), nullable=True),
+		sa.Column("reason", sa.Text(), nullable=False),
+		sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+		sa.Column("id", sa.BigInteger(), sa.Identity(always=True), nullable=False),
+		sa.CheckConstraint("jmonth BETWEEN 1 AND 12", name=op.f("ck_payslip_rejection_jmonth_valid")),
+		sa.PrimaryKeyConstraint("id", name=op.f("pk_payslip_rejection")),
+	)
+	op.create_index(
+		"ix_payslip_rejection_jyear_jmonth", "payslip_rejection", ["jyear", "jmonth"], unique=False
+	)
 	op.create_table(
 		"payslip",
 		sa.Column("employee_id", sa.BigInteger(), nullable=False),
@@ -40,8 +56,8 @@ def upgrade() -> None:
 			"national_status IN ('match', 'mismatch', 'unknown')",
 			name=op.f("ck_payslip_national_status_valid"),
 		),
-		sa.CheckConstraint("jyear BETWEEN 1300 AND 1499", name=op.f("ck_payslip_jyear_valid")),
 		sa.CheckConstraint("jmonth BETWEEN 1 AND 12", name=op.f("ck_payslip_jmonth_valid")),
+		sa.CheckConstraint("jyear BETWEEN 1300 AND 1499", name=op.f("ck_payslip_jyear_valid")),
 		sa.ForeignKeyConstraint(
 			["employee_id"], ["employee.id"], name=op.f("fk_payslip_employee_id_employee")
 		),
@@ -58,44 +74,20 @@ def upgrade() -> None:
 		),
 	)
 	op.create_index("ix_payslip_jyear_jmonth", "payslip", ["jyear", "jmonth"], unique=False)
-
-	op.create_table(
-		"payslip_rejection",
-		sa.Column("jyear", sa.SmallInteger(), nullable=False),
-		sa.Column("jmonth", sa.SmallInteger(), nullable=False),
-		sa.Column("source_name", sa.String(length=255), nullable=False),
-		sa.Column("page_no", sa.Integer(), nullable=True),
-		sa.Column("reason", sa.Text(), nullable=False),
-		sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-		sa.Column("id", sa.BigInteger(), sa.Identity(always=True), nullable=False),
-		sa.CheckConstraint("jmonth BETWEEN 1 AND 12", name=op.f("ck_payslip_rejection_jmonth_valid")),
-		sa.PrimaryKeyConstraint("id", name=op.f("pk_payslip_rejection")),
-	)
-	op.create_index(
-		"ix_payslip_rejection_jyear_jmonth", "payslip_rejection", ["jyear", "jmonth"], unique=False
-	)
-
 	op.create_table(
 		"payslip_link",
 		sa.Column("payslip_id", sa.BigInteger(), nullable=False),
 		sa.Column("token_hash", sa.String(length=64), nullable=False),
-		sa.Column("token_encrypted", sa.Text(), nullable=True),
 		sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
 		sa.Column("max_views", sa.Integer(), nullable=False),
 		sa.Column("view_count", sa.Integer(), server_default="0", nullable=False),
 		sa.Column("failed_attempts", sa.Integer(), server_default="0", nullable=False),
 		sa.Column("locked", sa.Boolean(), server_default=sa.text("false"), nullable=False),
 		sa.Column("lock_reason", sa.String(length=20), nullable=True),
-		sa.Column("sms_status", sa.String(length=10), server_default="pending", nullable=False),
-		sa.Column("sms_provider_id", sa.String(length=100), nullable=True),
-		sa.Column("sms_error", sa.Text(), nullable=True),
-		sa.Column("sms_sent_at", sa.DateTime(timezone=True), nullable=True),
+		sa.Column("sms_message_id", sa.BigInteger(), nullable=True),
 		sa.Column("created_by_id", sa.BigInteger(), nullable=True),
 		sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
 		sa.Column("id", sa.BigInteger(), sa.Identity(always=True), nullable=False),
-		sa.CheckConstraint(
-			"sms_status IN ('pending', 'sent', 'failed')", name=op.f("ck_payslip_link_sms_status_valid")
-		),
 		sa.CheckConstraint(
 			"lock_reason IS NULL OR lock_reason IN ('voided', 'failed_attempts')",
 			name=op.f("ck_payslip_link_lock_reason_valid"),
@@ -118,10 +110,17 @@ def upgrade() -> None:
 			name=op.f("fk_payslip_link_payslip_id_payslip"),
 			ondelete="CASCADE",
 		),
+		sa.ForeignKeyConstraint(
+			["sms_message_id"],
+			["sms_message.id"],
+			name=op.f("fk_payslip_link_sms_message_id_sms_message"),
+			ondelete="SET NULL",
+		),
 		sa.PrimaryKeyConstraint("id", name=op.f("pk_payslip_link")),
 		sa.UniqueConstraint("token_hash", name=op.f("uq_payslip_link_token_hash")),
 	)
 	op.create_index(op.f("ix_payslip_link_payslip_id"), "payslip_link", ["payslip_id"], unique=False)
+	op.create_index(op.f("ix_payslip_link_sms_message_id"), "payslip_link", ["sms_message_id"], unique=False)
 	op.create_index(
 		"uq_payslip_link_one_active",
 		"payslip_link",
@@ -129,14 +128,6 @@ def upgrade() -> None:
 		unique=True,
 		postgresql_where=sa.text("NOT locked"),
 	)
-	op.create_index(
-		"ix_payslip_link_sms_status",
-		"payslip_link",
-		["sms_status"],
-		unique=False,
-		postgresql_where=sa.text("sms_status = 'pending'"),
-	)
-
 	op.create_table(
 		"payslip_view",
 		sa.Column("link_id", sa.BigInteger(), nullable=False),
@@ -157,5 +148,5 @@ def upgrade() -> None:
 def downgrade() -> None:
 	op.drop_table("payslip_view")
 	op.drop_table("payslip_link")
-	op.drop_table("payslip_rejection")
 	op.drop_table("payslip")
+	op.drop_table("payslip_rejection")

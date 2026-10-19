@@ -31,8 +31,6 @@ from chronicle.db.types import enum_check
 # (the page shows none). A mismatch blocks the link: nobody's slip may reach somebody else.
 MATCH, MISMATCH, UNKNOWN = "match", "mismatch", "unknown"
 NATIONAL_STATUSES = (MATCH, MISMATCH, UNKNOWN)
-PENDING, SENT, FAILED = "pending", "sent", "failed"
-SMS_STATUSES = (PENDING, SENT, FAILED)
 VOIDED, TOO_MANY_ATTEMPTS = "voided", "failed_attempts"
 LOCK_REASONS = (VOIDED, TOO_MANY_ATTEMPTS)
 
@@ -76,35 +74,31 @@ class PayslipRejection(IdMixin, Base):
 
 
 class PayslipLink(IdMixin, Base):
-	"""The private link to one payslip. Only the SHA-256 of the token is kept for lookup; the
-	token itself waits, encrypted, until the SMS has gone out and is then erased. At most one
-	link per payslip is active (not locked): sending again voids the previous one."""
+	"""The private link to one payslip. Only the SHA-256 of the token is kept for lookup (the SMS
+	carries a short link to it, see ShortLink). At most one link per payslip is active (not
+	locked): sending again voids the previous one. `sms_message` is the SMS that carried it."""
 
 	__tablename__ = "payslip_link"
 	__table_args__ = (
-		enum_check("sms_status", SMS_STATUSES),
 		CheckConstraint(
 			"lock_reason IS NULL OR lock_reason IN ('voided', 'failed_attempts')", name="lock_reason_valid"
 		),
 		CheckConstraint("locked = (lock_reason IS NOT NULL)", name="lock_matches_reason"),
 		CheckConstraint("view_count >= 0 AND failed_attempts >= 0", name="counters_non_negative"),
 		Index("uq_payslip_link_one_active", "payslip_id", unique=True, postgresql_where=text("NOT locked")),
-		Index("ix_payslip_link_sms_status", "sms_status", postgresql_where=text("sms_status = 'pending'")),
 	)
 
 	payslip_id: Mapped[int] = mapped_column(ForeignKey("payslip.id", ondelete="CASCADE"), index=True)
 	token_hash: Mapped[str] = mapped_column(String(64), unique=True)
-	token_encrypted: Mapped[str | None] = mapped_column(Text)
 	expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 	max_views: Mapped[int] = mapped_column(Integer)
 	view_count: Mapped[int] = mapped_column(Integer, server_default="0")
 	failed_attempts: Mapped[int] = mapped_column(Integer, server_default="0")
 	locked: Mapped[bool] = mapped_column(Boolean, server_default=false())
 	lock_reason: Mapped[str | None] = mapped_column(String(20))
-	sms_status: Mapped[str] = mapped_column(String(10), server_default=PENDING)
-	sms_provider_id: Mapped[str | None] = mapped_column(String(100))
-	sms_error: Mapped[str | None] = mapped_column(Text)
-	sms_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+	sms_message_id: Mapped[int | None] = mapped_column(
+		ForeignKey("sms_message.id", ondelete="SET NULL"), index=True
+	)
 	created_by_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id", ondelete="SET NULL"))
 	created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

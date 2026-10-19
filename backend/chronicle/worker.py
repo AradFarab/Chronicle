@@ -20,13 +20,14 @@ from sqlalchemy.orm import Session, sessionmaker
 from chronicle.clock import now, today_jalali
 from chronicle.db.models import AttendanceDevice, Job
 from chronicle.jalali.dates import add_days, iter_days
-from chronicle.services import attendance, backup, devices, jobs, leave, payslips
+from chronicle.services import attendance, backup, devices, jobs, leave, sms_dispatch, sms_triggers
 
 log = logging.getLogger("chronicle.worker")
 
 TICK_SECONDS = 15
 NIGHTLY = "nightly"
 BACKUP = "backup"
+SMS_TRIGGERS = "sms_triggers"
 RETRY_AFTER = (timedelta(minutes=1), timedelta(minutes=5), timedelta(minutes=30))
 
 
@@ -68,16 +69,22 @@ def _backup(session: Session, payload: dict[str, Any], today: str) -> dict:
 	return {"backup": made.name, "removed": backup.prune(backup.schedule(session)["keep"])}
 
 
-def _payslip_send(session: Session, payload: dict[str, Any], today: str) -> dict:
-	"""The SMS of payslip links the system admin queued (see services/payslips.py)."""
-	return payslips.send_pending(session, payload.get("link_ids"))
+def _sms_triggers(session: Session, payload: dict[str, Any], today: str) -> dict:
+	"""The hourly SMS checks (shift reminders, missed punches, lateness, birthdays, ...)."""
+	return sms_triggers.run_periodic(session, today)
+
+
+def _sms_send(session: Session, payload: dict[str, Any], today: str) -> dict:
+	"""Send one queued SMS (services/sms_dispatch.py); it never raises, the outcome is the message's."""
+	return {"status": sms_dispatch.send_message(session, int(payload["message_id"]))}
 
 
 HANDLERS: dict[str, Callable[[Session, dict[str, Any], str], Any]] = {
 	jobs.RECALCULATE: _recalculate,
 	NIGHTLY: _nightly,
 	BACKUP: _backup,
-	jobs.PAYSLIP_SEND: _payslip_send,
+	sms_dispatch.SMS_SEND: _sms_send,
+	SMS_TRIGGERS: _sms_triggers,
 }
 
 
@@ -167,6 +174,17 @@ def schedule_backup(factory: sessionmaker[Session], today: str | None = None) ->
 		return True
 
 
+def schedule_sms_triggers(factory: sessionmaker[Session], today: str | None = None) -> bool:
+	"""Queue the hourly SMS checks once per hour."""
+	today = today or today_jalali()
+	key = f"{SMS_TRIGGERS}:{today}:{now().hour}"
+	with factory() as session, session.begin():
+		if session.scalar(select(Job.id).where(Job.dedup_key == key).limit(1)):
+			return False
+		session.add(Job(kind=SMS_TRIGGERS, payload={"jdate": today}, dedup_key=key, max_attempts=1))
+		return True
+
+
 def poll_devices(factory: sessionmaker[Session]) -> int:
 	"""Sync every enabled network device whose polling interval has passed. Each device has
 	its own transaction, so one unreachable device never holds up the others."""
@@ -192,6 +210,10 @@ def tick(factory: sessionmaker[Session]) -> None:
 		schedule_backup(factory)
 	except Exception:
 		log.exception("could not schedule the backup")
+	try:
+		schedule_sms_triggers(factory)
+	except Exception:
+		log.exception("could not schedule the SMS checks")
 	poll_devices(factory)
 	run_queue(factory)
 

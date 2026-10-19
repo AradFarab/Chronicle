@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chronicle\n"
 "Report-Msgid-Bugs-To: 219307864+AradFarab@users.noreply.github.com\n"
-"POT-Creation-Date: 2026-10-19 09:46+0000\n"
+"POT-Creation-Date: 2026-10-19 10:57+0000\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -55,7 +55,7 @@ msgstr "یک واحد"
 msgid "A designation"
 msgstr "یک سمت"
 
-#: backend/chronicle/services/resources.py:416
+#: backend/chronicle/services/resources.py:419
 msgid "A designation cannot be below itself"
 msgstr "یک سمت نمی‌تواند زیر خودش (یا زیر زیرمجموعه‌اش) قرار بگیرد"
 
@@ -67,19 +67,27 @@ msgstr "سمت بالادست باید از قبل وجود داشته باشد 
 msgid "A file made from the sample connects itself."
 msgstr "فایلی که از روی نمونه ساخته شده، خودش وصل می‌شود."
 
-#: backend/chronicle/services/resources.py:327
+#: backend/chronicle/services/resources.py:330
 msgid "A flexible shift needs the required minutes"
 msgstr "شیفت شناور به دقایق کار لازم نیاز دارد"
+
+#: frontend/src/pages/SmsTemplates.vue:183 frontend/src/pages/SmsTemplates.vue:190
+msgid "A full text"
+msgstr "یک متن کامل"
 
 #: frontend/src/lib/labels.ts:34
 msgid "A holiday file (JSON or CSV)"
 msgstr "فایل تعطیلات (JSON یا CSV)"
 
-#: frontend/src/pages/PayslipSettings.vue:23
+#: frontend/src/pages/SmsSettings.vue:34
 msgid "A key is saved; type here only to replace it"
 msgstr "کلید ذخیره شده است؛ فقط برای تغییر آن اینجا بنویسید"
 
-#: backend/chronicle/services/resources.py:165
+#: backend/chronicle/services/sms_dispatch.py:85 backend/chronicle/services/sms_dispatch.py:87
+msgid "A link must be a path on this site"
+msgstr "لینک باید مسیری در همین سایت باشد"
+
+#: backend/chronicle/services/resources.py:168
 msgid "A linked record does not exist"
 msgstr "رکورد مرتبط وجود ندارد"
 
@@ -91,9 +99,21 @@ msgstr "گزارش جدید…"
 msgid "A number"
 msgstr "یک عدد"
 
-#: backend/chronicle/services/resources.py:337 frontend/src/lib/timeline.ts:198
+#: backend/chronicle/services/sms.py:233
+msgid "A panel cannot be both the primary and the fallback"
+msgstr "یک پنل نمی‌تواند هم اصلی باشد هم پشتیبان"
+
+#: backend/chronicle/services/resources.py:340 frontend/src/lib/timeline.ts:198
 msgid "A part of the shift must end after it starts"
 msgstr "هر بخش شیفت باید بعد از شروعش تمام شود"
+
+#: frontend/src/pages/SmsTemplates.vue:183
+msgid "A pattern approved by the panel"
+msgstr "یک پترن تأییدشده در پنل"
+
+#: backend/chronicle/services/sms.py:385
+msgid "A pattern variable has no name"
+msgstr "یکی از متغیرهای پترن نام ندارد"
 
 #: frontend/src/pages/EmployeeForm.vue:57
 msgid "A person who left or is suspended can no longer log in."
@@ -107,7 +127,7 @@ msgstr "یک تردد جفت ندارد؛ این روز را اصلاح کنید
 msgid "A punch is missing on {0}: add the time the device missed"
 msgstr "در {0} یک تردد ناقص است: ساعتی را که دستگاه ثبت نکرده اضافه کنید"
 
-#: backend/chronicle/services/resources.py:360 frontend/src/components/PatternGrid.vue:489
+#: backend/chronicle/services/resources.py:363 frontend/src/components/PatternGrid.vue:489
 msgid "A rotating pattern needs the first day of the cycle"
 msgstr "الگوی چرخشی به روز اول چرخه نیاز دارد"
 
@@ -119,11 +139,15 @@ msgstr "شیفت حداکثر ۲۴ ساعت است و در روز خودش شر�
 msgid "A specific person"
 msgstr "شخص مشخص"
 
-#: backend/chronicle/services/resources.py:262
+#: backend/chronicle/services/resources.py:265
 msgid "A standard record cannot be removed"
 msgstr "رکورد استاندارد قابل حذف نیست"
 
-#: backend/chronicle/services/excel.py:1216 backend/chronicle/services/resources.py:170
+#: frontend/src/pages/SmsTemplates.vue:8
+msgid "A template says how an event is sent through a panel: the full text, or the code of a pattern approved by the panel with the event's fields filling its variables."
+msgstr "قالب مشخص می‌کند یک رویداد چطور از طریق یک پنل فرستاده شود: متن کامل، یا کد پترنی که پنل تأیید کرده و فیلدهای رویداد متغیرهای آن را پر می‌کنند."
+
+#: backend/chronicle/services/excel.py:1216 backend/chronicle/services/resources.py:173
 msgid "A value is not valid ({0})"
 msgstr "یکی از مقادیر معتبر نیست ({0})"
 
@@ -135,7 +159,7 @@ msgstr "هر مقدار می‌تواند به سود کارگر از قانون
 msgid "A weekly pattern fills the seven weekday columns; a rotating pattern fills the rotation column."
 msgstr "الگوی هفتگی ستون‌های هفت روز هفته را پر می‌کند و الگوی چرخشی ستون «چرخش» را."
 
-#: frontend/src/pages/PayslipSettings.vue:22
+#: backend/chronicle/sms/smsir.py:38
 msgid "API key"
 msgstr "کلید API"
 
@@ -167,11 +191,11 @@ msgstr "حساب کاربری"
 msgid "Action"
 msgstr "عملیات"
 
-#: backend/chronicle/services/excel.py:249 backend/chronicle/services/excel.py:305 backend/chronicle/services/excel.py:374 frontend/src/lib/people.ts:39 frontend/src/lib/resources.ts:91 frontend/src/pages/Users.vue:35 frontend/src/pages/Users.vue:92
+#: backend/chronicle/services/excel.py:249 backend/chronicle/services/excel.py:305 backend/chronicle/services/excel.py:374 frontend/src/lib/people.ts:39 frontend/src/lib/resources.ts:91 frontend/src/pages/SmsTemplates.vue:104 frontend/src/pages/SmsTemplates.vue:17 frontend/src/pages/SmsTemplates.vue:191 frontend/src/pages/Users.vue:35 frontend/src/pages/Users.vue:92
 msgid "Active"
 msgstr "فعال"
 
-#: frontend/src/pages/Calendar.vue:235
+#: frontend/src/pages/Calendar.vue:235 frontend/src/pages/SmsSettings.vue:79
 msgid "Add"
 msgstr "افزودن"
 
@@ -198,6 +222,10 @@ msgstr "افزودن ردیف"
 #: frontend/src/pages/NewRequest.vue:121
 msgid "Add a time"
 msgstr "افزودن ساعت"
+
+#: frontend/src/pages/SmsTemplates.vue:97
+msgid "Add a variable"
+msgstr "افزودن متغیر"
 
 #: frontend/src/components/ShiftTimeline.vue:162
 msgid "Add an overtime window"
@@ -227,11 +255,7 @@ msgstr "افزودن ساعت کار"
 msgid "Address"
 msgstr "نشانی"
 
-#: frontend/src/pages/PayslipSettings.vue:46
-msgid "Address of this site"
-msgstr "نشانی این سایت"
-
-#: frontend/src/components/DataTable.vue:31
+#: frontend/src/components/DataTable.vue:31 frontend/src/pages/SmsMessages.vue:102 frontend/src/pages/SmsMessages.vue:105
 msgid "All"
 msgstr "همه"
 
@@ -255,7 +279,7 @@ msgstr "همیشه ورود"
 msgid "Always Out"
 msgstr "همیشه خروج"
 
-#: backend/chronicle/services/resources.py:346 frontend/src/lib/timeline.ts:210
+#: backend/chronicle/services/resources.py:349 frontend/src/lib/timeline.ts:210
 msgid "An overtime window must be before the start or after the end of the shift"
 msgstr "بازهٔ مجاز اضافه‌کار باید پیش از شروع یا پس از پایان شیفت باشد"
 
@@ -267,7 +291,7 @@ msgstr "مرخصی سالانه (روز کاری)"
 msgid "Annual leave for hard and harmful work (weeks)"
 msgstr "مرخصی سالانهٔ کار سخت و زیان‌آور (هفته)"
 
-#: backend/chronicle/services/resources.py:161
+#: backend/chronicle/services/resources.py:164
 msgid "Another record already has this value"
 msgstr "رکورد دیگری همین مقدار را دارد"
 
@@ -351,10 +375,6 @@ msgstr "دست‌کم ۸ نویسه؛ خود فرد می‌تواند آن را 
 msgid "At least one active admin is needed"
 msgstr "دست‌کم یک مدیر سیستم فعال لازم است"
 
-#: backend/chronicle/sms/smsir.py:74
-msgid "At most {0} messages can be sent in one request"
-msgstr "در هر درخواست حداکثر {0} پیامک فرستاده می‌شود"
-
 #: frontend/src/pages/Backups.vue:85
 msgid "At this hour"
 msgstr "در این ساعت"
@@ -362,6 +382,10 @@ msgstr "در این ساعت"
 #: frontend/src/pages/Today.vue:28
 msgid "At work"
 msgstr "سر کار"
+
+#: frontend/src/pages/SmsMessages.vue:113 frontend/src/pages/SmsMessages.vue:53
+msgid "Attempts"
+msgstr "تعداد تلاش"
 
 #: frontend/src/pages/Login.vue:8
 msgid "Attendance"
@@ -395,7 +419,7 @@ msgstr "بازگشت به ستون‌ها"
 msgid "Back to today"
 msgstr "بازگشت به امروز"
 
-#: frontend/src/pages/Backups.vue:3 frontend/src/pages/Manage.vue:100
+#: frontend/src/pages/Backups.vue:3 frontend/src/pages/Manage.vue:105
 msgid "Backups"
 msgstr "پشتیبان‌گیری"
 
@@ -406,6 +430,10 @@ msgstr "پشتیبان‌ها روی سرور در این پوشه نگه داش
 #: frontend/src/pages/Backups.vue:25
 msgid "Backups on the server"
 msgstr "پشتیبان‌های روی سرور"
+
+#: backend/chronicle/sms/mock.py:29
+msgid "Behavior: ok, retryable, fatal or timeout"
+msgstr "رفتار: ok، retryable، fatal یا timeout"
 
 #: backend/chronicle/services/excel.py:389 frontend/src/pages/EmployeeForm.vue:180
 msgid "Biometric consent date"
@@ -427,7 +455,7 @@ msgstr "استراحت (بی‌حقوق)"
 msgid "Break minutes without punching"
 msgstr "دقایق استراحت بدون ثبت تردد"
 
-#: backend/chronicle/services/excel.py:430 backend/chronicle/services/resources.py:339
+#: backend/chronicle/services/excel.py:430 backend/chronicle/services/resources.py:342
 msgid "Breaks"
 msgstr "استراحت‌ها"
 
@@ -487,7 +515,7 @@ msgstr "دسته"
 msgid "Change"
 msgstr "تغییر"
 
-#: frontend/src/pages/Audit.vue:3 frontend/src/pages/Manage.vue:99
+#: frontend/src/pages/Audit.vue:3 frontend/src/pages/Manage.vue:104
 msgid "Change history"
 msgstr "تاریخچهٔ تغییرات"
 
@@ -523,7 +551,7 @@ msgstr "انتخاب تاریخ"
 msgid "Choose a holiday file"
 msgstr "فایل تعطیلات را انتخاب کنید"
 
-#: backend/chronicle/services/payslips.py:150 backend/chronicle/services/payslips.py:152
+#: backend/chronicle/services/payslips.py:106 backend/chronicle/services/payslips.py:108
 msgid "Choose a valid year and month"
 msgstr "سال و ماه معتبر انتخاب کنید"
 
@@ -539,7 +567,7 @@ msgstr "انتخاب کارمند"
 msgid "Choose at least one column"
 msgstr "دست‌کم یک ستون انتخاب کنید"
 
-#: backend/chronicle/services/resources.py:658 frontend/src/components/BulkAssignDialog.vue:164
+#: backend/chronicle/services/resources.py:661 frontend/src/components/BulkAssignDialog.vue:164
 msgid "Choose at least one person"
 msgstr "دست‌کم یک نفر را انتخاب کنید"
 
@@ -547,9 +575,17 @@ msgstr "دست‌کم یک نفر را انتخاب کنید"
 msgid "Choose from the list"
 msgstr "از فهرست انتخاب کنید"
 
+#: backend/chronicle/services/sms.py:425
+msgid "Choose how the message is sent"
+msgstr "روش ارسال پیام را انتخاب کنید"
+
 #: backend/chronicle/calendar/service.py:391
 msgid "Choose how the office closure is paid"
 msgstr "نحوه پرداخت این تعطیلی را انتخاب کنید"
+
+#: backend/chronicle/services/sms.py:664
+msgid "Choose sent or failed"
+msgstr "«ارسال‌شد» یا «ارسال‌نشد» را انتخاب کنید"
 
 #: frontend/src/components/RotationBuilder.vue:69
 msgid "Choose shift A"
@@ -562,6 +598,10 @@ msgstr "شیفت ب را انتخاب کنید"
 #: backend/chronicle/services/devices.py:497
 msgid "Choose the device and enter the device user id"
 msgstr "دستگاه را انتخاب و شناسهٔ کاربر دستگاه را وارد کنید"
+
+#: backend/chronicle/services/sms.py:417
+msgid "Choose the event"
+msgstr "رویداد را انتخاب کنید"
 
 #: frontend/src/components/BulkAssignDialog.vue:166
 msgid "Choose the first day"
@@ -598,6 +638,10 @@ msgstr "فایل انتخاب‌شده: {0}"
 #: frontend/src/components/AppShell.vue:142 frontend/src/components/AppShell.vue:8 frontend/src/pages/Login.vue:7 frontend/src/pages/PayslipView.vue:6
 msgid "Chronicle"
 msgstr "Chronicle"
+
+#: frontend/src/pages/SmsSettings.vue:9
+msgid "Chronicle sends every SMS through a panel you set up here. The primary panel is tried first; the fallback only when the primary refuses for good."
+msgstr "Chronicle هر پیامک را از طریق پنلی می‌فرستد که اینجا تنظیم می‌کنید. ابتدا پنل اصلی امتحان می‌شود و پنل پشتیبان فقط وقتی استفاده می‌شود که پنل اصلی قطعاً رد کند."
 
 #: backend/chronicle/services/excel.py:303 frontend/src/lib/resources.ts:89
 msgid "City"
@@ -647,7 +691,7 @@ msgstr "بسته"
 msgid "Closed on"
 msgstr "تاریخ بستن"
 
-#: frontend/src/pages/Payslips.vue:198
+#: frontend/src/pages/Payslips.vue:197
 msgid "Code"
 msgstr "کد"
 
@@ -703,7 +747,7 @@ msgstr "کار در تعطیلی شرکت"
 msgid "Company holiday"
 msgstr "تعطیلی شرکت"
 
-#: backend/chronicle/services/payslips.py:711
+#: backend/chronicle/services/payslips.py:627
 msgid "Confidential"
 msgstr "محرمانه"
 
@@ -723,11 +767,11 @@ msgstr "اتصال ستون‌ها"
 msgid "Connect each field to a column of your file. Fields marked * are required."
 msgstr "هر فیلد را به یکی از ستون‌های فایلتان وصل کنید. فیلدهای ستاره‌دار الزامی‌اند."
 
-#: frontend/src/pages/PayslipSettings.vue:33
+#: frontend/src/pages/SmsSettings.vue:49
 msgid "Connected"
 msgstr "اتصال برقرار شد"
 
-#: frontend/src/pages/PayslipSettings.vue:32
+#: frontend/src/pages/SmsSettings.vue:48
 msgid "Connected. Credit: {0}"
 msgstr "اتصال برقرار است. اعتبار: {0}"
 
@@ -747,9 +791,13 @@ msgstr "شامل…"
 msgid "Contract"
 msgstr "نوع قرارداد"
 
-#: backend/chronicle/sms/smsir.py:55
-msgid "Could not reach sms.ir: {0}"
-msgstr "اتصال به sms.ir برقرار نشد: {0}"
+#: backend/chronicle/sms/smsir.py:65
+msgid "Could not connect to sms.ir"
+msgstr "اتصال به sms.ir برقرار نشد"
+
+#: backend/chronicle/services/sms_dispatch.py:237
+msgid "Create an SMS template for this event in the SMS section"
+msgstr "برای این رویداد در بخش پیامک یک قالب بسازید"
 
 #: frontend/src/pages/Audit.vue:99
 msgid "Created"
@@ -815,7 +863,7 @@ msgstr "روزهای اشتغال"
 msgid "Days Present"
 msgstr "روزهای حضور"
 
-#: backend/chronicle/services/payslips.py:118 frontend/src/pages/PayslipSettings.vue:50
+#: backend/chronicle/services/payslips.py:78 frontend/src/pages/PayslipSettings.vue:14
 msgid "Days a link works"
 msgstr "تعداد روزهای اعتبار لینک"
 
@@ -863,7 +911,7 @@ msgstr "منبع پیش‌فرض تقویم"
 msgid "Delegation of approvals"
 msgstr "واگذاری تأیید"
 
-#: frontend/src/components/PatternGrid.vue:30 frontend/src/components/ResourceForm.vue:72 frontend/src/components/ShiftTimeline.vue:39 frontend/src/pages/Backups.vue:67 frontend/src/pages/Backups.vue:68 frontend/src/pages/Calendar.vue:63 frontend/src/pages/Delegations.vue:27 frontend/src/pages/Delegations.vue:45 frontend/src/pages/Payslips.vue:88 frontend/src/pages/Payslips.vue:89
+#: frontend/src/components/PatternGrid.vue:30 frontend/src/components/ResourceForm.vue:72 frontend/src/components/ShiftTimeline.vue:39 frontend/src/pages/Backups.vue:67 frontend/src/pages/Backups.vue:68 frontend/src/pages/Calendar.vue:63 frontend/src/pages/Delegations.vue:27 frontend/src/pages/Delegations.vue:45 frontend/src/pages/Payslips.vue:89 frontend/src/pages/Payslips.vue:90 frontend/src/pages/SmsSettings.vue:85 frontend/src/pages/SmsTemplates.vue:22
 msgid "Delete"
 msgstr "حذف"
 
@@ -871,7 +919,7 @@ msgstr "حذف"
 msgid "Delete the backup of {0}? It cannot be brought back."
 msgstr "پشتیبان {0} حذف شود؟ قابل بازگرداندن نیست."
 
-#: frontend/src/pages/Payslips.vue:283
+#: frontend/src/pages/Payslips.vue:282
 msgid "Delete the payslip of {0}? Its link stops working."
 msgstr "فیش {0} حذف شود؟ لینک او از کار می‌افتد."
 
@@ -879,9 +927,17 @@ msgstr "فیش {0} حذف شود؟ لینک او از کار می‌افتد."
 msgid "Delete this record?"
 msgstr "این رکورد حذف شود؟"
 
+#: frontend/src/pages/SmsTemplates.vue:288
+msgid "Delete this template? Messages of {0} cannot be sent until a new one is made."
+msgstr "این قالب حذف شود؟ تا قالب تازه‌ای ساخته نشود، پیام «{0}» فرستاده نمی‌شود."
+
 #: frontend/src/components/ResourceForm.vue:228 frontend/src/pages/Audit.vue:101 frontend/src/pages/Backups.vue:196 frontend/src/pages/Delegations.vue:190
 msgid "Deleted"
 msgstr "حذف شد"
+
+#: frontend/src/lib/sms.ts:13
+msgid "Delivered"
+msgstr "تحویل‌شده"
 
 #: backend/chronicle/reports/catalog.py:41 backend/chronicle/services/excel.py:377 backend/chronicle/services/excel.py:514 frontend/src/components/BulkAssignDialog.vue:121 frontend/src/lib/resources.ts:305 frontend/src/lib/resources.ts:97 frontend/src/pages/EmployeeForm.vue:168 frontend/src/pages/Employees.vue:69 frontend/src/pages/Reports.vue:11 frontend/src/pages/Reports.vue:150
 msgid "Department"
@@ -1039,11 +1095,11 @@ msgstr "تکراری"
 msgid "Each device user must point to an employee; users whose ID equals an employee code are mapped automatically."
 msgstr "هر کاربر دستگاه باید به یک کارمند وصل شود؛ کاربرانی که شناسه‌شان با کد پرسنلی یکی است خودکار وصل می‌شوند."
 
-#: backend/chronicle/services/resources.py:335
+#: backend/chronicle/services/resources.py:338
 msgid "Each part of the shift needs a kind, a start and an end"
 msgstr "هر بخش شیفت نوع، شروع و پایان لازم دارد"
 
-#: backend/chronicle/services/resources.py:367
+#: backend/chronicle/services/resources.py:370
 msgid "Each weekday can appear once"
 msgstr "هر روز هفته فقط یک بار می‌تواند بیاید"
 
@@ -1062,6 +1118,14 @@ msgstr "استحقاقی"
 #: frontend/src/pages/Organization.vue:9
 msgid "Economic code"
 msgstr "کد اقتصادی"
+
+#: frontend/src/pages/SmsTemplates.vue:21
+msgid "Edit"
+msgstr "ویرایش"
+
+#: frontend/src/pages/SmsTemplates.vue:58
+msgid "Edit the template"
+msgstr "ویرایش قالب"
 
 #: frontend/src/components/PatternGrid.vue:147
 msgid "Edit the times"
@@ -1167,14 +1231,6 @@ msgstr "عنوان را بنویسید"
 msgid "Enter a username"
 msgstr "نام کاربری را بنویسید"
 
-#: backend/chronicle/services/sms.py:82
-msgid "Enter the SMS API key first"
-msgstr "ابتدا کلید API سامانه پیامک را وارد کنید"
-
-#: backend/chronicle/services/sms.py:84
-msgid "Enter the SMS sender line number first"
-msgstr "ابتدا شماره خط ارسال پیامک را وارد کنید"
-
 #: backend/chronicle/services/excel.py:776
 msgid "Enter the date as 1405/07/14"
 msgstr "تاریخ را به شکل ۱۴۰۵/۰۷/۱۴ بنویسید"
@@ -1191,6 +1247,10 @@ msgstr "تعداد روز را وارد کنید"
 msgid "Enter the overtime minutes"
 msgstr "دقیقه اضافه‌کار را وارد کنید"
 
+#: backend/chronicle/services/sms.py:455
+msgid "Enter the pattern code"
+msgstr "کد پترن را وارد کنید"
+
 #: backend/chronicle/services/employees.py:94
 msgid "Enter the personnel code, the name and the start date"
 msgstr "کد پرسنلی، نام و تاریخ شروع را وارد کنید"
@@ -1199,7 +1259,7 @@ msgstr "کد پرسنلی، نام و تاریخ شروع را وارد کنید
 msgid "Enter the reason"
 msgstr "دلیل را بنویسید"
 
-#: backend/chronicle/services/requests.py:435
+#: backend/chronicle/services/requests.py:439
 msgid "Enter the reason for cancelling"
 msgstr "دلیل لغو را بنویسید"
 
@@ -1207,7 +1267,7 @@ msgstr "دلیل لغو را بنویسید"
 msgid "Enter the reason for exceptional or emergency overtime"
 msgstr "دلیل اضافه‌کار استثنایی یا اضطراری را بنویسید"
 
-#: backend/chronicle/services/requests.py:400
+#: backend/chronicle/services/requests.py:402
 msgid "Enter the reason for rejecting"
 msgstr "دلیل رد را بنویسید"
 
@@ -1215,7 +1275,7 @@ msgstr "دلیل رد را بنویسید"
 msgid "Enter the reason for reopening"
 msgstr "دلیل بازکردن را وارد کنید"
 
-#: backend/chronicle/calendar/service.py:426 backend/chronicle/calendar/service.py:449 backend/chronicle/services/resources.py:229
+#: backend/chronicle/calendar/service.py:426 backend/chronicle/calendar/service.py:449 backend/chronicle/services/resources.py:232
 msgid "Enter the reason for the change"
 msgstr "دلیل تغییر را بنویسید"
 
@@ -1231,11 +1291,7 @@ msgstr "دلیل مأموریت را بنویسید"
 msgid "Enter the rotation, for example Morning*14, Night*14"
 msgstr "چرخش را بنویسید، مثلاً صبح*۱۴، شب*۱۴"
 
-#: backend/chronicle/services/payslips.py:497 backend/chronicle/services/payslips.py:614
-msgid "Enter the site address in the payslip settings first"
-msgstr "ابتدا نشانی سایت را در تنظیمات فیش حقوقی وارد کنید"
-
-#: backend/chronicle/services/resources.py:329
+#: backend/chronicle/services/resources.py:332
 msgid "Enter the start and end time"
 msgstr "ساعت شروع و پایان را وارد کنید"
 
@@ -1251,9 +1307,17 @@ msgstr "ساعت و تعداد پشتیبان‌ها را عدد صحیح وار
 msgid "Entered by the system admin for someone"
 msgstr "ثبت مدیر سیستم برای دیگری"
 
-#: frontend/src/lib/format.ts:71 frontend/src/pages/DeviceForm.vue:376 frontend/src/pages/Devices.vue:257
+#: frontend/src/lib/format.ts:71 frontend/src/pages/DeviceForm.vue:376 frontend/src/pages/Devices.vue:257 frontend/src/pages/SmsMessages.vue:114
 msgid "Error"
 msgstr "خطا"
+
+#: frontend/src/pages/SmsMessages.vue:110 frontend/src/pages/SmsMessages.vue:30 frontend/src/pages/SmsMessages.vue:47 frontend/src/pages/SmsTemplates.vue:188 frontend/src/pages/SmsTemplates.vue:33 frontend/src/pages/SmsTemplates.vue:61
+msgid "Event"
+msgstr "رویداد"
+
+#: frontend/src/pages/SmsTemplates.vue:43
+msgid "Events"
+msgstr "رویدادها"
 
 #: frontend/src/components/BulkAssignDialog.vue:11
 msgid "Every department"
@@ -1267,7 +1331,7 @@ msgstr "هر کارمند یک کاربر هم هست: نام کاربری و ر
 msgid "Every row is right. Look through the values, then import."
 msgstr "همهٔ ردیف‌ها درست‌اند. مقادیر را نگاه کنید، سپس وارد کنید."
 
-#: frontend/src/pages/Payslips.vue:156
+#: frontend/src/pages/Payslips.vue:163
 msgid "Everyone (replaces the old links)"
 msgstr "همه (لینک‌های قبلی جایگزین می‌شوند)"
 
@@ -1299,7 +1363,7 @@ msgstr "اضافه‌کار استثنایی"
 msgid "Expand"
 msgstr "باز کردن"
 
-#: frontend/src/pages/Payslips.vue:187
+#: frontend/src/pages/Payslips.vue:186
 msgid "Expired"
 msgstr "منقضی‌شده"
 
@@ -1319,9 +1383,13 @@ msgstr "کار اضافه از این مقدار به بعد حساب می‌ش�
 msgid "Extra work without an approved overtime request"
 msgstr "کار اضافه بدون درخواست اضافه‌کار تأییدشده"
 
-#: frontend/src/pages/Payslips.vue:175
+#: frontend/src/lib/sms.ts:15
 msgid "Failed"
 msgstr "ناموفق"
+
+#: frontend/src/pages/SmsSettings.vue:122 frontend/src/pages/SmsSettings.vue:20
+msgid "Fallback"
+msgstr "پشتیبان"
 
 #: backend/chronicle/services/excel.py:248 frontend/src/pages/EmployeeForm.vue:145
 msgid "Female"
@@ -1330,6 +1398,14 @@ msgstr "زن"
 #: backend/chronicle/services/excel.py:619
 msgid "Field keys separated by commas, e.g. employee, employee_name, worked_minutes"
 msgstr "کلید فیلدها با ویرگول، مثلاً employee, employee_name, worked_minutes"
+
+#: frontend/src/pages/SmsTemplates.vue:110 frontend/src/pages/SmsTemplates.vue:277
+msgid "Fields not used by this template: {0}"
+msgstr "فیلدهایی که این قالب استفاده نمی‌کند: {0}"
+
+#: frontend/src/pages/SmsTemplates.vue:67
+msgid "Fields of this event:"
+msgstr "فیلدهای این رویداد:"
 
 #: frontend/src/components/ExcelImport.vue:294
 msgid "File"
@@ -1350,6 +1426,10 @@ msgstr "از روی درخواست پیشنهادی پر شد ({0} دقیقه). 
 #: frontend/src/pages/NewRequest.vue:10
 msgid "Filled in from a suggested request. Check it before you submit."
 msgstr "از روی درخواست پیشنهادی پر شد. پیش از ارسال بررسی کنید."
+
+#: frontend/src/pages/SmsTemplates.vue:94
+msgid "Filled with"
+msgstr "پرشده با"
 
 #: frontend/src/components/RotationBuilder.vue:6
 msgid "Fills the days of the cycle: shift A for some days, then shift B, then days off. You can edit the rows afterwards."
@@ -1411,7 +1491,7 @@ msgstr "قالب"
 msgid "Friday Work"
 msgstr "جمعه‌کاری"
 
-#: backend/chronicle/services/excel.py:349 backend/chronicle/services/excel.py:526 backend/chronicle/services/excel.py:675 frontend/src/components/AssignmentDialog.vue:20 frontend/src/components/BulkAssignDialog.vue:38 frontend/src/lib/resources.ts:141 frontend/src/lib/resources.ts:320 frontend/src/pages/Approvals.vue:98 frontend/src/pages/Delegations.vue:132 frontend/src/pages/Delegations.vue:72 frontend/src/pages/EmployeeForm.vue:23 frontend/src/pages/Reports.vue:8 frontend/src/pages/Requests.vue:78
+#: backend/chronicle/services/excel.py:349 backend/chronicle/services/excel.py:526 backend/chronicle/services/excel.py:675 frontend/src/components/AssignmentDialog.vue:20 frontend/src/components/BulkAssignDialog.vue:38 frontend/src/lib/resources.ts:141 frontend/src/lib/resources.ts:320 frontend/src/pages/Approvals.vue:98 frontend/src/pages/Delegations.vue:132 frontend/src/pages/Delegations.vue:72 frontend/src/pages/EmployeeForm.vue:23 frontend/src/pages/Reports.vue:8 frontend/src/pages/Requests.vue:78 frontend/src/pages/SmsSettings.vue:65
 msgid "From"
 msgstr "از"
 
@@ -1523,9 +1603,21 @@ msgstr "کار سخت و زیان‌آور در روز (دقیقه)"
 msgid "Hard and harmful work per week (minutes)"
 msgstr "کار سخت و زیان‌آور در هفته (دقیقه)"
 
+#: frontend/src/pages/SmsTemplates.vue:52
+msgid "Has a template"
+msgstr "قالب دارد"
+
 #: frontend/src/components/ExcelImport.vue:61
 msgid "Header row"
 msgstr "ردیف عنوان"
+
+#: frontend/src/pages/SmsSettings.vue:5
+msgid "History"
+msgstr "تاریخچه"
+
+#: frontend/src/pages/SmsSettings.vue:63
+msgid "Hold messages outside the window"
+msgstr "پیام‌های خارج از بازه نگه داشته شوند"
 
 #: backend/chronicle/reports/catalog.py:48 frontend/src/lib/format.ts:62 frontend/src/pages/Calendar.vue:31
 msgid "Holiday"
@@ -1635,6 +1727,10 @@ msgstr "ورود {0} ردیف"
 msgid "In"
 msgstr "ورود"
 
+#: frontend/src/pages/SmsTemplates.vue:17 frontend/src/pages/SmsTemplates.vue:191
+msgid "Inactive"
+msgstr "غیرفعال"
+
 #: frontend/src/lib/format.ts:58 frontend/src/pages/Month.vue:281
 msgid "Incomplete"
 msgstr "ناقص"
@@ -1646,6 +1742,14 @@ msgstr "کد کارگاه بیمه"
 #: backend/chronicle/services/devices.py:215
 msgid "Invalid punch time {0}"
 msgstr "ساعت تردد نامعتبر است: {0}"
+
+#: frontend/src/pages/SmsMessages.vue:23
+msgid "It was not sent"
+msgstr "ارسال نشده"
+
+#: frontend/src/pages/SmsMessages.vue:22
+msgid "It was sent"
+msgstr "ارسال شده"
 
 #: backend/chronicle/services/excel.py:707
 msgid "Jalali date, e.g. 1405/07/14"
@@ -1743,7 +1847,7 @@ msgstr "انواع مرخصی"
 msgid "Left"
 msgstr "پایان همکاری"
 
-#: frontend/src/pages/Payslips.vue:111
+#: frontend/src/pages/Payslips.vue:117
 msgid "Left out ({0}):"
 msgstr "کنار گذاشته‌شده‌ها ({0}):"
 
@@ -1755,13 +1859,17 @@ msgstr "مبنای قانونی"
 msgid "Limit from the rule set (parameter)"
 msgstr "سقف از مجموعه قواعد (پارامتر)"
 
-#: frontend/src/pages/Payslips.vue:203
+#: frontend/src/pages/Payslips.vue:202
 msgid "Link"
 msgstr "لینک"
 
-#: frontend/src/pages/PayslipSettings.vue:41
-msgid "Links and message"
-msgstr "لینک‌ها و متن پیامک"
+#: frontend/src/pages/PayslipSettings.vue:12
+msgid "Links"
+msgstr "لینک‌ها"
+
+#: backend/chronicle/services/sms.py:390
+msgid "List the event variables in the order of the pattern"
+msgstr "فیلدهای رویداد را به ترتیب متغیرهای پترن فهرست کنید"
 
 #: frontend/src/components/PatternGrid.vue:34
 msgid "List view"
@@ -1771,7 +1879,7 @@ msgstr "نمای فهرستی"
 msgid "Loading..."
 msgstr "در حال بارگذاری..."
 
-#: frontend/src/pages/Payslips.vue:193
+#: frontend/src/pages/Payslips.vue:192
 msgid "Locked after wrong answers"
 msgstr "قفل‌شده پس از پاسخ‌های اشتباه"
 
@@ -1815,6 +1923,10 @@ msgstr "ثبت دستی"
 msgid "Manual time entry"
 msgstr "ثبت دستی ساعت"
 
+#: backend/chronicle/services/sms.py:381
+msgid "Map the pattern's variables: this panel names them"
+msgstr "متغیرهای پترن را نگاشت کنید: این پنل متغیرها را با نام می‌شناسد"
+
 #: backend/chronicle/services/excel.py:274 frontend/src/lib/resources.ts:372
 msgid "Marriage or bereavement"
 msgstr "ازدواج یا فوت بستگان"
@@ -1830,6 +1942,10 @@ msgstr "زایمان"
 #: frontend/src/lib/resources.ts:468
 msgid "Maternity leave (days)"
 msgstr "مرخصی زایمان (روز)"
+
+#: frontend/src/pages/SmsMessages.vue:42
+msgid "Message"
+msgstr "پیام"
 
 #: backend/chronicle/services/rule_sets.py:33
 msgid "Missing parameters: {0}"
@@ -1851,9 +1967,13 @@ msgstr "مأموریت (روز)"
 msgid "Mission (Hours)"
 msgstr "مأموریت (ساعت)"
 
-#: backend/chronicle/services/excel.py:370 frontend/src/pages/EmployeeForm.vue:149 frontend/src/pages/Payslips.vue:200
+#: backend/chronicle/services/excel.py:370 frontend/src/pages/EmployeeForm.vue:149 frontend/src/pages/Payslips.vue:199
 msgid "Mobile"
 msgstr "موبایل"
+
+#: frontend/src/pages/SmsMessages.vue:31 frontend/src/pages/SmsSettings.vue:77 frontend/src/pages/SmsTemplates.vue:34
+msgid "Mobile number"
+msgstr "شمارهٔ موبایل"
 
 #: frontend/src/pages/DeviceForm.vue:344
 msgid "Model"
@@ -1891,7 +2011,7 @@ msgstr "درخواست‌های من"
 msgid "Myself"
 msgstr "خودم"
 
-#: backend/chronicle/services/excel.py:301 backend/chronicle/services/excel.py:312 backend/chronicle/services/excel.py:319 backend/chronicle/services/excel.py:408 backend/chronicle/services/excel.py:453 backend/chronicle/services/excel.py:547 backend/chronicle/services/excel.py:563 backend/chronicle/services/excel.py:594 backend/chronicle/services/excel.py:611 backend/chronicle/services/excel.py:653 frontend/src/components/BulkAssignDialog.vue:120 frontend/src/lib/resources.ts:100 frontend/src/lib/resources.ts:109 frontend/src/lib/resources.ts:163 frontend/src/lib/resources.ts:236 frontend/src/lib/resources.ts:346 frontend/src/lib/resources.ts:361 frontend/src/lib/resources.ts:396 frontend/src/lib/resources.ts:87 frontend/src/pages/Devices.vue:183 frontend/src/pages/Employees.vue:68 frontend/src/pages/Organization.vue:5 frontend/src/pages/Payslips.vue:199 frontend/src/pages/Users.vue:90
+#: backend/chronicle/services/excel.py:301 backend/chronicle/services/excel.py:312 backend/chronicle/services/excel.py:319 backend/chronicle/services/excel.py:408 backend/chronicle/services/excel.py:453 backend/chronicle/services/excel.py:547 backend/chronicle/services/excel.py:563 backend/chronicle/services/excel.py:594 backend/chronicle/services/excel.py:611 backend/chronicle/services/excel.py:653 frontend/src/components/BulkAssignDialog.vue:120 frontend/src/lib/resources.ts:100 frontend/src/lib/resources.ts:109 frontend/src/lib/resources.ts:163 frontend/src/lib/resources.ts:236 frontend/src/lib/resources.ts:346 frontend/src/lib/resources.ts:361 frontend/src/lib/resources.ts:396 frontend/src/lib/resources.ts:87 frontend/src/pages/Devices.vue:183 frontend/src/pages/Employees.vue:68 frontend/src/pages/Organization.vue:5 frontend/src/pages/Payslips.vue:198 frontend/src/pages/Users.vue:90
 msgid "Name"
 msgstr "نام"
 
@@ -1914,6 +2034,10 @@ msgstr "کد ملی"
 #: frontend/src/pages/Organization.vue:8
 msgid "National id of the company"
 msgstr "شناسهٔ ملی شرکت"
+
+#: frontend/src/pages/SmsTemplates.vue:51
+msgid "Never held back"
+msgstr "هرگز نگه داشته نمی‌شود"
 
 #: frontend/src/pages/Calendar.vue:8 frontend/src/pages/Delegations.vue:4 frontend/src/pages/Employees.vue:7 frontend/src/pages/ResourceList.vue:7 frontend/src/pages/Users.vue:4
 msgid "New"
@@ -1946,6 +2070,10 @@ msgstr "تکرار رمز عبور جدید"
 #: frontend/src/pages/NewRequest.vue:3 frontend/src/pages/Requests.vue:6
 msgid "New request"
 msgstr "درخواست جدید"
+
+#: frontend/src/pages/SmsTemplates.vue:4 frontend/src/pages/SmsTemplates.vue:58
+msgid "New template"
+msgstr "قالب تازه"
 
 #: frontend/src/pages/OrgChart.vue:4
 msgid "New top designation"
@@ -2011,9 +2139,17 @@ msgstr "فوق‌العادهٔ نوبت شب (درصد)"
 msgid "No"
 msgstr "خیر"
 
-#: backend/chronicle/services/sms.py:62 backend/chronicle/sms/base.py:94
-msgid "No SMS gateway registered for {0}"
-msgstr "درگاه پیامکی «{0}» شناخته‌شده نیست"
+#: backend/chronicle/sms/base.py:157
+msgid "No SMS driver is registered for «{0}»"
+msgstr "درایور پیامکی «{0}» شناخته‌شده نیست"
+
+#: backend/chronicle/services/sms_dispatch.py:235
+msgid "No SMS panel is set up: add one in the SMS section"
+msgstr "هیچ پنل پیامکی تنظیم نشده: در بخش پیامک یکی اضافه کنید"
+
+#: backend/chronicle/services/sms_dispatch.py:310
+msgid "No SMS panel with a template for this event is available"
+msgstr "هیچ پنل پیامکی با قالب این رویداد در دسترس نیست"
 
 #: backend/chronicle/devices/base.py:115 backend/chronicle/services/devices.py:132
 msgid "No adapter registered for device type {0}"
@@ -2043,11 +2179,11 @@ msgstr "هنوز سمتی ندارد"
 msgid "No device yet."
 msgstr "هنوز دستگاهی تعریف نشده است."
 
-#: backend/chronicle/services/payslips.py:252
+#: backend/chronicle/services/payslips.py:208
 msgid "No employee has the personnel code {0}"
 msgstr "هیچ کارمندی کد پرسنلی {0} ندارد"
 
-#: backend/chronicle/api/routes/payslips.py:111
+#: backend/chronicle/api/routes/payslips.py:95
 msgid "No file was chosen"
 msgstr "فایلی انتخاب نشده است"
 
@@ -2079,7 +2215,7 @@ msgstr "اضافه‌کار برای کارگر نوجوان ممنوع است (
 msgid "No overtime in hard and harmful work (Article 61)"
 msgstr "اضافه‌کار در کار سخت و زیان‌آور ممنوع است (ماده ۶۱)"
 
-#: frontend/src/pages/Payslips.vue:162
+#: frontend/src/pages/Payslips.vue:169
 msgid "No payslip uploaded"
 msgstr "فیشی بارگذاری نشده"
 
@@ -2094,6 +2230,10 @@ msgstr "هنوز درخواستی ثبت نشده"
 #: frontend/src/components/DataTable.vue:134 frontend/src/components/DataTable.vue:157
 msgid "No row matches the filters"
 msgstr "هیچ ردیفی با فیلترها جور نیست"
+
+#: frontend/src/pages/SmsTemplates.vue:52
+msgid "No template"
+msgstr "بدون قالب"
 
 #: frontend/src/components/DataTable.vue:210
 msgid "No value"
@@ -2115,7 +2255,7 @@ msgstr "روز کاری عادی (جبران بعداً)"
 msgid "Not Scheduled"
 msgstr "بدون برنامه"
 
-#: frontend/src/pages/Payslips.vue:164
+#: frontend/src/pages/Payslips.vue:171
 msgid "Not an active employee"
 msgstr "کارمند فعال نیست"
 
@@ -2123,11 +2263,11 @@ msgstr "کارمند فعال نیست"
 msgid "Not closed"
 msgstr "بسته نشده"
 
-#: backend/chronicle/services/requests.py:344
+#: backend/chronicle/services/requests.py:346
 msgid "Not enough leave: {0} days available, {1} requested"
 msgstr "مرخصی کافی نیست: {0} روز مانده، {1} روز درخواست شده"
 
-#: backend/chronicle/api/routes/admin.py:156 backend/chronicle/api/routes/admin.py:92 backend/chronicle/api/routes/devices.py:169 backend/chronicle/services/backup.py:136 backend/chronicle/services/backup.py:139 backend/chronicle/services/delegations.py:69 backend/chronicle/services/devices.py:488 backend/chronicle/services/devices.py:580 backend/chronicle/services/excel.py:688 backend/chronicle/services/payslips.py:402 backend/chronicle/services/payslips.py:433 backend/chronicle/services/reports.py:308 backend/chronicle/services/resources.py:206 backend/chronicle/services/resources.py:647 backend/chronicle/services/suggestions.py:153 frontend/src/pages/DeviceForm.vue:305 frontend/src/pages/ResourceList.vue:26
+#: backend/chronicle/api/routes/admin.py:156 backend/chronicle/api/routes/admin.py:92 backend/chronicle/api/routes/devices.py:169 backend/chronicle/services/backup.py:136 backend/chronicle/services/backup.py:139 backend/chronicle/services/delegations.py:69 backend/chronicle/services/devices.py:488 backend/chronicle/services/devices.py:580 backend/chronicle/services/excel.py:688 backend/chronicle/services/payslips.py:363 backend/chronicle/services/payslips.py:394 backend/chronicle/services/reports.py:308 backend/chronicle/services/resources.py:209 backend/chronicle/services/resources.py:650 backend/chronicle/services/sms.py:107 backend/chronicle/services/sms.py:275 backend/chronicle/services/sms.py:286 backend/chronicle/services/sms.py:357 backend/chronicle/services/sms.py:499 backend/chronicle/services/sms.py:526 backend/chronicle/services/sms.py:633 backend/chronicle/services/sms.py:667 backend/chronicle/services/suggestions.py:153 frontend/src/pages/DeviceForm.vue:305 frontend/src/pages/ResourceList.vue:26
 msgid "Not found"
 msgstr "پیدا نشد"
 
@@ -2135,17 +2275,29 @@ msgstr "پیدا نشد"
 msgid "Not imported"
 msgstr "وارد نشود"
 
-#: backend/chronicle/api/deps.py:62 backend/chronicle/api/routes/attendance.py:135 backend/chronicle/api/routes/attendance.py:36 backend/chronicle/api/routes/people.py:42 backend/chronicle/services/access.py:221 backend/chronicle/services/delegations.py:71 backend/chronicle/services/payslips.py:84 backend/chronicle/services/reports.py:260 backend/chronicle/services/reports.py:310 backend/chronicle/services/reports.py:329 backend/chronicle/services/requests.py:383 backend/chronicle/services/resources.py:146 backend/chronicle/services/suggestions.py:139 backend/chronicle/services/suggestions.py:155
+#: backend/chronicle/api/deps.py:62 backend/chronicle/api/routes/attendance.py:135 backend/chronicle/api/routes/attendance.py:36 backend/chronicle/api/routes/people.py:42 backend/chronicle/services/access.py:221 backend/chronicle/services/access.py:233 backend/chronicle/services/delegations.py:71 backend/chronicle/services/reports.py:260 backend/chronicle/services/reports.py:310 backend/chronicle/services/reports.py:329 backend/chronicle/services/requests.py:385 backend/chronicle/services/resources.py:146 backend/chronicle/services/suggestions.py:139 backend/chronicle/services/suggestions.py:155
 msgid "Not permitted"
 msgstr "دسترسی ندارید"
+
+#: frontend/src/pages/SmsSettings.vue:22
+msgid "Not set up"
+msgstr "تنظیم نشده"
 
 #: frontend/src/pages/Delegations.vue:126
 msgid "Not started"
 msgstr "شروع نشده"
 
+#: frontend/src/pages/SmsSettings.vue:123 frontend/src/pages/SmsSettings.vue:21
+msgid "Not used"
+msgstr "استفاده نمی‌شود"
+
 #: backend/chronicle/services/excel.py:351 backend/chronicle/services/excel.py:528 backend/chronicle/services/excel.py:645 backend/chronicle/services/excel.py:808 frontend/src/components/AssignmentDialog.vue:22 frontend/src/components/BulkAssignDialog.vue:57 frontend/src/lib/resources.ts:143 frontend/src/lib/resources.ts:322 frontend/src/pages/Calendar.vue:56 frontend/src/pages/Delegations.vue:135 frontend/src/pages/Delegations.vue:74 frontend/src/pages/Periods.vue:64
 msgid "Note"
 msgstr "یادداشت"
+
+#: frontend/src/pages/SmsMessages.vue:147
+msgid "Note (what the panel's report says)"
+msgstr "یادداشت (گزارش پنل چه می‌گوید)"
 
 #: frontend/src/components/ExcelImport.vue:146
 msgid "Nothing can be imported until every row is right. Fix the file or the column connections and check again."
@@ -2163,13 +2315,17 @@ msgstr "چیزی منتظر تأیید شما نیست"
 msgid "Number"
 msgstr "عدد"
 
-#: backend/chronicle/services/resources.py:363
+#: backend/chronicle/services/resources.py:366
 msgid "Number the days of the cycle 1, 2, 3, ..."
 msgstr "روزهای چرخه را ۱، ۲، ۳، ... شماره‌گذاری کنید"
 
-#: backend/chronicle/services/resources.py:458
+#: backend/chronicle/services/resources.py:461
 msgid "Number the steps 1, 2, 3, ..."
 msgstr "مراحل را ۱، ۲، ۳، ... شماره‌گذاری کنید"
+
+#: frontend/src/pages/SmsSettings.vue:73
+msgid "Numbers that opted out"
+msgstr "شماره‌های لغوکنندهٔ اشتراک"
 
 #: backend/chronicle/reports/catalog.py:77
 msgid "Nursing Breaks"
@@ -2247,6 +2403,10 @@ msgstr "یک محل کار"
 msgid "One-day shift changes"
 msgstr "تغییر شیفت یک‌روزه"
 
+#: backend/chronicle/services/sms.py:669
+msgid "Only a message with an unknown outcome can be marked"
+msgstr "فقط پیامی که نتیجه‌اش نامعلوم است قابل علامت‌گذاری است"
+
 #: frontend/src/pages/Settings.vue:22
 msgid "Only a warning: nothing happens automatically (Article 27)."
 msgstr "فقط هشدار است: هیچ اقدامی خودکار انجام نمی‌شود (ماده ۲۷)."
@@ -2267,19 +2427,23 @@ msgstr "فقط ردیف‌های دارای مشکل"
 msgid "Only someone with people below them can delegate their approvals"
 msgstr "فقط کسی که زیردست دارد می‌تواند تأییدهایش را واگذار کند"
 
-#: backend/chronicle/services/requests.py:433
+#: backend/chronicle/services/requests.py:437
 msgid "Only the system admin can cancel this request"
 msgstr "فقط مدیر سیستم می‌تواند این درخواست را لغو کند"
 
-#: frontend/src/pages/Payslips.vue:206
+#: frontend/src/pages/PayslipSettings.vue:8 frontend/src/pages/Payslips.vue:104
+msgid "Open the SMS section"
+msgstr "باز کردن بخش پیامک"
+
+#: frontend/src/pages/Payslips.vue:205
 msgid "Opened"
 msgstr "بازشده"
 
-#: frontend/src/pages/Payslips.vue:189
+#: frontend/src/pages/Payslips.vue:188
 msgid "Opened the most times"
 msgstr "به سقف بازدید رسیده"
 
-#: frontend/src/pages/Payslips.vue:61
+#: frontend/src/pages/Payslips.vue:62
 msgid "Opened: {0}"
 msgstr "بازشده: {0}"
 
@@ -2298,6 +2462,10 @@ msgstr "سایر"
 #: frontend/src/lib/format.ts:82 frontend/src/pages/NewRequest.vue:169
 msgid "Out"
 msgstr "خروج"
+
+#: frontend/src/pages/SmsSettings.vue:60
+msgid "Outside these hours a message waits for the next morning. A one-time code is never held back."
+msgstr "خارج از این ساعت‌ها پیام تا صبح بعد نگه داشته می‌شود. رمز یک‌بارمصرف هرگز نگه داشته نمی‌شود."
 
 #: backend/chronicle/services/requests.py:199
 msgid "Overlaps leave request {0}"
@@ -2339,7 +2507,7 @@ msgstr "اضافه‌کار {0} دقیقه در {1}"
 msgid "Overtime premium (percent)"
 msgstr "فوق‌العادهٔ اضافه‌کار (درصد)"
 
-#: backend/chronicle/services/excel.py:436 backend/chronicle/services/resources.py:339
+#: backend/chronicle/services/excel.py:436 backend/chronicle/services/resources.py:342
 msgid "Overtime windows"
 msgstr "بازه‌های مجاز اضافه‌کار"
 
@@ -2383,6 +2551,10 @@ msgstr "تعطیلی با حقوق"
 msgid "Pair by order"
 msgstr "جفت‌کردن به ترتیب"
 
+#: frontend/src/pages/SmsMessages.vue:112 frontend/src/pages/SmsMessages.vue:51 frontend/src/pages/SmsTemplates.vue:189 frontend/src/pages/SmsTemplates.vue:62
+msgid "Panel"
+msgstr "پنل"
+
 #: frontend/src/lib/resources.ts:349
 msgid "Parameters"
 msgstr "پارامترها"
@@ -2423,6 +2595,14 @@ msgstr "انتساب الگو"
 msgid "Pattern assignments"
 msgstr "انتساب الگوها"
 
+#: frontend/src/pages/SmsTemplates.vue:75
+msgid "Pattern code"
+msgstr "کد پترن"
+
+#: frontend/src/pages/SmsTemplates.vue:190
+msgid "Pattern {0}"
+msgstr "پترن {0}"
+
 #: frontend/src/pages/PayslipView.vue:10
 msgid "Payslip"
 msgstr "فیش حقوقی"
@@ -2435,11 +2615,11 @@ msgstr "تنظیمات فیش حقوقی"
 msgid "Payslip {0}"
 msgstr "فیش حقوقی {0}"
 
-#: frontend/src/pages/Manage.vue:91 frontend/src/pages/Payslips.vue:3
+#: frontend/src/pages/Payslips.vue:3
 msgid "Payslips"
 msgstr "فیش‌های حقوقی"
 
-#: frontend/src/pages/Manage.vue:92
+#: frontend/src/pages/Manage.vue:96
 msgid "Payslips and SMS links"
 msgstr "فیش‌های حقوقی و لینک پیامکی"
 
@@ -2447,7 +2627,7 @@ msgstr "فیش‌های حقوقی و لینک پیامکی"
 msgid "Pending"
 msgstr "در انتظار تأیید"
 
-#: frontend/src/pages/Payslips.vue:155
+#: frontend/src/pages/Payslips.vue:162
 msgid "People without a working link"
 msgstr "افراد بدون لینک سالم"
 
@@ -2491,6 +2671,10 @@ msgstr "حاضر"
 msgid "Press “Read Users from Device”."
 msgstr "دکمه «خواندن کاربران از دستگاه» را بزنید."
 
+#: frontend/src/pages/SmsTemplates.vue:116
+msgid "Preview"
+msgstr "پیش‌نمایش"
+
 #: frontend/src/pages/Payslips.vue:51
 msgid "Preview the SMS"
 msgstr "پیش‌نمایش پیامک"
@@ -2503,13 +2687,21 @@ msgstr "ماه قبل"
 msgid "Previous year"
 msgstr "سال قبل"
 
+#: frontend/src/pages/SmsSettings.vue:121 frontend/src/pages/SmsSettings.vue:19
+msgid "Primary"
+msgstr "اصلی"
+
 #: frontend/src/components/ExcelImport.vue:167
 msgid "Problems and changes"
 msgstr "مشکلات و تغییرات"
 
-#: frontend/src/pages/PayslipSettings.vue:14
-msgid "Provider"
-msgstr "سرویس‌دهنده"
+#: frontend/src/pages/SmsTemplates.vue:50
+msgid "Promotional"
+msgstr "تبلیغاتی"
+
+#: frontend/src/pages/SmsSettings.vue:74
+msgid "Promotional messages (such as birthdays) are not sent to these numbers."
+msgstr "پیام‌های تبلیغاتی (مثل تبریک تولد) به این شماره‌ها فرستاده نمی‌شود."
 
 #: backend/chronicle/services/excel.py:302 backend/chronicle/services/excel.py:641 frontend/src/lib/resources.ts:88 frontend/src/pages/Calendar.vue:46
 msgid "Province"
@@ -2530,6 +2722,18 @@ msgstr "ترددهای این روز"
 #: backend/chronicle/services/excel.py:325
 msgid "Put parents above their children in the sheet"
 msgstr "سمت بالادست را بالاتر از زیرمجموعه‌هایش در برگه بنویسید"
+
+#: backend/chronicle/services/sms.py:401
+msgid "Put the link (or its short path) in the pattern"
+msgstr "لینک (یا مسیر کوتاه آن) را در پترن بگذارید"
+
+#: backend/chronicle/services/sms.py:449
+msgid "Put the link (or its short path) in the text"
+msgstr "لینک (یا مسیر کوتاه آن) را در متن بگذارید"
+
+#: frontend/src/lib/sms.ts:7 frontend/src/pages/SmsMessages.vue:108 frontend/src/pages/SmsMessages.vue:55
+msgid "Queued"
+msgstr "در صف"
 
 #: frontend/src/components/PatternGrid.vue:83 frontend/src/components/RotationBuilder.vue:4
 msgid "Quick rotation"
@@ -2563,11 +2767,11 @@ msgstr "در حال خواندن فایل..."
 msgid "Reading the text of the page failed"
 msgstr "خواندن متن صفحه ناموفق بود"
 
-#: frontend/src/pages/Payslips.vue:201
+#: frontend/src/pages/Payslips.vue:200
 msgid "Ready"
 msgstr "آماده"
 
-#: backend/chronicle/services/excel.py:539 frontend/src/lib/resources.ts:335 frontend/src/pages/Approvals.vue:101 frontend/src/pages/Approvals.vue:60 frontend/src/pages/Audit.vue:31 frontend/src/pages/Audit.vue:83 frontend/src/pages/NewRequest.vue:123 frontend/src/pages/NewRequest.vue:39 frontend/src/pages/NewRequest.vue:59 frontend/src/pages/NewRequest.vue:73
+#: backend/chronicle/services/excel.py:539 frontend/src/lib/resources.ts:335 frontend/src/pages/Approvals.vue:101 frontend/src/pages/Approvals.vue:60 frontend/src/pages/Audit.vue:31 frontend/src/pages/Audit.vue:83 frontend/src/pages/NewRequest.vue:123 frontend/src/pages/NewRequest.vue:39 frontend/src/pages/NewRequest.vue:59 frontend/src/pages/NewRequest.vue:73 frontend/src/pages/SmsSettings.vue:78
 msgid "Reason"
 msgstr "دلیل"
 
@@ -2619,9 +2823,13 @@ msgstr "ردشده"
 msgid "Rejected: {0}"
 msgstr "رد شد: {0}"
 
-#: frontend/src/components/ResourceForm.vue:27 frontend/src/components/ShiftTimeline.vue:154 frontend/src/pages/Calendar.vue:235 frontend/src/pages/NewRequest.vue:116
+#: frontend/src/components/ResourceForm.vue:27 frontend/src/components/ShiftTimeline.vue:154 frontend/src/pages/Calendar.vue:235 frontend/src/pages/NewRequest.vue:116 frontend/src/pages/SmsSettings.vue:43 frontend/src/pages/SmsTemplates.vue:95
 msgid "Remove"
 msgstr "حذف"
+
+#: frontend/src/pages/SmsSettings.vue:200
+msgid "Remove the settings of {0}?"
+msgstr "تنظیمات {0} حذف شود؟"
 
 #: frontend/src/components/PatternGrid.vue:155 frontend/src/components/PatternGrid.vue:178
 msgid "Remove this day"
@@ -2635,7 +2843,7 @@ msgstr "بازکردن"
 msgid "Reopened"
 msgstr "دوباره باز شد"
 
-#: frontend/src/pages/Payslips.vue:191
+#: frontend/src/pages/Payslips.vue:190
 msgid "Replaced or voided"
 msgstr "جایگزین یا باطل‌شده"
 
@@ -2659,7 +2867,7 @@ msgstr "گزارش‌ها"
 msgid "Request leave"
 msgstr "درخواست مرخصی"
 
-#: backend/chronicle/services/requests.py:378 backend/chronicle/services/requests.py:392
+#: backend/chronicle/services/requests.py:380 backend/chronicle/services/requests.py:394
 msgid "Request not found"
 msgstr "درخواست پیدا نشد"
 
@@ -2718,6 +2926,10 @@ msgstr "بازگردانی پشتیبان"
 #: frontend/src/pages/Backups.vue:105
 msgid "Restoring replaces everything (all data and uploaded files) with the contents of the backup. It is done on the server, not here: stop the worker first, then run:"
 msgstr "بازگردانی همه‌چیز (همهٔ داده‌ها و فایل‌های بارگذاری‌شده) را با محتوای پشتیبان جایگزین می‌کند. این کار روی سرور انجام می‌شود، نه اینجا: اول worker را متوقف کنید، سپس اجرا کنید:"
+
+#: frontend/src/pages/SmsSettings.vue:37
+msgid "Role"
+msgstr "نقش"
 
 #: frontend/src/pages/Users.vue:30 frontend/src/pages/Users.vue:91
 msgid "Roles"
@@ -2803,27 +3015,39 @@ msgstr "ردیف‌های دارای مشکل"
 msgid "Rules"
 msgstr "قواعد"
 
-#: frontend/src/pages/Payslips.vue:202
+#: frontend/src/pages/Payslips.vue:201 frontend/src/pages/SmsSettings.vue:3
 msgid "SMS"
 msgstr "پیامک"
 
-#: frontend/src/pages/PayslipSettings.vue:8
-msgid "SMS connection"
-msgstr "اتصال پیامک"
+#: frontend/src/pages/Manage.vue:91
+msgid "SMS and payslips"
+msgstr "پیامک و فیش حقوقی"
 
 #: frontend/src/pages/Payslips.vue:60
 msgid "SMS failed: {0}"
 msgstr "پیامک ناموفق: {0}"
 
+#: frontend/src/pages/Manage.vue:95 frontend/src/pages/SmsMessages.vue:3
+msgid "SMS history"
+msgstr "تاریخچهٔ پیامک"
+
+#: frontend/src/pages/Manage.vue:93
+msgid "SMS panels and settings"
+msgstr "پنل‌ها و تنظیمات پیامک"
+
 #: frontend/src/pages/Payslips.vue:59
 msgid "SMS sent: {0}"
 msgstr "پیامک ارسال‌شده: {0}"
+
+#: frontend/src/pages/Manage.vue:94 frontend/src/pages/SmsTemplates.vue:3
+msgid "SMS templates"
+msgstr "قالب‌های پیامک"
 
 #: backend/chronicle/api/routes/imports.py:29
 msgid "Sample"
 msgstr "نمونه"
 
-#: frontend/src/components/AssignmentDialog.vue:32 frontend/src/components/BulkAssignDialog.vue:65 frontend/src/components/ResourceForm.vue:66 frontend/src/pages/Account.vue:22 frontend/src/pages/Backups.vue:97 frontend/src/pages/Calendar.vue:62 frontend/src/pages/Delegations.vue:78 frontend/src/pages/DeviceForm.vue:66 frontend/src/pages/EmployeeForm.vue:68 frontend/src/pages/Organization.vue:15 frontend/src/pages/PayslipSettings.vue:26 frontend/src/pages/PayslipSettings.vue:62 frontend/src/pages/Settings.vue:29 frontend/src/pages/Users.vue:46
+#: frontend/src/components/AssignmentDialog.vue:32 frontend/src/components/BulkAssignDialog.vue:65 frontend/src/components/ResourceForm.vue:66 frontend/src/pages/Account.vue:22 frontend/src/pages/Backups.vue:97 frontend/src/pages/Calendar.vue:62 frontend/src/pages/Delegations.vue:78 frontend/src/pages/DeviceForm.vue:66 frontend/src/pages/EmployeeForm.vue:68 frontend/src/pages/Organization.vue:15 frontend/src/pages/PayslipSettings.vue:24 frontend/src/pages/Settings.vue:29 frontend/src/pages/SmsSettings.vue:41 frontend/src/pages/SmsSettings.vue:68 frontend/src/pages/SmsTemplates.vue:117 frontend/src/pages/Users.vue:46
 msgid "Save"
 msgstr "ذخیره"
 
@@ -2831,7 +3055,7 @@ msgstr "ذخیره"
 msgid "Save as a report"
 msgstr "ذخیره به‌عنوان گزارش"
 
-#: frontend/src/components/AssignmentDialog.vue:96 frontend/src/components/ResourceForm.vue:212 frontend/src/pages/ApprovalDefaults.vue:47 frontend/src/pages/Backups.vue:214 frontend/src/pages/Calendar.vue:267 frontend/src/pages/Delegations.vue:175 frontend/src/pages/DeviceForm.vue:318 frontend/src/pages/DeviceForm.vue:481 frontend/src/pages/EmployeeForm.vue:272 frontend/src/pages/EmployeeForm.vue:275 frontend/src/pages/Organization.vue:57 frontend/src/pages/PayslipSettings.vue:115 frontend/src/pages/PayslipSettings.vue:140 frontend/src/pages/Reports.vue:253 frontend/src/pages/Settings.vue:77 frontend/src/pages/Users.vue:150
+#: frontend/src/components/AssignmentDialog.vue:96 frontend/src/components/ResourceForm.vue:212 frontend/src/pages/ApprovalDefaults.vue:47 frontend/src/pages/Backups.vue:214 frontend/src/pages/Calendar.vue:267 frontend/src/pages/Delegations.vue:175 frontend/src/pages/DeviceForm.vue:318 frontend/src/pages/DeviceForm.vue:481 frontend/src/pages/EmployeeForm.vue:272 frontend/src/pages/EmployeeForm.vue:275 frontend/src/pages/Organization.vue:57 frontend/src/pages/PayslipSettings.vue:55 frontend/src/pages/Reports.vue:253 frontend/src/pages/Settings.vue:77 frontend/src/pages/SmsSettings.vue:179 frontend/src/pages/SmsSettings.vue:216 frontend/src/pages/SmsTemplates.vue:276 frontend/src/pages/Users.vue:150
 msgid "Saved"
 msgstr "ذخیره شد"
 
@@ -2847,7 +3071,7 @@ msgstr "کار برنامه‌ریزی‌شده در هفته: {0}"
 msgid "Scheduled work: {0}"
 msgstr "کار برنامه‌ریزی‌شده: {0}"
 
-#: frontend/src/components/BulkAssignDialog.vue:7 frontend/src/pages/Employees.vue:9 frontend/src/pages/ResourceList.vue:9
+#: frontend/src/components/BulkAssignDialog.vue:7 frontend/src/pages/Employees.vue:9 frontend/src/pages/ResourceList.vue:9 frontend/src/pages/SmsMessages.vue:32
 msgid "Search"
 msgstr "جستجو"
 
@@ -2867,35 +3091,59 @@ msgstr "انتخاب"
 msgid "Select all"
 msgstr "انتخاب همه"
 
-#: frontend/src/pages/Payslips.vue:121 frontend/src/pages/Today.vue:74
+#: frontend/src/pages/Payslips.vue:127 frontend/src/pages/SmsTemplates.vue:35 frontend/src/pages/Today.vue:74
 msgid "Send"
 msgstr "ارسال"
 
-#: frontend/src/pages/Payslips.vue:97
+#: frontend/src/pages/SmsTemplates.vue:29
+msgid "Send a test"
+msgstr "ارسال آزمایشی"
+
+#: frontend/src/pages/Payslips.vue:98
 msgid "Send the payslip links"
 msgstr "ارسال لینک فیش‌ها"
 
-#: frontend/src/pages/PayslipSettings.vue:15
+#: frontend/src/pages/SmsSettings.vue:58
+msgid "Send window"
+msgstr "بازهٔ مجاز ارسال"
+
+#: backend/chronicle/sms/smsir.py:39
 msgid "Sender line number"
 msgstr "شماره خط ارسال"
 
-#: frontend/src/pages/Payslips.vue:175
+#: frontend/src/lib/sms.ts:9
+msgid "Sending"
+msgstr "در حال ارسال"
+
+#: frontend/src/pages/SmsTemplates.vue:30
+msgid "Sends a real SMS now with sample values, through the active template of the event."
+msgstr "همین حالا یک پیامک واقعی با مقدارهای نمونه از قالب فعال رویداد می‌فرستد."
+
+#: frontend/src/lib/sms.ts:11 frontend/src/pages/SmsMessages.vue:57
 msgid "Sent"
 msgstr "ارسال‌شده"
+
+#: frontend/src/pages/SmsTemplates.vue:190 frontend/src/pages/SmsTemplates.vue:63
+msgid "Sent as"
+msgstr "ارسال به‌صورت"
 
 #: frontend/src/pages/DeviceForm.vue:345
 msgid "Serial Number"
 msgstr "شماره سریال"
 
+#: frontend/src/pages/SmsTemplates.vue:80
+msgid "Service number"
+msgstr "شمارهٔ خدماتی"
+
 #: frontend/src/pages/DeviceForm.vue:84
 msgid "Set Device Clock"
 msgstr "تنظیم ساعت دستگاه"
 
-#: frontend/src/pages/DeviceForm.vue:10 frontend/src/pages/Manage.vue:98 frontend/src/pages/Payslips.vue:4 frontend/src/pages/Settings.vue:3
+#: frontend/src/pages/DeviceForm.vue:10 frontend/src/pages/Manage.vue:103 frontend/src/pages/Payslips.vue:4 frontend/src/pages/Settings.vue:3
 msgid "Settings"
 msgstr "تنظیمات"
 
-#: backend/chronicle/services/payslips.py:255
+#: backend/chronicle/services/payslips.py:211
 msgid "Several employees match the personnel code {0}"
 msgstr "چند کارمند با کد پرسنلی {0} تطبیق دارند"
 
@@ -2951,7 +3199,7 @@ msgstr "نمایش {0} از {1} ردیف؛ همهٔ ردیف‌های دارای
 msgid "Sick"
 msgstr "استعلاجی"
 
-#: frontend/src/lib/format.ts:69
+#: frontend/src/lib/format.ts:69 frontend/src/lib/sms.ts:17
 msgid "Skipped"
 msgstr "ردشده از مرحله"
 
@@ -3011,7 +3259,7 @@ msgstr "شروع چرخه با این تعداد روز تأخیر"
 msgid "State"
 msgstr "وضعیت"
 
-#: backend/chronicle/reports/catalog.py:46 backend/chronicle/services/excel.py:374 backend/chronicle/services/excel.py:644 frontend/src/pages/Calendar.vue:191 frontend/src/pages/Calendar.vue:55 frontend/src/pages/Devices.vue:193 frontend/src/pages/EmployeeForm.vue:153 frontend/src/pages/Employees.vue:76 frontend/src/pages/Periods.vue:62 frontend/src/pages/Requests.vue:81
+#: backend/chronicle/reports/catalog.py:46 backend/chronicle/services/excel.py:374 backend/chronicle/services/excel.py:644 frontend/src/pages/Calendar.vue:191 frontend/src/pages/Calendar.vue:55 frontend/src/pages/Devices.vue:193 frontend/src/pages/EmployeeForm.vue:153 frontend/src/pages/Employees.vue:76 frontend/src/pages/Periods.vue:62 frontend/src/pages/Requests.vue:81 frontend/src/pages/SmsMessages.vue:111 frontend/src/pages/SmsMessages.vue:29 frontend/src/pages/SmsMessages.vue:49 frontend/src/pages/SmsTemplates.vue:191
 msgid "Status"
 msgstr "وضعیت"
 
@@ -3047,7 +3295,7 @@ msgstr "مرحلهٔ {0}: «{1}» نه «پرنت» است، نه «مدیرعا
 msgid "Steps"
 msgstr "مراحل"
 
-#: frontend/src/pages/Payslips.vue:273
+#: frontend/src/pages/Payslips.vue:272
 msgid "Stop the link of {0} from working?"
 msgstr "لینک {0} باطل شود؟"
 
@@ -3071,7 +3319,15 @@ msgstr "درخواست‌های پیشنهادی"
 msgid "Suspended"
 msgstr "تعلیق"
 
-#: frontend/src/pages/Audit.vue:28 frontend/src/pages/Audit.vue:82 frontend/src/pages/Manage.vue:95
+#: frontend/src/pages/SmsSettings.vue:21
+msgid "Switched off"
+msgstr "خاموش"
+
+#: frontend/src/pages/SmsSettings.vue:38
+msgid "Switched on"
+msgstr "روشن"
+
+#: frontend/src/pages/Audit.vue:28 frontend/src/pages/Audit.vue:82 frontend/src/pages/Manage.vue:100
 msgid "System"
 msgstr "سیستم"
 
@@ -3107,11 +3363,15 @@ msgstr "گرفتن سمت"
 msgid "Taking the backup. This can take a few minutes for a large database; keep this page open."
 msgstr "در حال گرفتن پشتیبان. برای پایگاه دادهٔ بزرگ چند دقیقه طول می‌کشد؛ این صفحه را باز نگه دارید."
 
+#: frontend/src/pages/SmsSettings.vue:4
+msgid "Templates"
+msgstr "قالب‌ها"
+
 #: frontend/src/pages/DeviceForm.vue:75 frontend/src/pages/Devices.vue:117 frontend/src/pages/Devices.vue:49 frontend/src/pages/Devices.vue:50
 msgid "Test Connection"
 msgstr "تست اتصال"
 
-#: frontend/src/pages/PayslipSettings.vue:27
+#: frontend/src/pages/SmsSettings.vue:42
 msgid "Test connection"
 msgstr "آزمایش اتصال"
 
@@ -3123,17 +3383,25 @@ msgstr "متن"
 msgid "Text (CSV)"
 msgstr "متن (CSV)"
 
-#: frontend/src/pages/PayslipSettings.vue:59
-msgid "Text of the SMS"
-msgstr "متن پیامک"
+#: frontend/src/pages/SmsTemplates.vue:70
+msgid "Text of the message"
+msgstr "متن پیام"
 
-#: backend/chronicle/services/resources.py:411
+#: backend/chronicle/services/resources.py:414
 msgid "The CEO designation must be at the top of the chart"
 msgstr "سمت مدیرعامل باید بالای نمودار سازمانی باشد"
 
-#: backend/chronicle/services/payslips.py:658
-msgid "The SMS was refused"
-msgstr "پیامک پذیرفته نشد"
+#: backend/chronicle/services/sms_dispatch.py:232
+msgid "The SMS event is switched off"
+msgstr "این رویداد پیامکی خاموش است"
+
+#: backend/chronicle/services/sms_dispatch.py:165
+msgid "The SMS event «{0}» is unknown or switched off"
+msgstr "رویداد پیامکی «{0}» ناشناخته یا خاموش است"
+
+#: frontend/src/pages/PayslipSettings.vue:7
+msgid "The SMS panel and the text of the message are set in the SMS section; here only the links."
+msgstr "پنل پیامک و متن پیام در بخش پیامک تنظیم می‌شود؛ اینجا فقط لینک‌ها هستند."
 
 #: backend/chronicle/devices/zkteco.py:71
 msgid "The ZKTeco comm key must be a number"
@@ -3155,7 +3423,7 @@ msgstr "پشتیبان‌گیری انجام نشد: {0}"
 msgid "The backup was taken"
 msgstr "پشتیبان گرفته شد"
 
-#: backend/chronicle/services/resources.py:344 frontend/src/lib/timeline.ts:208
+#: backend/chronicle/services/resources.py:347 frontend/src/lib/timeline.ts:208
 msgid "The break must be inside the shift"
 msgstr "استراحت باید داخل شیفت باشد"
 
@@ -3187,21 +3455,25 @@ msgstr "روز هنوز تمام نشده است؛ اعداد پس از آخری
 msgid "The designation decides who approves this person's requests. More can be given later."
 msgstr "سمت مشخص می‌کند چه کسی درخواست‌های این فرد را تأیید کند. بعداً می‌شود سمت‌های بیشتری داد."
 
-#: frontend/src/pages/Payslips.vue:168
+#: frontend/src/pages/Payslips.vue:175
 msgid "The employee has no national id"
 msgstr "کد ملی کارمند ثبت نشده"
 
-#: backend/chronicle/services/resources.py:667
+#: backend/chronicle/services/resources.py:670
 msgid "The employee {0} does not exist"
 msgstr "کارمند {0} وجود ندارد"
 
-#: backend/chronicle/api/routes/attendance.py:124 backend/chronicle/api/routes/attendance.py:62 backend/chronicle/services/delegations.py:50 backend/chronicle/services/devices.py:499 backend/chronicle/services/reports.py:256 backend/chronicle/services/requests.py:148 backend/chronicle/services/requests.py:221 backend/chronicle/services/resources.py:298 backend/chronicle/services/resources.py:436
+#: backend/chronicle/api/routes/attendance.py:124 backend/chronicle/api/routes/attendance.py:62 backend/chronicle/services/delegations.py:50 backend/chronicle/services/devices.py:499 backend/chronicle/services/reports.py:256 backend/chronicle/services/requests.py:148 backend/chronicle/services/requests.py:221 backend/chronicle/services/resources.py:301 backend/chronicle/services/resources.py:439
 msgid "The end date is before the start date"
 msgstr "تاریخ پایان قبل از تاریخ شروع است"
 
 #: backend/chronicle/services/requests.py:133 backend/chronicle/services/requests.py:212
 msgid "The end time must be after the start time"
 msgstr "ساعت پایان باید بعد از ساعت شروع باشد"
+
+#: frontend/src/pages/SmsTemplates.vue:88
+msgid "The event fields, in the order of the pattern's variables"
+msgstr "فیلدهای رویداد، به ترتیب متغیرهای پترن"
 
 #: backend/chronicle/services/devices.py:633
 msgid "The file could not be read: {0}"
@@ -3215,7 +3487,7 @@ msgstr "فایل PDF معتبر نیست یا رمز دارد"
 msgid "The file is not an Excel workbook (.xlsx) or a CSV file"
 msgstr "فایل اکسل (.xlsx) یا CSV نیست"
 
-#: backend/chronicle/api/routes/payslips.py:108
+#: backend/chronicle/api/routes/payslips.py:92
 msgid "The file {0} is larger than 100 MB"
 msgstr "حجم فایل {0} بیشتر از ۱۰۰ مگابایت است"
 
@@ -3223,9 +3495,9 @@ msgstr "حجم فایل {0} بیشتر از ۱۰۰ مگابایت است"
 msgid "The first designation they hold"
 msgstr "اولین سمتی که دارد"
 
-#: frontend/src/pages/Payslips.vue:107
-msgid "The first message:"
-msgstr "متن نخستین پیامک:"
+#: frontend/src/pages/Payslips.vue:112
+msgid "The first message, exactly as it is sent:"
+msgstr "نخستین پیام، دقیقاً همان‌طور که فرستاده می‌شود:"
 
 #: backend/chronicle/services/excel.py:938
 msgid "The header row {0} is outside the sheet"
@@ -3251,7 +3523,15 @@ msgstr "تعطیلات سال {0} هنوز قطعی نشده است؛ تقویم
 msgid "The hour must be between 0 and 23"
 msgstr "ساعت باید بین ۰ تا ۲۳ باشد"
 
-#: backend/chronicle/services/payslips.py:703
+#: backend/chronicle/services/sms.py:316
+msgid "The hours must be between 0 and 24"
+msgstr "ساعت‌ها باید بین ۰ و ۲۴ باشند"
+
+#: backend/chronicle/services/sms.py:314
+msgid "The hours must be numbers"
+msgstr "ساعت‌ها باید عدد باشند"
+
+#: backend/chronicle/services/payslips.py:619
 msgid "The information entered is not correct"
 msgstr "اطلاعات واردشده صحیح نیست"
 
@@ -3263,45 +3543,53 @@ msgstr "برچسب «کد پرسنلی» روی صفحه پیدا نشد"
 msgid "The legal baseline Labor Rule Set is missing; run chronicle db install"
 msgstr "مجموعه قواعد پایه قانونی وجود ندارد؛ chronicle db install را اجرا کنید"
 
-#: backend/chronicle/services/resources.py:400
+#: backend/chronicle/services/resources.py:403
 msgid "The legal baseline is part of the app and cannot be changed"
 msgstr "مبنای قانونی بخشی از نرم‌افزار است و تغییر نمی‌کند"
 
-#: backend/chronicle/services/payslips.py:633
-msgid "The link or the mobile number is not usable"
-msgstr "لینک یا شماره موبایل قابل استفاده نیست"
-
-#: frontend/src/pages/PayslipSettings.vue:47
-msgid "The links in the SMS start with this address. It must reach this server from outside the company network."
-msgstr "لینک‌های پیامک با این نشانی شروع می‌شوند. باید از بیرون شبکه شرکت به این سرور برسد."
-
-#: backend/chronicle/services/payslips.py:102
-msgid "The message must contain {0} and may only use {1}"
-msgstr "متن باید شامل {0} باشد و فقط از {1} می‌تواند استفاده کند"
-
-#: frontend/src/pages/Payslips.vue:170
+#: frontend/src/pages/Payslips.vue:177
 msgid "The mobile number is missing or wrong"
 msgstr "شماره موبایل ثبت نشده یا اشتباه است"
+
+#: backend/chronicle/sms/mock.py:54
+msgid "The mock panel did not answer in time"
+msgstr "پنل آزمایشی به موقع پاسخ نداد"
+
+#: backend/chronicle/sms/mock.py:50
+msgid "The mock panel is busy"
+msgstr "پنل آزمایشی مشغول است"
+
+#: backend/chronicle/sms/mock.py:52
+msgid "The mock panel refused the request"
+msgstr "پنل آزمایشی درخواست را رد کرد"
 
 #: backend/chronicle/services/periods.py:69
 msgid "The month {0} is not over yet"
 msgstr "ماه {0} هنوز تمام نشده است"
 
+#: frontend/src/pages/SmsTemplates.vue:99
+msgid "The name must be exactly the variable of the approved text (capitals count). The panel does not complain about a wrong name: it sends the text with the variable left in it."
+msgstr "نام باید دقیقاً همان متغیر متن تأییدشده باشد (حروف بزرگ و کوچک فرق دارند). پنل از نام اشتباه ایراد نمی‌گیرد و متن را با متغیر خام می‌فرستد."
+
 #: frontend/src/components/ExcelImport.vue:402
 msgid "The name or code of an existing record"
 msgstr "نام یا کد یک مورد موجود"
 
-#: backend/chronicle/services/resources.py:300
+#: backend/chronicle/services/resources.py:303
 msgid "The national id must be 10 digits"
 msgstr "کد ملی باید ۱۰ رقم باشد"
 
-#: frontend/src/pages/Payslips.vue:166
+#: frontend/src/pages/Payslips.vue:173
 msgid "The national id on the page is not theirs"
 msgstr "کد ملی روی فیش با کد ملی کارمند یکی نیست"
 
 #: backend/chronicle/payslips/pdf.py:115
 msgid "The number beside «کد پرسنلی» could not be read"
 msgstr "عدد کنار «کد پرسنلی» خوانده نشد"
+
+#: backend/chronicle/services/sms_dispatch.py:192
+msgid "The number opted out of promotional messages"
+msgstr "این شماره پیام تبلیغاتی نمی‌خواهد"
 
 #: backend/chronicle/payslips/pdf.py:107
 msgid "The page has no readable text (probably a scan or a picture)"
@@ -3310,10 +3598,6 @@ msgstr "صفحه متن قابل‌خواندن ندارد (احتمالاً ا�
 #: backend/chronicle/services/users.py:26
 msgid "The password must be at least {0} characters"
 msgstr "رمز عبور باید دست‌کم {0} نویسه باشد"
-
-#: frontend/src/pages/PayslipSettings.vue:10
-msgid "The payslip links are sent through this account. The key is kept encrypted on the server."
-msgstr "لینک فیش‌ها از طریق این حساب پیامک می‌شوند. کلید رمزنگاری‌شده روی سرور نگهداری می‌شود."
 
 #: backend/chronicle/services/periods.py:38
 msgid "The period {0} is closed; reopen it first"
@@ -3327,7 +3611,7 @@ msgstr "کد حساب فرد در دفاتر حسابداری"
 msgid "The personnel code"
 msgstr "کد پرسنلی"
 
-#: backend/chronicle/services/payslips.py:262
+#: backend/chronicle/services/payslips.py:218
 msgid "The personnel code {0} is repeated (already on {1})"
 msgstr "کد پرسنلی {0} تکراری است (قبلاً در {1})"
 
@@ -3343,9 +3627,17 @@ msgstr "چرخش «{0}» باید مثل صبح*۱۴ باشد"
 msgid "The same value for every row"
 msgstr "یک مقدار برای همهٔ ردیف‌ها"
 
-#: backend/chronicle/services/sms.py:65 backend/chronicle/sms/smsir.py:78
+#: backend/chronicle/services/sms.py:155
+msgid "The saved «{0}» cannot be read; enter it again"
+msgstr "«{0}» ذخیره‌شده خوانده نمی‌شود؛ دوباره وارد کنید"
+
+#: backend/chronicle/sms/smsir.py:104
 msgid "The sender line number must be a number"
 msgstr "شماره خط ارسال باید عدد باشد"
+
+#: backend/chronicle/sms/base.py:108
+msgid "The setting «{0}» is required"
+msgstr "تنظیم «{0}» الزامی است"
 
 #: backend/chronicle/services/excel.py:1171
 msgid "The sheet has more than {0} rows"
@@ -3371,9 +3663,9 @@ msgstr "شیفت {0}"
 msgid "The shift {0} does not exist"
 msgstr "شیفت «{0}» وجود ندارد"
 
-#: backend/chronicle/services/payslips.py:115
-msgid "The site address must start with http:// or https://"
-msgstr "نشانی سایت باید با http:// یا https:// شروع شود"
+#: backend/chronicle/sms/smsir.py:53
+msgid "The sms.ir pattern code must be a number"
+msgstr "کد پترن sms.ir باید عدد باشد"
 
 #: backend/chronicle/devices/file_import.py:192
 msgid "The template needs a user id column and either a date-time column or date and time columns"
@@ -3395,9 +3687,17 @@ msgstr "نام کاربری {0} قبلاً گرفته شده است"
 msgid "The value"
 msgstr "مقدار"
 
+#: frontend/src/pages/SmsTemplates.vue:87
+msgid "The variables of the approved text, and the event field that fills each"
+msgstr "متغیرهای متن تأییدشده و فیلد رویدادی که هرکدام را پر می‌کند"
+
 #: backend/chronicle/services/excel.py:112 frontend/src/lib/resources.ts:284
 msgid "The whole company"
 msgstr "کل شرکت"
+
+#: backend/chronicle/services/sms.py:318
+msgid "The window must start before it ends"
+msgstr "شروع بازه باید پیش از پایان آن باشد"
 
 #: frontend/src/components/BulkAssignDialog.vue:179
 msgid "The work pattern was given to {0} people"
@@ -3431,7 +3731,7 @@ msgstr "هنوز پشتیبانی نیست."
 msgid "There is no working day in this leave"
 msgstr "این مرخصی هیچ روز کاری ندارد"
 
-#: backend/chronicle/services/payslips.py:554
+#: backend/chronicle/services/payslips.py:533
 msgid "There is nobody to send to"
 msgstr "کسی برای ارسال نیست"
 
@@ -3443,11 +3743,19 @@ msgstr "این دستگاه تردد ثبت‌شده دارد؛ به‌جای ح
 msgid "This device receives punches by file import; there is nothing to connect to"
 msgstr "ترددهای این دستگاه با ورود فایل می‌آید و اتصالی ندارد"
 
+#: frontend/src/pages/SmsTemplates.vue:106
+msgid "This is exactly what is sent:"
+msgstr "دقیقاً این فرستاده می‌شود:"
+
 #: backend/chronicle/services/backup.py:211
 msgid "This is not a Chronicle backup"
 msgstr "این فایل پشتیبان Chronicle نیست"
 
-#: backend/chronicle/services/payslips.py:667 backend/chronicle/services/payslips.py:702
+#: backend/chronicle/services/sms.py:335
+msgid "This is not a mobile number"
+msgstr "این شمارهٔ موبایل نیست"
+
+#: backend/chronicle/services/payslips.py:583 backend/chronicle/services/payslips.py:618
 msgid "This link is invalid or has expired"
 msgstr "لینک نامعتبر است یا منقضی شده."
 
@@ -3455,19 +3763,27 @@ msgstr "لینک نامعتبر است یا منقضی شده."
 msgid "This page is confidential; do not share your link with anyone."
 msgstr "این صفحه محرمانه است؛ لینک خود را در اختیار دیگران قرار ندهید."
 
-#: backend/chronicle/services/resources.py:164
+#: backend/chronicle/services/sms.py:398
+msgid "This panel allows at most {0} pattern variables"
+msgstr "این پنل حداکثر {0} متغیر در پترن می‌پذیرد"
+
+#: backend/chronicle/services/sms.py:460
+msgid "This panel needs the service number for a pattern"
+msgstr "این پنل برای پترن شمارهٔ خدماتی می‌خواهد"
+
+#: backend/chronicle/services/resources.py:167
 msgid "This record is used elsewhere and cannot be removed"
 msgstr "این رکورد جای دیگری استفاده شده و قابل حذف نیست"
 
-#: backend/chronicle/services/requests.py:430
+#: backend/chronicle/services/requests.py:434
 msgid "This request cannot be cancelled"
 msgstr "این درخواست قابل لغو نیست"
 
-#: backend/chronicle/services/requests.py:396
+#: backend/chronicle/services/requests.py:398
 msgid "This request is not waiting for approval"
 msgstr "این درخواست در انتظار تأیید نیست"
 
-#: backend/chronicle/services/requests.py:398
+#: backend/chronicle/services/requests.py:400
 msgid "This request is waiting for someone else"
 msgstr "این درخواست منتظر تأیید شخص دیگری است"
 
@@ -3499,7 +3815,7 @@ msgstr "ساعت، مثل 08:30"
 msgid "Timeout (Seconds)"
 msgstr "مهلت اتصال (ثانیه)"
 
-#: backend/chronicle/services/payslips.py:119 frontend/src/pages/PayslipSettings.vue:51
+#: backend/chronicle/services/payslips.py:79 frontend/src/pages/PayslipSettings.vue:15
 msgid "Times a link can be opened"
 msgstr "سقف دفعات باز کردن لینک"
 
@@ -3514,6 +3830,10 @@ msgstr "ساعت‌ها، تاریخ‌ها و ارقام استاندارد م�
 #: backend/chronicle/services/excel.py:631 frontend/src/pages/Calendar.vue:183 frontend/src/pages/Calendar.vue:34
 msgid "Title"
 msgstr "عنوان"
+
+#: frontend/src/pages/SmsMessages.vue:109 frontend/src/pages/SmsMessages.vue:45
+msgid "To"
+msgstr "گیرنده"
 
 #: backend/chronicle/services/requests.py:145 backend/chronicle/services/requests.py:218 frontend/src/pages/NewRequest.vue:29 frontend/src/pages/NewRequest.vue:49
 msgid "To Date"
@@ -3555,7 +3875,7 @@ msgstr "کار اضافه تأییدنشده"
 msgid "Unknown"
 msgstr "نامشخص"
 
-#: backend/chronicle/services/requests.py:394
+#: backend/chronicle/services/requests.py:396
 msgid "Unknown action"
 msgstr "عملیات نامعتبر"
 
@@ -3567,9 +3887,21 @@ msgstr "نوع تأییدکننده نامعتبر: {0}"
 msgid "Unknown calendar source {0}"
 msgstr "منبع تقویم {0} ناشناخته است"
 
+#: backend/chronicle/services/sms.py:338
+msgid "Unknown category"
+msgstr "دستهٔ نامعتبر"
+
+#: backend/chronicle/services/sms.py:395
+msgid "Unknown event variables: {0}"
+msgstr "فیلدهای ناشناختهٔ رویداد: {0}"
+
 #: backend/chronicle/services/reports.py:348
 msgid "Unknown export format"
 msgstr "قالب خروجی نامعتبر"
+
+#: backend/chronicle/services/sms.py:446
+msgid "Unknown fields in the text: {0}"
+msgstr "فیلدهای ناشناخته در متن: {0}"
 
 #: backend/chronicle/services/reports.py:116
 msgid "Unknown grouping"
@@ -3591,11 +3923,15 @@ msgstr "واحد مأموریت ناشناخته است"
 msgid "Unknown month"
 msgstr "ماه نامعتبر است"
 
+#: frontend/src/pages/Payslips.vue:61
+msgid "Unknown outcome: {0}"
+msgstr "نتیجهٔ نامعلوم: {0}"
+
 #: backend/chronicle/services/requests.py:234
 msgid "Unknown overtime kind"
 msgstr "نوع اضافه‌کار ناشناخته است"
 
-#: backend/chronicle/services/resources.py:466
+#: backend/chronicle/services/resources.py:469
 msgid "Unknown report columns: {0}"
 msgstr "ستون‌های ناشناختهٔ گزارش: {0}"
 
@@ -3615,9 +3951,13 @@ msgstr "نقش {0} ناشناخته است"
 msgid "Unknown settings: {0}"
 msgstr "تنظیمات ناشناخته: {0}"
 
-#: backend/chronicle/services/payslips.py:463
+#: backend/chronicle/services/payslips.py:431
 msgid "Unknown way of choosing the people"
 msgstr "روش انتخاب افراد نامعتبر است"
+
+#: frontend/src/lib/sms.ts:19
+msgid "Unknown: check the panel"
+msgstr "نامعلوم: پنل را بررسی کنید"
 
 #: frontend/src/pages/Devices.vue:103 frontend/src/pages/Devices.vue:199
 msgid "Unmapped users"
@@ -3631,7 +3971,7 @@ msgstr "بدون حقوق"
 msgid "Unpaid breaks, e.g. 12:30-13:10, 15:00-15:15"
 msgstr "استراحت‌های بی‌حقوق، مثلاً 12:30-13:10, 15:00-15:15"
 
-#: backend/chronicle/services/excel.py:350 backend/chronicle/services/excel.py:527 backend/chronicle/services/excel.py:676 frontend/src/components/AssignmentDialog.vue:21 frontend/src/components/AssignmentDialog.vue:26 frontend/src/components/BulkAssignDialog.vue:39 frontend/src/lib/resources.ts:142 frontend/src/lib/resources.ts:321 frontend/src/pages/Approvals.vue:99 frontend/src/pages/Delegations.vue:133 frontend/src/pages/Delegations.vue:73 frontend/src/pages/Reports.vue:9 frontend/src/pages/Requests.vue:79
+#: backend/chronicle/services/excel.py:350 backend/chronicle/services/excel.py:527 backend/chronicle/services/excel.py:676 frontend/src/components/AssignmentDialog.vue:21 frontend/src/components/AssignmentDialog.vue:26 frontend/src/components/BulkAssignDialog.vue:39 frontend/src/lib/resources.ts:142 frontend/src/lib/resources.ts:321 frontend/src/pages/Approvals.vue:99 frontend/src/pages/Delegations.vue:133 frontend/src/pages/Delegations.vue:73 frontend/src/pages/Reports.vue:9 frontend/src/pages/Requests.vue:79 frontend/src/pages/SmsSettings.vue:66
 msgid "Until"
 msgstr "تا"
 
@@ -3663,7 +4003,7 @@ msgstr "استفاده از UDP"
 msgid "Username"
 msgstr "نام کاربری"
 
-#: frontend/src/pages/Manage.vue:97 frontend/src/pages/Users.vue:3
+#: frontend/src/pages/Manage.vue:102 frontend/src/pages/Users.vue:3
 msgid "Users and roles"
 msgstr "کاربران و نقش‌ها"
 
@@ -3679,21 +4019,25 @@ msgstr "کاربران روی دستگاه"
 msgid "Uses a card instead of biometrics"
 msgstr "به‌جای بیومتریک کارت دارد"
 
+#: frontend/src/pages/SmsMessages.vue:62
+msgid "Values of the event"
+msgstr "مقدارهای رویداد"
+
 #: frontend/src/components/ExcelImport.vue:140
 msgid "Values standardised"
 msgstr "مقادیر استانداردشده"
 
-#: frontend/src/pages/Payslips.vue:73
+#: frontend/src/pages/SmsTemplates.vue:92
+msgid "Variable name in the panel"
+msgstr "نام متغیر در پنل"
+
+#: frontend/src/pages/Payslips.vue:74
 msgid "View"
 msgstr "نمایش"
 
-#: frontend/src/pages/Payslips.vue:78 frontend/src/pages/Payslips.vue:79
+#: frontend/src/pages/Payslips.vue:79 frontend/src/pages/Payslips.vue:80
 msgid "Void the link"
 msgstr "باطل‌کردن لینک"
-
-#: frontend/src/pages/Payslips.vue:175
-msgid "Waiting"
-msgstr "در انتظار"
 
 #: frontend/src/pages/Requests.vue:84
 msgid "Waiting for"
@@ -3734,6 +4078,14 @@ msgstr "الگوی هفتگی: شیفت؛ خالی = روز استراحت"
 #: backend/chronicle/services/excel.py:464 frontend/src/components/PatternGrid.vue:120 frontend/src/lib/resources.ts:250
 msgid "Weekly rest day"
 msgstr "روز تعطیل هفتگی"
+
+#: frontend/src/pages/SmsMessages.vue:70
+msgid "What the panel answered"
+msgstr "پاسخ پنل"
+
+#: frontend/src/pages/SmsMessages.vue:66
+msgid "What was sent to the panel"
+msgstr "آنچه به پنل فرستاده شد"
 
 #: frontend/src/pages/Audit.vue:78
 msgid "When"
@@ -3823,13 +4175,17 @@ msgstr "کارکرد"
 msgid "Working hours, breaks and overtime windows"
 msgstr "ساعت کار، استراحت‌ها و بازه‌های مجاز اضافه‌کار"
 
-#: frontend/src/pages/Payslips.vue:185
+#: frontend/src/pages/Payslips.vue:184
 msgid "Works"
 msgstr "سالم"
 
 #: backend/chronicle/services/rule_sets.py:43
 msgid "Worse for the worker than the law: {0}"
 msgstr "بدتر از حداقل قانونی برای کارگر: {0}"
+
+#: backend/chronicle/services/sms.py:442
+msgid "Write the text of the message"
+msgstr "متن پیام را بنویسید"
 
 #: backend/chronicle/services/excel.py:185
 msgid "Write times like 12:30-13:10, 15:00-15:15 ({0})"
@@ -3843,7 +4199,7 @@ msgstr "پیش از ثبت چهره یا اثر انگشت رضایت کتبی �
 msgid "Written overtime consent on file"
 msgstr "رضایت کتبی اضافه‌کار در پرونده هست"
 
-#: backend/chronicle/services/payslips.py:120 frontend/src/pages/PayslipSettings.vue:56
+#: backend/chronicle/services/payslips.py:80 frontend/src/pages/PayslipSettings.vue:20
 msgid "Wrong answers before a link locks"
 msgstr "تعداد پاسخ اشتباه تا قفل‌شدن لینک"
 
@@ -3939,11 +4295,19 @@ msgstr "pg_dump روی سرور نصب نیست و پشتیبان گرفته ن�
 msgid "pg_restore is not installed on the server"
 msgstr "pg_restore روی سرور نصب نیست"
 
-#: backend/chronicle/sms/smsir.py:67
+#: backend/chronicle/sms/smsir.py:82 backend/chronicle/sms/smsir.py:86
 msgid "sms.ir answered: {0}"
 msgstr "پاسخ sms.ir: {0}"
 
-#: backend/chronicle/sms/smsir.py:60
+#: backend/chronicle/sms/smsir.py:68
+msgid "sms.ir did not answer in time"
+msgstr "sms.ir به موقع پاسخ نداد"
+
+#: backend/chronicle/sms/smsir.py:116
+msgid "sms.ir patterns need named variables"
+msgstr "پترن‌های sms.ir متغیر نام‌دار می‌خواهند"
+
+#: backend/chronicle/sms/smsir.py:78
 msgid "sms.ir refused the API key"
 msgstr "sms.ir کلید API را نپذیرفت"
 
@@ -3983,7 +4347,7 @@ msgstr "{0} کیلوبایت"
 msgid "{0} MB"
 msgstr "{0} مگابایت"
 
-#: frontend/src/pages/Payslips.vue:309
+#: frontend/src/pages/Payslips.vue:308
 msgid "{0} SMS were queued; the server sends them in a moment"
 msgstr "{0} پیامک در صف ارسال قرار گرفت؛ سرور تا چند لحظهٔ دیگر می‌فرستد"
 
@@ -3994,6 +4358,18 @@ msgstr "{0} فقط یک بار در دوران همکاری مجاز است"
 #: backend/chronicle/services/requests.py:126
 msgid "{0} cannot be taken by the hour"
 msgstr "{0} ساعتی ممکن نیست"
+
+#: backend/chronicle/sms/base.py:126
+msgid "{0} cannot send a full text"
+msgstr "{0} متن کامل نمی‌فرستد"
+
+#: backend/chronicle/sms/base.py:131
+msgid "{0} cannot send a pattern"
+msgstr "{0} پترن نمی‌فرستد"
+
+#: backend/chronicle/services/sms.py:427
+msgid "{0} cannot send in this way"
+msgstr "{0} به این روش نمی‌فرستد"
 
 #: frontend/src/pages/Calendar.vue:87
 msgid "{0} changes · {1} unchanged · {2} edited by hand (kept)"
@@ -4011,9 +4387,13 @@ msgstr "{0} حداکثر {1} روز است"
 msgid "{0} is not a valid Jalali date"
 msgstr "{0} تاریخ شمسی معتبری نیست"
 
-#: backend/chronicle/services/excel.py:1197 backend/chronicle/services/resources.py:167
+#: backend/chronicle/services/excel.py:1197 backend/chronicle/services/resources.py:170
 msgid "{0} is required"
 msgstr "{0} لازم است"
+
+#: frontend/src/pages/SmsMessages.vue:11
+msgid "{0} messages have an unknown outcome: the panel did not answer, so they may or may not have been sent. They are never sent again by themselves. Look at the panel's report and mark each one."
+msgstr "نتیجهٔ {0} پیام نامعلوم است: پنل پاسخ نداد و ممکن است فرستاده شده باشند یا نه. این پیام‌ها هرگز خودکار دوباره فرستاده نمی‌شوند. گزارش پنل را ببینید و هرکدام را علامت بزنید."
 
 #: frontend/src/components/PatternGrid.vue:26 frontend/src/components/ShiftTimeline.vue:27
 msgid "{0} min"
@@ -4023,11 +4403,11 @@ msgstr "{0} دقیقه"
 msgid "{0} more; search to find them"
 msgstr "{0} مورد دیگر؛ برای یافتن جستجو کنید"
 
-#: backend/chronicle/api/routes/admin.py:133 backend/chronicle/services/excel.py:1066 backend/chronicle/services/payslips.py:126 backend/chronicle/services/rule_sets.py:38
+#: backend/chronicle/api/routes/admin.py:133 backend/chronicle/services/excel.py:1066 backend/chronicle/services/payslips.py:86 backend/chronicle/services/rule_sets.py:38
 msgid "{0} must be a number"
 msgstr "{0} باید عدد باشد"
 
-#: backend/chronicle/services/payslips.py:128
+#: backend/chronicle/services/payslips.py:88
 msgid "{0} must be between {1} and {2}"
 msgstr "{0} باید بین {1} و {2} باشد"
 
@@ -4035,19 +4415,19 @@ msgstr "{0} باید بین {1} و {2} باشد"
 msgid "{0} new punches"
 msgstr "{0} تردد جدید"
 
-#: frontend/src/pages/Payslips.vue:238
+#: frontend/src/pages/Payslips.vue:237
 msgid "{0} new, {1} replaced, {2} not used"
 msgstr "{0} جدید، {1} جایگزین، {2} استفاده‌نشده"
 
-#: frontend/src/pages/Payslips.vue:104
+#: frontend/src/pages/Payslips.vue:109
 msgid "{0} of them already have a link; it stops working and the new one replaces it."
 msgstr "{0} نفر از آن‌ها لینک دارند؛ لینک قبلی از کار می‌افتد و لینک تازه جایگزین می‌شود."
 
-#: frontend/src/components/DataTable.vue:12
+#: frontend/src/components/DataTable.vue:12 frontend/src/pages/SmsMessages.vue:40
 msgid "{0} of {1}"
 msgstr "{0} از {1}"
 
-#: backend/chronicle/services/resources.py:342
+#: backend/chronicle/services/resources.py:345
 msgid "{0} overlap each other"
 msgstr "{0} با هم هم‌پوشانی دارند"
 
@@ -4063,7 +4443,7 @@ msgstr "{0} فیش روی یک صفحه است؛ هر فیش باید در صف�
 msgid "{0} people selected"
 msgstr "{0} نفر انتخاب شده"
 
-#: frontend/src/pages/Payslips.vue:102
+#: frontend/src/pages/Payslips.vue:107
 msgid "{0} people will get an SMS now."
 msgstr "اکنون برای {0} نفر پیامک فرستاده می‌شود."
 
@@ -4135,6 +4515,14 @@ msgstr "{0}: {1} تاریخ شمسی معتبری نیست"
 msgid "{0}: {1} is not one of the allowed values"
 msgstr "{0}: «{1}» از مقدارهای مجاز نیست"
 
+#: backend/chronicle/services/sms_dispatch.py:162
+msgid "«{0}» is not a mobile number"
+msgstr "«{0}» شمارهٔ موبایل نیست"
+
+#: backend/chronicle/services/sms.py:205
+msgid "«{0}» must be a number"
+msgstr "«{0}» باید عدد باشد"
+
 #: frontend/src/pages/DeviceForm.vue:186
 msgid "— no employee —"
 msgstr "— بدون کارمند —"
@@ -4180,6 +4568,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Add Punch"
 #~ msgstr "افزودن تردد"
+
+#~ msgid "Address of this site"
+#~ msgstr "نشانی این سایت"
 
 #~ msgid "Adjustment"
 #~ msgstr "اصلاح دستی"
@@ -4364,6 +4755,9 @@ msgstr "— بدون کارمند —"
 #~ msgid "At least one holiday on this day is a prediction that the operator has not confirmed yet"
 #~ msgstr "دست‌کم یکی از تعطیلی‌های این روز پیش‌بینی است و اپراتور هنوز آن را قطعی نکرده"
 
+#~ msgid "At most {0} messages can be sent in one request"
+#~ msgstr "در هر درخواست حداکثر {0} پیامک فرستاده می‌شود"
+
 #~ msgid "Attendance Correction"
 #~ msgstr "اصلاح تردد"
 
@@ -4543,6 +4937,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Could not download the calendar file: {0}"
 #~ msgstr "دریافت فایل تقویم ممکن نشد: {0}"
+
+#~ msgid "Could not reach sms.ir: {0}"
+#~ msgstr "اتصال به sms.ir برقرار نشد: {0}"
 
 #~ msgid "Country"
 #~ msgstr "کشوری"
@@ -4793,6 +5190,12 @@ msgstr "— بدون کارمند —"
 #~ msgid "Enter the IP address of the device"
 #~ msgstr "IP دستگاه را وارد کنید"
 
+#~ msgid "Enter the SMS API key first"
+#~ msgstr "ابتدا کلید API سامانه پیامک را وارد کنید"
+
+#~ msgid "Enter the SMS sender line number first"
+#~ msgstr "ابتدا شماره خط ارسال پیامک را وارد کنید"
+
 #~ msgid "Enter the end date for an employee who has left"
 #~ msgstr "برای پرسنلی که رفته تاریخ پایان را وارد کنید"
 
@@ -4807,6 +5210,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Enter the required work minutes"
 #~ msgstr "دقیقه کار موظف را وارد کنید"
+
+#~ msgid "Enter the site address in the payslip settings first"
+#~ msgstr "ابتدا نشانی سایت را در تنظیمات فیش حقوقی وارد کنید"
 
 #~ msgid "Enter the user id column"
 #~ msgstr "ستون شناسه کاربر را وارد کنید"
@@ -5117,6 +5523,9 @@ msgstr "— بدون کارمند —"
 #~ msgid "Limit from Labor Rule Set"
 #~ msgstr "سقف از مجموعه قواعد"
 
+#~ msgid "Links and message"
+#~ msgstr "لینک‌ها و متن پیامک"
+
 #~ msgid "Lock"
 #~ msgstr "قفل"
 
@@ -5215,6 +5624,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Nightly calculation"
 #~ msgstr "محاسبه شبانه"
+
+#~ msgid "No SMS gateway registered for {0}"
+#~ msgstr "درگاه پیامکی «{0}» شناخته‌شده نیست"
 
 #~ msgid "No approval process is set for {0}. Set one in Hozur Settings."
 #~ msgstr "برای {0} فرایند تأیید تعیین نشده است. در تنظیمات حضور تعیین کنید."
@@ -5387,9 +5799,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Prepared by {0} on {1} at {2}"
 #~ msgstr "تهیه‌کننده: {0}، {1} ساعت {2}"
 
-#~ msgid "Preview"
-#~ msgstr "پیش‌نمایش"
-
 #~ msgid "Previous Month"
 #~ msgstr "ماه قبل"
 
@@ -5398,6 +5807,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Protected Groups"
 #~ msgstr "گروه‌های حمایت‌شده"
+
+#~ msgid "Provider"
+#~ msgstr "سرویس‌دهنده"
 
 #~ msgid "Province Name"
 #~ msgstr "نام استان"
@@ -5522,9 +5934,6 @@ msgstr "— بدون کارمند —"
 #~ msgid "Right"
 #~ msgstr "راست"
 
-#~ msgid "Role"
-#~ msgstr "نقش"
-
 #~ msgid "Rotating Shift 4-Week Limit (Minutes)"
 #~ msgstr "سقف ۴ هفته نوبت‌کاری (دقیقه)"
 
@@ -5548,6 +5957,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Rule Set Name"
 #~ msgstr "نام مجموعه قواعد"
+
+#~ msgid "SMS connection"
+#~ msgstr "اتصال پیامک"
 
 #~ msgid "Saturday"
 #~ msgstr "شنبه"
@@ -5648,6 +6060,12 @@ msgstr "— بدون کارمند —"
 #~ msgid "Template Name"
 #~ msgstr "نام قالب"
 
+#~ msgid "Text of the SMS"
+#~ msgstr "متن پیامک"
+
+#~ msgid "The SMS was refused"
+#~ msgstr "پیامک پذیرفته نشد"
+
 #~ msgid "The approver of step {0} has no user account"
 #~ msgstr "تأییدکنندهٔ مرحلهٔ {0} حساب کاربری ندارد"
 
@@ -5656,6 +6074,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "The file is not an Excel workbook (.xlsx)"
 #~ msgstr "فایل یک کتاب اکسل (.xlsx) نیست"
+
+#~ msgid "The first message:"
+#~ msgstr "متن نخستین پیامک:"
 
 #~ msgid "The latest start must be inside the shift"
 #~ msgstr "دیرترین ورود باید داخل شیفت باشد"
@@ -5671,6 +6092,21 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "The legal baseline is the law itself and cannot be edited. Create a company rule set instead."
 #~ msgstr "مبنای قانونی خود قانون است و ویرایش نمی‌شود. یک مجموعه قواعد شرکت بسازید."
+
+#~ msgid "The link or the mobile number is not usable"
+#~ msgstr "لینک یا شماره موبایل قابل استفاده نیست"
+
+#~ msgid "The links in the SMS start with this address. It must reach this server from outside the company network."
+#~ msgstr "لینک‌های پیامک با این نشانی شروع می‌شوند. باید از بیرون شبکه شرکت به این سرور برسد."
+
+#~ msgid "The message must contain {0} and may only use {1}"
+#~ msgstr "متن باید شامل {0} باشد و فقط از {1} می‌تواند استفاده کند"
+
+#~ msgid "The payslip links are sent through this account. The key is kept encrypted on the server."
+#~ msgstr "لینک فیش‌ها از طریق این حساب پیامک می‌شوند. کلید رمزنگاری‌شده روی سرور نگهداری می‌شود."
+
+#~ msgid "The site address must start with http:// or https://"
+#~ msgstr "نشانی سایت باید با http:// یا https:// شروع شود"
 
 #~ msgid "The values of the law itself. Read-only; company rule sets may only be more generous."
 #~ msgstr "مقادیر خود قانون؛ فقط‌خواندنی. مجموعه قواعد شرکت فقط می‌تواند سخاوتمندانه‌تر باشد."
@@ -5797,6 +6233,9 @@ msgstr "— بدون کارمند —"
 
 #~ msgid "Visible only to HR operators"
 #~ msgstr "فقط اپراتور منابع انسانی می‌بیند"
+
+#~ msgid "Waiting"
+#~ msgstr "در انتظار"
 
 #~ msgid "Waiting For"
 #~ msgstr "در انتظار"
