@@ -5,6 +5,8 @@ const admin = { admin: true }
 
 const routes: RouteRecordRaw[] = [
   { path: "/login", name: "login", component: () => import("./pages/Login.vue"), meta: { public: true } },
+  // the page an employee opens from the SMS: no login, the link and the national id are the keys
+  { path: "/p/:token", name: "payslip-link", component: () => import("./pages/PayslipView.vue"), meta: { public: true } },
   { path: "/", name: "today", component: () => import("./pages/Today.vue") },
   { path: "/month/:year(\\d+)?/:month(\\d+)?", name: "month", component: () => import("./pages/Month.vue") },
   { path: "/requests", name: "requests", component: () => import("./pages/Requests.vue") },
@@ -40,6 +42,16 @@ const routes: RouteRecordRaw[] = [
   { path: "/manage/settings", name: "settings", component: () => import("./pages/Settings.vue"), meta: admin },
   { path: "/manage/approval-defaults", name: "approval-defaults", component: () => import("./pages/ApprovalDefaults.vue"), meta: admin },
   { path: "/manage/audit", name: "audit", component: () => import("./pages/Audit.vue"), meta: admin },
+  { path: "/manage/payslips", name: "payslips", component: () => import("./pages/Payslips.vue"), meta: admin },
+  {
+    path: "/manage/payslips/settings",
+    name: "payslip-settings",
+    component: () => import("./pages/PayslipSettings.vue"),
+    meta: admin,
+  },
+  { path: "/manage/sms", name: "sms", component: () => import("./pages/SmsSettings.vue"), meta: admin },
+  { path: "/manage/sms/templates", name: "sms-templates", component: () => import("./pages/SmsTemplates.vue"), meta: admin },
+  { path: "/manage/sms/messages", name: "sms-messages", component: () => import("./pages/SmsMessages.vue"), meta: admin },
   { path: "/manage/backups", name: "backups", component: () => import("./pages/Backups.vue"), meta: admin },
   { path: "/devices", name: "devices", component: () => import("./pages/Devices.vue"), meta: admin },
   { path: "/devices/new", name: "new-device", component: () => import("./pages/DeviceForm.vue"), meta: admin },

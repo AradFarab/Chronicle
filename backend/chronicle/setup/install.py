@@ -30,10 +30,17 @@ def run(session: Session) -> None:
 	ensure_import_templates(session)
 	ensure_report_templates(session)
 	ensure_settings(session)
+	ensure_sms_events(session)
 	from chronicle.calendar.service import ensure_bundled_years
 
 	ensure_bundled_years(session)
 	session.flush()
+
+
+def ensure_sms_events(session: Session) -> None:
+	from chronicle.services import sms
+
+	sms.sync_events(session)
 
 
 def ensure_provinces(session: Session) -> None:

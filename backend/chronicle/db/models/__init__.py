@@ -20,6 +20,7 @@ from chronicle.db.models.org import (
 	Province,
 	WorkLocation,
 )
+from chronicle.db.models.payslips import Payslip, PayslipLink, PayslipRejection, PayslipView
 from chronicle.db.models.requests import (
 	ApprovalDefault,
 	ApprovalDelegation,
@@ -43,6 +44,14 @@ from chronicle.db.models.schedules import (
 	WorkPattern,
 	WorkPatternAssignment,
 	WorkPatternDay,
+)
+from chronicle.db.models.sms import (
+	ShortLink,
+	SmsEvent,
+	SmsMessage,
+	SmsOptOut,
+	SmsProviderConfig,
+	SmsTemplate,
 )
 from chronicle.db.models.system import AppSetting, AuditEntry, Job, ReportTemplate, StoredFile
 
@@ -75,6 +84,10 @@ __all__ = [
 	"MissionRequest",
 	"Organization",
 	"OvertimeRequest",
+	"Payslip",
+	"PayslipLink",
+	"PayslipRejection",
+	"PayslipView",
 	"Province",
 	"PunchImport",
 	"PunchImportTemplate",
@@ -87,6 +100,12 @@ __all__ = [
 	"Shift",
 	"ShiftOverride",
 	"ShiftSegment",
+	"ShortLink",
+	"SmsEvent",
+	"SmsMessage",
+	"SmsOptOut",
+	"SmsProviderConfig",
+	"SmsTemplate",
 	"StoredFile",
 	"UserRole",
 	"UserSession",

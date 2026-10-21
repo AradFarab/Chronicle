@@ -88,6 +88,15 @@ const groups = computed(() => {
 			],
 		},
 		{
+			title: __("SMS and payslips"),
+			items: [
+				{ label: __("SMS panels and settings"), icon: "lucide-message-square", to: { name: "sms" } },
+				{ label: __("SMS templates"), icon: "lucide-message-square-text", to: { name: "sms-templates" } },
+				{ label: __("SMS history"), icon: "lucide-history", to: { name: "sms-messages" } },
+				{ label: __("Payslips and SMS links"), icon: "lucide-file-text", to: { name: "payslips" } },
+			],
+		},
+		{
 			title: __("System"),
 			items: [
 				{ label: __("Users and roles"), icon: "lucide-user-round-cog", to: { name: "users" } },

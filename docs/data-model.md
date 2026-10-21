@@ -124,6 +124,36 @@ The request number (`LV-00012`, `MS-…`, `OT-…`, `COR-…`) is a generated co
 | `daily_attendance_leave` | leave minutes/days per type in that day | PK (`attendance_id`, `leave_type_id`) |
 | `attendance_period` | Jalali month open/closed (rule 9) | unique (`jyear`, `jmonth`) |
 
+### SMS
+
+The SMS module sends every message through one gate (`services/sms_dispatch.py`): the core dispatches an *event* and a *driver* (`chronicle/sms/`) does the panel's part. Sending happens in the worker, never in a web request.
+
+| Table | Purpose | Key invariants |
+| --- | --- | --- |
+| `sms_provider_config` | one panel account; secret fields of `config` are stored encrypted (`enc:v1:...`) and never returned | `provider_code` unique; **at most one active primary and one active fallback** (partial unique indexes); `NOT (is_primary AND is_fallback)` |
+| `sms_event` | what can send an SMS: fixed in `chronicle/sms/events.py`, synced on install | `code` unique; `category ∈ transactional, promotional`; `variables text[]`; `bypasses_send_window` (a one-time code is not held until morning) |
+| `sms_template` | how an event is sent through a panel: a full text (`bulk`) or a panel pattern (`pattern`) with `param_map` ({"LINK": "link_path"} for named panels, a list for positional ones) | one active template per (event, panel) (partial unique index); `mode ∈ bulk, pattern` with `body` / `pattern_code` required accordingly; validated when saved, not when sent |
+| `sms_message` | every message, also the one never sent | `status ∈ queued, sending, sent, delivered, failed, skipped, unknown`; `raw_request` / `raw_response` kept with secrets masked; **`(event_id, entity_key)` unique when set**: a leave decision, a birthday or a payslip link is recorded once; `send_after` is the start of the next send window |
+| `sms_opt_out` | a number that does not want a category | unique (`mobile`, `category`); keyed by number, not person |
+| `short_link` | `/l/<code>` for the SMS: panels accept a fixed domain in the approved text and a short parameter | `code` unique; only the **path** is stored, never a domain (no open redirect); expires after 14 days |
+
+Rules of the sender: a message is **claimed** with a conditional `UPDATE ... WHERE status = 'queued'` before any network call, so two workers never send it twice. When the outcome is unknown (the panel did not answer, an unexpected error) the message becomes `unknown` and is never retried or sent through another panel; the admin settles it from the panel's report. Only definite, retryable refusals are retried (backoff, at most 5 attempts). The send window and the opt-out check happen in `dispatch`.
+
+The window is the `app_setting` row `sms` (`window_enabled`, `window_start_hour`, `window_end_hour`).
+
+### Payslips
+
+Payslips are not computed here: the payroll software's PDF is split into pages, each stored as a PDF of its own and handed to its owner through a private link sent by SMS (event `payslip_link`). Out of scope stays everything about pay itself.
+
+| Table | Purpose | Key invariants |
+| --- | --- | --- |
+| `payslip` | one stored PDF page per employee and Jalali month | unique (`employee_id`, `jyear`, `jmonth`); `file_id` → `stored_file`; `national_status ∈ match, mismatch, unknown` (the national id printed on the page against the employee's; a mismatch blocks the link so nobody's slip reaches somebody else) |
+| `payslip_rejection` | a page of an upload that could not be matched, with the reason (the page is not kept) | listed per month until the system admin clears it |
+| `payslip_link` | the private link to one payslip | `token_hash` (SHA-256) unique, the token is never stored; **at most one active (`NOT locked`) link per payslip** (partial unique index); `locked` ⇔ `lock_reason ∈ voided, failed_attempts`; limits `expires_at`, `max_views`, `view_count`, `failed_attempts`; `sms_message_id` → the SMS that carried it |
+| `payslip_view` | one successful opening of a link (time, IP) | cascades with the link |
+
+The link settings are the `app_setting` row `payslips` (expiry, views, wrong answers before a lock).
+
 ### Reports, settings, audit, jobs
 
 | Table | Purpose | Key invariants |

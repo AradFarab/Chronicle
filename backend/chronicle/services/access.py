@@ -227,6 +227,12 @@ def is_manager(session: Session, actor: Actor, today: str) -> bool:
 	return bool(actor.employee_id) and bool(subordinate_ids(session, actor.employee_id, today))
 
 
+def require_admin(actor: Actor) -> None:
+	"""The service-layer guard for system-admin work (CLAUDE.md rule 8)."""
+	if not actor.is_admin:
+		raise PermissionDenied(_("Not permitted"))
+
+
 def user_of(session: Session, employee_id: int | None) -> int | None:
 	if not employee_id:
 		return None

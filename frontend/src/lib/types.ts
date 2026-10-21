@@ -203,3 +203,146 @@ export interface Suggestion {
   status: string
   request_id: number | null
 }
+
+/** An SMS message status (the history, and the SMS of a payslip link). */
+export type SmsStatus = "queued" | "sending" | "sent" | "delivered" | "failed" | "skipped" | "unknown"
+
+/** One employee in a payslip month (GET /payslips/{year}/{month}). */
+export interface PayslipRow {
+  employee_id: number
+  code: string
+  full_name: string
+  mobile: string | null
+  payslip: { id: number; national_status: "match" | "mismatch" | "unknown"; source_name: string | null; source_page: number | null } | null
+  /** Why no link can be sent to this person now. */
+  problem: "no_payslip" | "not_active" | "national_mismatch" | "no_national_id" | "bad_mobile" | null
+  link: {
+    id: number
+    state: "active" | "expired" | "exhausted" | "voided" | "failed_attempts"
+    sms_message_id: number | null
+    sms_status: SmsStatus | null
+    sms_error: string | null
+    sms_sent_at: string | null
+    expires_at: string | null
+    view_count: number
+    max_views: number
+  } | null
+}
+
+export interface PayslipMonth {
+  jyear: number
+  jmonth: number
+  month_label: string
+  rows: PayslipRow[]
+  rejections: { id: number; source_name: string; page_no: number | null; reason: string; created_at: string | null }[]
+  counts: {
+    employees: number
+    payslips: number
+    missing: number
+    blocked: number
+    sent: number
+    pending: number
+    failed: number
+    unknown: number
+    viewed: number
+    rejected: number
+  }
+}
+
+/** What an SMS template would send: a text, or a pattern code with its parameters. */
+export interface SmsSample {
+  provider?: string
+  text: string | null
+  request: { pattern_code: string | null; line_number: string | null; params: Record<string, string> | string[] } | null
+}
+
+export interface PayslipPreview {
+  count: number
+  replacing: number
+  blocked: { employee_id: number; code: string; full_name: string; problem: NonNullable<PayslipRow["problem"]> }[]
+  sample: SmsSample | null
+  unavailable: string | null
+}
+
+export interface PayslipSettings {
+  link_expiry_days: number
+  link_max_views: number
+  max_failed_attempts: number
+}
+
+export interface SmsDriver {
+  code: string
+  label: string
+  kind: string
+  config_schema: Record<string, { type: "string" | "secret" | "boolean" | "integer"; label: string; required?: boolean }>
+  capabilities: ("bulk" | "pattern")[]
+  pattern_schema: { requires_line_number: boolean; param_style: "named" | "positional"; max_params: number }
+}
+
+export interface SmsProvider {
+  code: string
+  label: string
+  configured: boolean
+  config: Record<string, string | number | boolean>
+  is_primary: boolean
+  is_fallback: boolean
+  is_active: boolean
+}
+
+export interface SmsEvent {
+  id: number
+  code: string
+  label: string
+  variables: string[]
+  category: "transactional" | "promotional"
+  bypasses_send_window: boolean
+  is_active: boolean
+  providers: string[]
+}
+
+export interface SmsTemplate {
+  id: number
+  event: string
+  event_id: number
+  event_label: string
+  provider_code: string
+  mode: "bulk" | "pattern"
+  body: string | null
+  pattern_code: string | null
+  line_number: string | null
+  param_map: Record<string, string> | string[] | null
+  is_active: boolean
+  warnings?: string[]
+}
+
+export interface SmsMessage {
+  id: number
+  to: string
+  event: string
+  event_label: string
+  provider_code: string | null
+  status: SmsStatus
+  attempts: number
+  error: string | null
+  cost: number | null
+  queued_at: string | null
+  send_after: string | null
+  sent_at: string | null
+  provider_message_id?: string | null
+  context?: Record<string, unknown>
+  raw_request?: unknown
+  raw_response?: unknown
+}
+
+export interface SmsWindow {
+  window_enabled: boolean
+  window_start_hour: number
+  window_end_hour: number
+}
+
+export interface SmsOptOut {
+  id: number
+  mobile: string
+  category: "transactional" | "promotional"
+  reason: string | null
+}
